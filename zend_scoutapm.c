@@ -9,6 +9,7 @@ static int zend_scoutapm_startup(zend_extension*);
 static void zend_scoutapm_activate(void);
 static void zend_scoutapm_deactivate(void);
 static void zend_scoutapm_fcall_begin_handler(zend_execute_data *execute_data);
+static void zend_scoutapm_fcall_end_handler(zend_execute_data *execute_data);
 boolean_e is_observed_function(char *function_name);
 
 zend_extension_version_info extension_version_info = {
@@ -30,7 +31,7 @@ zend_extension zend_extension_entry = {
     NULL, // compiler op_array_ahndler
     NULL, // VM statement_handler
     zend_scoutapm_fcall_begin_handler, // VM fcall_begin_handler
-    NULL, // VM_fcall_end_handler
+    zend_scoutapm_fcall_end_handler, // VM_fcall_end_handler
     NULL, // compiler op_array_ctor
     NULL, // compiler op_array_dtor
     STANDARD_ZEND_EXTENSION_PROPERTIES
@@ -56,8 +57,22 @@ static void zend_scoutapm_fcall_begin_handler(zend_execute_data *execute_data) {
     // @todo take care of namespacing
 
     if (is_observed_function(ZSTR_VAL(execute_data->call->func->common.function_name))) {
-        php_printf("Observed: %s\n", ZSTR_VAL(execute_data->call->func->common.function_name));
+        php_printf("Entered: %s\n", ZSTR_VAL(execute_data->call->func->common.function_name));
     }
+
+    // @todo regardless of whether we are in an interesting function, add something to stack
+}
+
+static void zend_scoutapm_fcall_end_handler(zend_execute_data *aexecute_data) {
+
+    // @todo keep track of stack somewhere so we know what we're exiting from, execute_data doesn't seem to have it?
+//    php_printf("Exited ");
+
+    // @todo take care of namespacing
+
+//    if (is_observed_function(ZSTR_VAL(execute_data->func->common.function_name))) {
+//        php_printf("Exited: %s\n", ZSTR_VAL(execute_data->call->func->common.function_name));
+//    }
 }
 
 boolean_e is_observed_function(char *function_name)

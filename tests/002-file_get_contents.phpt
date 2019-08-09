@@ -5,4 +5,5 @@ Calls to file_get_contents are logged
 file_get_contents(__FILE__);
 ?>
 --EXPECT--
-Observed: file_get_contents
+Entered: file_get_contents
+Exited: file_get_contents
