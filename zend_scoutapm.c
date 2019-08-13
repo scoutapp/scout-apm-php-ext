@@ -1,7 +1,3 @@
-//
-// Created by james on 09/08/2019.
-//
-
 #include "zend_scoutapm.h"
 
 static PHP_RINIT_FUNCTION(scoutapm);
@@ -76,16 +72,21 @@ static PHP_RINIT_FUNCTION(scoutapm)
     SCOUTAPM_G(current_function_stack) = calloc(0, sizeof(scoutapm_stack_frame));
 }
 
+static void print_stack_frame()
+{
+    php_printf("       CURRENT STACK: ");
+    for (int i = 0; i < SCOUTAPM_G(stack_depth); i++) {
+        php_printf("    %d:%s ", i, SCOUTAPM_G(current_function_stack)[i].function_name);
+    }
+    php_printf("\n");
+}
+
 static void zend_scoutapm_fcall_begin_handler(zend_execute_data *execute_data) {
     if (!execute_data->call) {
         return;
     }
 
     // @todo take care of namespacing - https://github.com/scoutapp/scout-apm-php-ext/issues/2
-
-//    if (is_observed_function(ZSTR_VAL(execute_data->call->func->common.function_name))) {
-        php_printf("Entered: %s\n", ZSTR_VAL(execute_data->call->func->common.function_name));
-//    }
 
     SCOUTAPM_G(current_function_stack) = realloc(
         SCOUTAPM_G(current_function_stack),
@@ -97,24 +98,31 @@ static void zend_scoutapm_fcall_begin_handler(zend_execute_data *execute_data) {
         .exited = 0
     };
     SCOUTAPM_G(stack_depth)++;
+    // @todo possibly need to free the stack in RSHUTDOWN ..? I suppose only needed if there's anything left...
 
-//    for (int i = 0; i < SCOUTAPM_G(stack_depth); i++) {
-//        php_printf("    + %s\n", SCOUTAPM_G(current_function_stack)[i].function_name);
-//    }
-    // @todo probably free the stack in RSHUTDOWN ..?
+    if (is_observed_function(SCOUTAPM_CURRENT_STACK_FRAME.function_name)) {
+        php_printf("Entered: %s\n", SCOUTAPM_CURRENT_STACK_FRAME.function_name);
+    }
 }
 
 static void zend_scoutapm_fcall_end_handler(zend_execute_data *execute_data)
 {
-    // @todo keep track of stack somewhere so we know what we're exiting from, execute_data doesn't seem to have it? - https://github.com/scoutapp/scout-apm-php-ext/issues/3
-//    php_printf("Exited ");
-    php_printf("exit - depth=%ld\n", SCOUTAPM_G(stack_depth));
+    scoutapm_stack_frame exiting_stack_frame = {
+        .function_name = SCOUTAPM_CURRENT_STACK_FRAME.function_name,
+        .entered = SCOUTAPM_CURRENT_STACK_FRAME.entered
+    };
+
+    SCOUTAPM_G(current_function_stack) = realloc(
+        SCOUTAPM_G(current_function_stack),
+        (SCOUTAPM_G(stack_depth)-1) * sizeof(scoutapm_stack_frame)
+    );
+    SCOUTAPM_G(stack_depth)--;
+
+    if (is_observed_function(exiting_stack_frame.function_name)) {
+        php_printf("Exited: %s\n", exiting_stack_frame.function_name);
+    }
 
     // @todo take care of namespacing - https://github.com/scoutapp/scout-apm-php-ext/issues/2
-
-//    if (is_observed_function(ZSTR_VAL(execute_data->func->common.function_name))) {
-//        php_printf("Exited: %s\n", ZSTR_VAL(execute_data->call->func->common.function_name));
-//    }
 }
 
 static boolean_e is_observed_function(char *function_name)

@@ -33,4 +33,6 @@ ZEND_END_MODULE_GLOBALS(scoutapm)
 #define SCOUTAPM_G(v) (scoutapm_globals.v)
 #endif
 
+#define SCOUTAPM_CURRENT_STACK_FRAME SCOUTAPM_G(current_function_stack)[SCOUTAPM_G(stack_depth)-1]
+
 #endif //ZEND_SCOUTAPM_H
