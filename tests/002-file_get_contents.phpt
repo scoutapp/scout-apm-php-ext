@@ -3,7 +3,6 @@ Calls to file_get_contents are logged
 --FILE--
 <?php
 file_get_contents(__FILE__);
-// @todo also expect "Exited: file_get_contents" - https://github.com/scoutapp/scout-apm-php-ext/issues/3
+// @todo scoutapm_get_calls() - https://github.com/scoutapp/scout-apm-php-ext/issues/4
 ?>
---EXPECT--
-Entered: file_get_contents
+--EXPECTF--

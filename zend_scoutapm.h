@@ -12,8 +12,30 @@
 #include "php.h"
 #include <zend_extensions.h>
 #include <zend_compile.h>
+#include <zend_exceptions.h>
 
 #define SCOUT_APM_EXT_NAME "scoutapm"
 #define SCOUT_APM_EXT_VERSION "0.0"
+
+typedef struct scoutapm_stack_frame {
+    const char *function_name;
+    double entered;
+    double exited;
+} scoutapm_stack_frame;
+
+ZEND_BEGIN_MODULE_GLOBALS(scoutapm)
+    zend_long stack_depth;
+    scoutapm_stack_frame *current_function_stack;
+    zend_long observed_stack_frames_count;
+    scoutapm_stack_frame *observed_stack_frames;
+ZEND_END_MODULE_GLOBALS(scoutapm)
+
+#ifdef ZTS
+#define SCOUTAPM_G(v) ZEND_MODULE_GLOBALS_ACCESSOR(scoutapm, v)
+#else
+#define SCOUTAPM_G(v) (scoutapm_globals.v)
+#endif
+
+#define SCOUTAPM_CURRENT_STACK_FRAME SCOUTAPM_G(current_function_stack)[SCOUTAPM_G(stack_depth)-1]
 
 #endif //ZEND_SCOUTAPM_H
