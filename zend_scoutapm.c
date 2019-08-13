@@ -4,6 +4,7 @@
 
 #include "zend_scoutapm.h"
 
+static PHP_RINIT_FUNCTION(scoutapm);
 static int zend_scoutapm_startup(zend_extension*);
 static void zend_scoutapm_activate(void);
 static void zend_scoutapm_deactivate(void);
@@ -11,13 +12,15 @@ static void zend_scoutapm_fcall_begin_handler(zend_execute_data *execute_data);
 static void zend_scoutapm_fcall_end_handler(zend_execute_data *execute_data);
 static boolean_e is_observed_function(char *function_name);
 
+ZEND_DECLARE_MODULE_GLOBALS(scoutapm)
+
 static zend_module_entry scoutapm_module_entry = {
     STANDARD_MODULE_HEADER,
     SCOUT_APM_EXT_NAME,
     NULL, // function entries
     NULL, // module init
     NULL, // module shutdown
-    NULL, // request init
+    PHP_RINIT(scoutapm), // request init
     NULL, // request shutdown
     NULL, // module information
     SCOUT_APM_EXT_VERSION,
@@ -67,6 +70,11 @@ static void zend_scoutapm_deactivate(void) {
     CG(compiler_options) |= ZEND_COMPILE_EXTENDED_INFO;
 }
 
+static PHP_RINIT_FUNCTION(scoutapm)
+{
+    SCOUTAPM_G(stack_depth) = 0;
+}
+
 static void zend_scoutapm_fcall_begin_handler(zend_execute_data *execute_data) {
     if (!execute_data->call) {
         return;
@@ -74,17 +82,20 @@ static void zend_scoutapm_fcall_begin_handler(zend_execute_data *execute_data) {
 
     // @todo take care of namespacing - https://github.com/scoutapp/scout-apm-php-ext/issues/2
 
-    if (is_observed_function(ZSTR_VAL(execute_data->call->func->common.function_name))) {
+//    if (is_observed_function(ZSTR_VAL(execute_data->call->func->common.function_name))) {
         php_printf("Entered: %s\n", ZSTR_VAL(execute_data->call->func->common.function_name));
-    }
+//    }
 
-    // @todo regardless of whether we are in an interesting function, add something to stack - https://github.com/scoutapp/scout-apm-php-ext/issues/3
+    SCOUTAPM_G(stack_depth)++;
+    php_printf("enter - depth=%ld\n", SCOUTAPM_G(stack_depth));
 }
 
 static void zend_scoutapm_fcall_end_handler(zend_execute_data *aexecute_data) {
 
     // @todo keep track of stack somewhere so we know what we're exiting from, execute_data doesn't seem to have it? - https://github.com/scoutapp/scout-apm-php-ext/issues/3
 //    php_printf("Exited ");
+    SCOUTAPM_G(stack_depth)--;
+    php_printf("exit - depth=%ld\n", SCOUTAPM_G(stack_depth));
 
     // @todo take care of namespacing - https://github.com/scoutapp/scout-apm-php-ext/issues/2
 

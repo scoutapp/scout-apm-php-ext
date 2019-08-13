@@ -16,4 +16,14 @@
 #define SCOUT_APM_EXT_NAME "scoutapm"
 #define SCOUT_APM_EXT_VERSION "0.0"
 
+ZEND_BEGIN_MODULE_GLOBALS(scoutapm)
+    zend_long stack_depth;
+ZEND_END_MODULE_GLOBALS(scoutapm)
+
+#ifdef ZTS
+#define SCOUTAPM_G(v) ZEND_MODULE_GLOBALS_ACCESSOR(scoutapm, v)
+#else
+#define SCOUTAPM_G(v) (scoutapm_globals.v)
+#endif
+
 #endif //ZEND_SCOUTAPM_H
