@@ -16,8 +16,15 @@
 #define SCOUT_APM_EXT_NAME "scoutapm"
 #define SCOUT_APM_EXT_VERSION "0.0"
 
+typedef struct scoutapm_stack_frame {
+    char *function_name;
+    float entered;
+    float exited;
+} scoutapm_stack_frame;
+
 ZEND_BEGIN_MODULE_GLOBALS(scoutapm)
     zend_long stack_depth;
+    scoutapm_stack_frame *current_function_stack;
 ZEND_END_MODULE_GLOBALS(scoutapm)
 
 #ifdef ZTS

@@ -73,6 +73,7 @@ static void zend_scoutapm_deactivate(void) {
 static PHP_RINIT_FUNCTION(scoutapm)
 {
     SCOUTAPM_G(stack_depth) = 0;
+    SCOUTAPM_G(current_function_stack) = calloc(0, sizeof(scoutapm_stack_frame));
 }
 
 static void zend_scoutapm_fcall_begin_handler(zend_execute_data *execute_data) {
@@ -86,15 +87,27 @@ static void zend_scoutapm_fcall_begin_handler(zend_execute_data *execute_data) {
         php_printf("Entered: %s\n", ZSTR_VAL(execute_data->call->func->common.function_name));
 //    }
 
+    SCOUTAPM_G(current_function_stack) = realloc(
+        SCOUTAPM_G(current_function_stack),
+        (SCOUTAPM_G(stack_depth)+1) * sizeof(scoutapm_stack_frame)
+    );
+    SCOUTAPM_G(current_function_stack)[SCOUTAPM_G(stack_depth)] = (scoutapm_stack_frame){
+        .function_name = ZSTR_VAL(execute_data->call->func->common.function_name),
+        .entered = 0, // @todo microtime(true)
+        .exited = 0
+    };
     SCOUTAPM_G(stack_depth)++;
-    php_printf("enter - depth=%ld\n", SCOUTAPM_G(stack_depth));
+
+//    for (int i = 0; i < SCOUTAPM_G(stack_depth); i++) {
+//        php_printf("    + %s\n", SCOUTAPM_G(current_function_stack)[i].function_name);
+//    }
+    // @todo probably free the stack in RSHUTDOWN ..?
 }
 
-static void zend_scoutapm_fcall_end_handler(zend_execute_data *aexecute_data) {
-
+static void zend_scoutapm_fcall_end_handler(zend_execute_data *execute_data)
+{
     // @todo keep track of stack somewhere so we know what we're exiting from, execute_data doesn't seem to have it? - https://github.com/scoutapp/scout-apm-php-ext/issues/3
 //    php_printf("Exited ");
-    SCOUTAPM_G(stack_depth)--;
     php_printf("exit - depth=%ld\n", SCOUTAPM_G(stack_depth));
 
     // @todo take care of namespacing - https://github.com/scoutapp/scout-apm-php-ext/issues/2
