@@ -81,7 +81,18 @@ static void print_stack_frame()
     php_printf("\n");
 }
 
-static void enter_stack_frame(const char *entered_function_name, float microtime_entered)
+// @todo we could just use already implemented microtime(true) ?
+static double scoutapm_microtime()
+{
+    struct timeval tp = {0};
+    if (gettimeofday(&tp, NULL)) {
+        zend_throw_exception_ex(zend_ce_exception, 0, "Could not call gettimeofday");
+        return 0;
+    }
+    return (double)(tp.tv_sec + tp.tv_usec / 1000000.00);
+}
+
+static void enter_stack_frame(const char *entered_function_name, double microtime_entered)
 {
     SCOUTAPM_G(current_function_stack) = realloc(
         SCOUTAPM_G(current_function_stack),
@@ -110,13 +121,12 @@ static void zend_scoutapm_fcall_begin_handler(zend_execute_data *execute_data) {
 
     // @todo take care of namespacing - https://github.com/scoutapp/scout-apm-php-ext/issues/2
 
-    // @todo microtime(true)
-    enter_stack_frame(ZSTR_VAL(execute_data->call->func->common.function_name), 0);
+    enter_stack_frame(ZSTR_VAL(execute_data->call->func->common.function_name), scoutapm_microtime());
 
     // @todo possibly need to free the stack in RSHUTDOWN ..? I suppose only needed if there's anything left...
 
     if (is_observed_function(SCOUTAPM_CURRENT_STACK_FRAME.function_name)) {
-        php_printf("Entered: %s\n", SCOUTAPM_CURRENT_STACK_FRAME.function_name);
+        php_printf("Entered @ %f: %s\n", SCOUTAPM_CURRENT_STACK_FRAME.entered, SCOUTAPM_CURRENT_STACK_FRAME.function_name);
     }
 }
 
@@ -124,13 +134,14 @@ static void zend_scoutapm_fcall_end_handler(zend_execute_data *execute_data)
 {
     scoutapm_stack_frame exiting_stack_frame = {
         .function_name = SCOUTAPM_CURRENT_STACK_FRAME.function_name,
-        .entered = SCOUTAPM_CURRENT_STACK_FRAME.entered
+        .entered = SCOUTAPM_CURRENT_STACK_FRAME.entered,
+        .exited = scoutapm_microtime()
     };
 
     leave_stack_frame();
 
     if (is_observed_function(exiting_stack_frame.function_name)) {
-        php_printf("Exited: %s\n", exiting_stack_frame.function_name);
+        php_printf("Exited  @ %f: %s\n", exiting_stack_frame.exited, exiting_stack_frame.function_name);
     }
 
     // @todo take care of namespacing - https://github.com/scoutapp/scout-apm-php-ext/issues/2

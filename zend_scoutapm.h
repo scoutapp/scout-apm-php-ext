@@ -12,14 +12,15 @@
 #include "php.h"
 #include <zend_extensions.h>
 #include <zend_compile.h>
+#include <zend_exceptions.h>
 
 #define SCOUT_APM_EXT_NAME "scoutapm"
 #define SCOUT_APM_EXT_VERSION "0.0"
 
 typedef struct scoutapm_stack_frame {
     const char *function_name;
-    float entered;
-    float exited;
+    double entered;
+    double exited;
 } scoutapm_stack_frame;
 
 ZEND_BEGIN_MODULE_GLOBALS(scoutapm)
