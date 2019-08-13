@@ -2,7 +2,6 @@
 // Created by james on 09/08/2019.
 //
 
-#include <zend_compile.h>
 #include "zend_scoutapm.h"
 
 static int zend_scoutapm_startup(zend_extension*);
@@ -12,17 +11,36 @@ static void zend_scoutapm_fcall_begin_handler(zend_execute_data *execute_data);
 static void zend_scoutapm_fcall_end_handler(zend_execute_data *execute_data);
 boolean_e is_observed_function(char *function_name);
 
+static zend_module_entry scoutapm_module_entry = {
+    STANDARD_MODULE_HEADER,
+    SCOUT_APM_EXT_NAME,
+    NULL, // function entries
+    NULL, // module init
+    NULL, // module shutdown
+    NULL, // request init
+    NULL, // request shutdown
+    NULL, // module information
+    SCOUT_APM_EXT_VERSION,
+    STANDARD_MODULE_PROPERTIES
+};
+
+/*
+ * Do not export this module, so it cannot be registered with `extension=scoutapm.so` - must be `zend_extension=`
+ * Instead, see `zend_scoutapm_startup` - we load the module there.
+ZEND_GET_MODULE(scoutapm);
+ */
+
 zend_extension_version_info extension_version_info = {
     ZEND_EXTENSION_API_NO,
     ZEND_EXTENSION_BUILD_ID
 };
 
 zend_extension zend_extension_entry = {
-    "scoutapm",
-    "0.0",
+    SCOUT_APM_EXT_NAME,
+    SCOUT_APM_EXT_VERSION,
     "Scout APM",
     "https://scoutapm.com/",
-    "Copyright Scout APM",
+    "Copyright 2019",
     zend_scoutapm_startup, // extension startup
     NULL, // extension shutdown
     zend_scoutapm_activate, // request startup
@@ -38,7 +56,7 @@ zend_extension zend_extension_entry = {
 };
 
 static int zend_scoutapm_startup(zend_extension *ze) {
-    return SUCCESS;
+    return zend_startup_module(&scoutapm_module_entry);
 }
 
 static void zend_scoutapm_activate(void) {
