@@ -81,6 +81,28 @@ static void print_stack_frame()
     php_printf("\n");
 }
 
+static void enter_stack_frame(char *entered_function_name, float microtime_entered)
+{
+    SCOUTAPM_G(current_function_stack) = realloc(
+        SCOUTAPM_G(current_function_stack),
+        (SCOUTAPM_G(stack_depth)+1) * sizeof(scoutapm_stack_frame)
+    );
+    SCOUTAPM_G(current_function_stack)[SCOUTAPM_G(stack_depth)] = (scoutapm_stack_frame){
+        .function_name = entered_function_name,
+        .entered = microtime_entered,
+    };
+    SCOUTAPM_G(stack_depth)++;
+}
+
+static void leave_stack_frame()
+{
+    SCOUTAPM_G(current_function_stack) = realloc(
+        SCOUTAPM_G(current_function_stack),
+        (SCOUTAPM_G(stack_depth)-1) * sizeof(scoutapm_stack_frame)
+    );
+    SCOUTAPM_G(stack_depth)--;
+}
+
 static void zend_scoutapm_fcall_begin_handler(zend_execute_data *execute_data) {
     if (!execute_data->call) {
         return;
@@ -88,16 +110,9 @@ static void zend_scoutapm_fcall_begin_handler(zend_execute_data *execute_data) {
 
     // @todo take care of namespacing - https://github.com/scoutapp/scout-apm-php-ext/issues/2
 
-    SCOUTAPM_G(current_function_stack) = realloc(
-        SCOUTAPM_G(current_function_stack),
-        (SCOUTAPM_G(stack_depth)+1) * sizeof(scoutapm_stack_frame)
-    );
-    SCOUTAPM_G(current_function_stack)[SCOUTAPM_G(stack_depth)] = (scoutapm_stack_frame){
-        .function_name = ZSTR_VAL(execute_data->call->func->common.function_name),
-        .entered = 0, // @todo microtime(true)
-        .exited = 0
-    };
-    SCOUTAPM_G(stack_depth)++;
+    // @todo microtime(true)
+    enter_stack_frame(ZSTR_VAL(execute_data->call->func->common.function_name), 0);
+
     // @todo possibly need to free the stack in RSHUTDOWN ..? I suppose only needed if there's anything left...
 
     if (is_observed_function(SCOUTAPM_CURRENT_STACK_FRAME.function_name)) {
@@ -112,11 +127,7 @@ static void zend_scoutapm_fcall_end_handler(zend_execute_data *execute_data)
         .entered = SCOUTAPM_CURRENT_STACK_FRAME.entered
     };
 
-    SCOUTAPM_G(current_function_stack) = realloc(
-        SCOUTAPM_G(current_function_stack),
-        (SCOUTAPM_G(stack_depth)-1) * sizeof(scoutapm_stack_frame)
-    );
-    SCOUTAPM_G(stack_depth)--;
+    leave_stack_frame();
 
     if (is_observed_function(exiting_stack_frame.function_name)) {
         php_printf("Exited: %s\n", exiting_stack_frame.function_name);
