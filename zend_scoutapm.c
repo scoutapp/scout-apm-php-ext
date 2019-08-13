@@ -8,13 +8,19 @@ static void zend_scoutapm_deactivate(void);
 static void zend_scoutapm_fcall_begin_handler(zend_execute_data *execute_data);
 static void zend_scoutapm_fcall_end_handler(zend_execute_data *execute_data);
 static boolean_e is_observed_function(const char *function_name);
+PHP_FUNCTION(scoutapm_get_calls);
 
 ZEND_DECLARE_MODULE_GLOBALS(scoutapm)
+
+static const zend_function_entry scoutapm_functions[] = {
+    PHP_FE(scoutapm_get_calls, NULL)
+    PHP_FE_END
+};
 
 static zend_module_entry scoutapm_module_entry = {
     STANDARD_MODULE_HEADER,
     SCOUT_APM_EXT_NAME,
-    NULL, // function entries
+    scoutapm_functions, // function entries
     NULL, // module init
     NULL, // module shutdown
     PHP_RINIT(scoutapm), // request init
@@ -70,16 +76,22 @@ static void zend_scoutapm_deactivate(void) {
 static PHP_RINIT_FUNCTION(scoutapm)
 {
     SCOUTAPM_G(stack_depth) = 0;
-    SCOUTAPM_G(observed_stack_frames_count) = 0;
     SCOUTAPM_G(current_function_stack) = calloc(0, sizeof(scoutapm_stack_frame));
+
+    SCOUTAPM_G(observed_stack_frames_count) = 0;
     SCOUTAPM_G(observed_stack_frames) = calloc(0, sizeof(scoutapm_stack_frame));
 }
 
 static PHP_RSHUTDOWN_FUNCTION(scoutapm)
 {
-    free(SCOUTAPM_G(current_function_stack));
-    free(SCOUTAPM_G(observed_stack_frames));
+    if (SCOUTAPM_G(current_function_stack)) {
+        free(SCOUTAPM_G(current_function_stack));
+    }
     SCOUTAPM_G(stack_depth) = 0;
+
+    if (SCOUTAPM_G(observed_stack_frames)) {
+        free(SCOUTAPM_G(observed_stack_frames));
+    }
     SCOUTAPM_G(observed_stack_frames_count) = 0;
 }
 
@@ -164,6 +176,54 @@ static void zend_scoutapm_fcall_end_handler(zend_execute_data *execute_data)
     }
 
     leave_stack_frame();
+}
+
+PHP_FUNCTION(scoutapm_get_calls)
+{
+    const char *item_key_function = "function";
+    const char *item_key_entered = "entered";
+    const char *item_key_exited = "exited";
+    const char *item_key_time_taken = "time_taken";
+    zval item;
+    ZEND_PARSE_PARAMETERS_NONE();
+
+//    print_stack_frame(SCOUTAPM_G(observed_stack_frames), SCOUTAPM_G(observed_stack_frames_count));
+
+    array_init(return_value);
+
+    for (int i = 0; i < SCOUTAPM_G(observed_stack_frames_count); i++) {
+        array_init(&item);
+
+        add_assoc_str_ex(
+            &item,
+            item_key_function, strlen(item_key_function),
+            zend_string_init(SCOUTAPM_G(observed_stack_frames)[i].function_name, strlen(SCOUTAPM_G(observed_stack_frames)[i].function_name), 0)
+        );
+
+        add_assoc_double_ex(
+            &item,
+            item_key_entered, strlen(item_key_entered),
+            SCOUTAPM_G(observed_stack_frames)[i].entered
+        );
+
+        add_assoc_double_ex(
+            &item,
+            item_key_exited, strlen(item_key_exited),
+            SCOUTAPM_G(observed_stack_frames)[i].exited
+        );
+
+        // Time taken is calculated here because float precision gets knocked off otherwise - so this is a useful metric
+        add_assoc_double_ex(
+            &item,
+            item_key_time_taken, strlen(item_key_time_taken),
+            SCOUTAPM_G(observed_stack_frames)[i].exited - SCOUTAPM_G(observed_stack_frames)[i].entered
+        );
+
+        add_next_index_zval(return_value, &item);
+    }
+
+    SCOUTAPM_G(observed_stack_frames) = realloc(SCOUTAPM_G(observed_stack_frames), 0);
+    SCOUTAPM_G(observed_stack_frames_count) = 0;
 }
 
 static boolean_e is_observed_function(const char *function_name)
