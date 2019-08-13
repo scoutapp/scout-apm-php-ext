@@ -1,0 +1,18 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/php:7.3-cli
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - run:
+          name: "Build extension"
+          command: |
+            phpize
+            ./configure --enable-scoutapm
+            make
+      - run:
+          name: "Run tests"
+          command: |
+            make test
