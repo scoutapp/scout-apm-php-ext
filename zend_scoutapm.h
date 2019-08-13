@@ -17,7 +17,7 @@
 #define SCOUT_APM_EXT_VERSION "0.0"
 
 typedef struct scoutapm_stack_frame {
-    char *function_name;
+    const char *function_name;
     float entered;
     float exited;
 } scoutapm_stack_frame;

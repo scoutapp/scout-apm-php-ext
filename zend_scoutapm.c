@@ -6,7 +6,7 @@ static void zend_scoutapm_activate(void);
 static void zend_scoutapm_deactivate(void);
 static void zend_scoutapm_fcall_begin_handler(zend_execute_data *execute_data);
 static void zend_scoutapm_fcall_end_handler(zend_execute_data *execute_data);
-static boolean_e is_observed_function(char *function_name);
+static boolean_e is_observed_function(const char *function_name);
 
 ZEND_DECLARE_MODULE_GLOBALS(scoutapm)
 
@@ -81,7 +81,7 @@ static void print_stack_frame()
     php_printf("\n");
 }
 
-static void enter_stack_frame(char *entered_function_name, float microtime_entered)
+static void enter_stack_frame(const char *entered_function_name, float microtime_entered)
 {
     SCOUTAPM_G(current_function_stack) = realloc(
         SCOUTAPM_G(current_function_stack),
@@ -136,7 +136,7 @@ static void zend_scoutapm_fcall_end_handler(zend_execute_data *execute_data)
     // @todo take care of namespacing - https://github.com/scoutapp/scout-apm-php-ext/issues/2
 }
 
-static boolean_e is_observed_function(char *function_name)
+static boolean_e is_observed_function(const char *function_name)
 {
     int i;
     const char *observe_functions[1] = {
