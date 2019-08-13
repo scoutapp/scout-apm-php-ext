@@ -69,15 +69,23 @@ static void zend_scoutapm_deactivate(void) {
 static PHP_RINIT_FUNCTION(scoutapm)
 {
     SCOUTAPM_G(stack_depth) = 0;
+    SCOUTAPM_G(observed_stack_frames_count) = 0;
     SCOUTAPM_G(current_function_stack) = calloc(0, sizeof(scoutapm_stack_frame));
+    SCOUTAPM_G(observed_stack_frames) = calloc(0, sizeof(scoutapm_stack_frame));
 }
 
 // Note - useful for debugging, can probably be removed
-static void print_stack_frame()
+static void print_stack_frame(scoutapm_stack_frame *stack_frame, zend_long depth)
 {
-    php_printf("       CURRENT STACK: ");
-    for (int i = 0; i < SCOUTAPM_G(stack_depth); i++) {
-        php_printf("    %d:%s ", i, SCOUTAPM_G(current_function_stack)[i].function_name);
+    php_printf("  Stack Record:\n");
+    for (int i = 0; i < depth; i++) {
+        php_printf(
+            "    %d:%s\n      + %f\n      - %f\n",
+            i,
+            stack_frame[i].function_name,
+            stack_frame[i].entered,
+            stack_frame[i].exited
+        );
     }
     php_printf("\n");
 }
@@ -91,6 +99,22 @@ static double scoutapm_microtime()
         return 0;
     }
     return (double)(tp.tv_sec + tp.tv_usec / 1000000.00);
+}
+
+static void record_observed_stack_frame(const char *function_name, double microtime_entered, double microtime_exited)
+{
+    SCOUTAPM_G(observed_stack_frames) = realloc(
+        SCOUTAPM_G(observed_stack_frames),
+        (SCOUTAPM_G(observed_stack_frames_count)+1) * sizeof(scoutapm_stack_frame)
+    );
+    SCOUTAPM_G(observed_stack_frames)[SCOUTAPM_G(observed_stack_frames_count)] = (scoutapm_stack_frame){
+        .function_name = function_name,
+        .entered = microtime_entered,
+        .exited = microtime_exited
+    };
+    SCOUTAPM_G(observed_stack_frames_count)++;
+
+//    print_stack_frame(SCOUTAPM_G(observed_stack_frames), SCOUTAPM_G(observed_stack_frames_count));
 }
 
 static void enter_stack_frame(const char *entered_function_name, double microtime_entered)
@@ -127,26 +151,20 @@ static void zend_scoutapm_fcall_begin_handler(zend_execute_data *execute_data) {
     // @todo possibly need to free the stack in RSHUTDOWN ..? I suppose only needed if there's anything left...
 
     if (is_observed_function(SCOUTAPM_CURRENT_STACK_FRAME.function_name)) {
-        php_printf("Entered @ %f: %s\n", SCOUTAPM_CURRENT_STACK_FRAME.entered, SCOUTAPM_CURRENT_STACK_FRAME.function_name);
+//        php_printf("Entered @ %f: %s\n", SCOUTAPM_CURRENT_STACK_FRAME.entered, SCOUTAPM_CURRENT_STACK_FRAME.function_name);
     }
 }
 
 static void zend_scoutapm_fcall_end_handler(zend_execute_data *execute_data)
 {
-    scoutapm_stack_frame exiting_stack_frame = {
-        .function_name = SCOUTAPM_CURRENT_STACK_FRAME.function_name,
-        .entered = SCOUTAPM_CURRENT_STACK_FRAME.entered,
-        .exited = 0
-    };
-
-    leave_stack_frame();
-
-    if (is_observed_function(exiting_stack_frame.function_name)) {
-        exiting_stack_frame.exited = scoutapm_microtime();
-        php_printf("Exited  @ %f: %s\n", exiting_stack_frame.exited, exiting_stack_frame.function_name);
+    // @todo take care of namespacing - https://github.com/scoutapp/scout-apm-php-ext/issues/2
+    if (is_observed_function(SCOUTAPM_CURRENT_STACK_FRAME.function_name)) {
+        const double exit_time = scoutapm_microtime();
+        record_observed_stack_frame(SCOUTAPM_CURRENT_STACK_FRAME.function_name, SCOUTAPM_CURRENT_STACK_FRAME.entered, exit_time);
+//        php_printf("Exited  @ %f: %s\n", exit_time, SCOUTAPM_CURRENT_STACK_FRAME.function_name);
     }
 
-    // @todo take care of namespacing - https://github.com/scoutapp/scout-apm-php-ext/issues/2
+    leave_stack_frame();
 }
 
 static boolean_e is_observed_function(const char *function_name)

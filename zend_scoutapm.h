@@ -26,6 +26,8 @@ typedef struct scoutapm_stack_frame {
 ZEND_BEGIN_MODULE_GLOBALS(scoutapm)
     zend_long stack_depth;
     scoutapm_stack_frame *current_function_stack;
+    zend_long observed_stack_frames_count;
+    scoutapm_stack_frame *observed_stack_frames;
 ZEND_END_MODULE_GLOBALS(scoutapm)
 
 #ifdef ZTS
