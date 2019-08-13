@@ -12,8 +12,8 @@ foreach (explode("\n", $phpinfo) as $line) {
   }
 }
 
-// @todo check why isn't this bool(true), maybe only works for modules, not Zend extensions?
-//var_dump(extension_loaded('scoutapm'));
+var_dump(extension_loaded('scoutapm'));
 ?>
 --EXPECT--
-string(57) "    with scoutapm v0.0, Copyright Scout APM, by Scout APM"
+string(52) "    with scoutapm v0.0, Copyright 2019, by Scout APM"
+bool(true)
