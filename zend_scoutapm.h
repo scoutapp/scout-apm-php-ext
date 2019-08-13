@@ -30,6 +30,10 @@ ZEND_BEGIN_MODULE_GLOBALS(scoutapm)
     scoutapm_stack_frame *observed_stack_frames;
 ZEND_END_MODULE_GLOBALS(scoutapm)
 
+#ifndef ZEND_PARSE_PARAMETERS_NONE
+#define ZEND_PARSE_PARAMETERS_NONE() if (zend_parse_parameters_none() != SUCCESS) { return; }
+#endif
+
 #ifdef ZTS
 #define SCOUTAPM_G(v) ZEND_MODULE_GLOBALS_ACCESSOR(scoutapm, v)
 #else
