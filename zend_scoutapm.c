@@ -72,21 +72,21 @@ static void zend_scoutapm_fcall_begin_handler(zend_execute_data *execute_data) {
         return;
     }
 
-    // @todo take care of namespacing
+    // @todo take care of namespacing - https://github.com/scoutapp/scout-apm-php-ext/issues/2
 
     if (is_observed_function(ZSTR_VAL(execute_data->call->func->common.function_name))) {
         php_printf("Entered: %s\n", ZSTR_VAL(execute_data->call->func->common.function_name));
     }
 
-    // @todo regardless of whether we are in an interesting function, add something to stack
+    // @todo regardless of whether we are in an interesting function, add something to stack - https://github.com/scoutapp/scout-apm-php-ext/issues/3
 }
 
 static void zend_scoutapm_fcall_end_handler(zend_execute_data *aexecute_data) {
 
-    // @todo keep track of stack somewhere so we know what we're exiting from, execute_data doesn't seem to have it?
+    // @todo keep track of stack somewhere so we know what we're exiting from, execute_data doesn't seem to have it? - https://github.com/scoutapp/scout-apm-php-ext/issues/3
 //    php_printf("Exited ");
 
-    // @todo take care of namespacing
+    // @todo take care of namespacing - https://github.com/scoutapp/scout-apm-php-ext/issues/2
 
 //    if (is_observed_function(ZSTR_VAL(execute_data->func->common.function_name))) {
 //        php_printf("Exited: %s\n", ZSTR_VAL(execute_data->call->func->common.function_name));
