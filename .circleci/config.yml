@@ -16,6 +16,8 @@ jobs:
           name: "Run tests"
           command: |
             make test
+      - store_artifacts:
+          path: tests
   "build-7.2":
     docker:
       - image: circleci/php:7.2-cli
