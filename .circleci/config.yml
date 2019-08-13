@@ -15,7 +15,7 @@ jobs:
       - run:
           name: "Run tests"
           command: |
-            php run-tests.php -p `which php` -d zend_extension=`pwd`/modules/scoutapm.so -g "FAIL,XFAIL,BORK,WARN,LEAK,SKIP" --offline --show-diff --show-slow 1000 --set-timeout 120
+            php run-tests.php -p `which php` -d zend_extension=`pwd`/modules/scoutapm.so -g "FAIL,XFAIL,BORK,WARN,LEAK,SKIP" --offline --show-diff --set-timeout 120
       - store_artifacts:
           path: ~/repo/tests
   "build-7.2":
