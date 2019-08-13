@@ -7,7 +7,7 @@ jobs:
     steps:
       - checkout
       - run:
-          name: "Build extension"
+          name: "Build"
           command: |
             phpize
             ./configure --enable-scoutapm
