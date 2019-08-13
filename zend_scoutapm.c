@@ -72,6 +72,7 @@ static PHP_RINIT_FUNCTION(scoutapm)
     SCOUTAPM_G(current_function_stack) = calloc(0, sizeof(scoutapm_stack_frame));
 }
 
+// Note - useful for debugging, can probably be removed
 static void print_stack_frame()
 {
     php_printf("       CURRENT STACK: ");
@@ -135,12 +136,13 @@ static void zend_scoutapm_fcall_end_handler(zend_execute_data *execute_data)
     scoutapm_stack_frame exiting_stack_frame = {
         .function_name = SCOUTAPM_CURRENT_STACK_FRAME.function_name,
         .entered = SCOUTAPM_CURRENT_STACK_FRAME.entered,
-        .exited = scoutapm_microtime()
+        .exited = 0
     };
 
     leave_stack_frame();
 
     if (is_observed_function(exiting_stack_frame.function_name)) {
+        exiting_stack_frame.exited = scoutapm_microtime();
         php_printf("Exited  @ %f: %s\n", exiting_stack_frame.exited, exiting_stack_frame.function_name);
     }
 
