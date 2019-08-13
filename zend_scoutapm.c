@@ -1,6 +1,7 @@
 #include "zend_scoutapm.h"
 
 static PHP_RINIT_FUNCTION(scoutapm);
+static PHP_RSHUTDOWN_FUNCTION(scoutapm);
 static int zend_scoutapm_startup(zend_extension*);
 static void zend_scoutapm_activate(void);
 static void zend_scoutapm_deactivate(void);
@@ -17,7 +18,7 @@ static zend_module_entry scoutapm_module_entry = {
     NULL, // module init
     NULL, // module shutdown
     PHP_RINIT(scoutapm), // request init
-    NULL, // request shutdown
+    PHP_RSHUTDOWN(scoutapm), // request shutdown
     NULL, // module information
     SCOUT_APM_EXT_VERSION,
     STANDARD_MODULE_PROPERTIES
@@ -74,6 +75,14 @@ static PHP_RINIT_FUNCTION(scoutapm)
     SCOUTAPM_G(observed_stack_frames) = calloc(0, sizeof(scoutapm_stack_frame));
 }
 
+static PHP_RSHUTDOWN_FUNCTION(scoutapm)
+{
+    free(SCOUTAPM_G(current_function_stack));
+    free(SCOUTAPM_G(observed_stack_frames));
+    SCOUTAPM_G(stack_depth) = 0;
+    SCOUTAPM_G(observed_stack_frames_count) = 0;
+}
+
 // Note - useful for debugging, can probably be removed
 static void print_stack_frame(scoutapm_stack_frame *stack_frame, zend_long depth)
 {
@@ -113,8 +122,6 @@ static void record_observed_stack_frame(const char *function_name, double microt
         .exited = microtime_exited
     };
     SCOUTAPM_G(observed_stack_frames_count)++;
-
-//    print_stack_frame(SCOUTAPM_G(observed_stack_frames), SCOUTAPM_G(observed_stack_frames_count));
 }
 
 static void enter_stack_frame(const char *entered_function_name, double microtime_entered)
@@ -145,14 +152,7 @@ static void zend_scoutapm_fcall_begin_handler(zend_execute_data *execute_data) {
     }
 
     // @todo take care of namespacing - https://github.com/scoutapp/scout-apm-php-ext/issues/2
-
     enter_stack_frame(ZSTR_VAL(execute_data->call->func->common.function_name), scoutapm_microtime());
-
-    // @todo possibly need to free the stack in RSHUTDOWN ..? I suppose only needed if there's anything left...
-
-    if (is_observed_function(SCOUTAPM_CURRENT_STACK_FRAME.function_name)) {
-//        php_printf("Entered @ %f: %s\n", SCOUTAPM_CURRENT_STACK_FRAME.entered, SCOUTAPM_CURRENT_STACK_FRAME.function_name);
-    }
 }
 
 static void zend_scoutapm_fcall_end_handler(zend_execute_data *execute_data)
@@ -161,7 +161,6 @@ static void zend_scoutapm_fcall_end_handler(zend_execute_data *execute_data)
     if (is_observed_function(SCOUTAPM_CURRENT_STACK_FRAME.function_name)) {
         const double exit_time = scoutapm_microtime();
         record_observed_stack_frame(SCOUTAPM_CURRENT_STACK_FRAME.function_name, SCOUTAPM_CURRENT_STACK_FRAME.entered, exit_time);
-//        php_printf("Exited  @ %f: %s\n", exit_time, SCOUTAPM_CURRENT_STACK_FRAME.function_name);
     }
 
     leave_stack_frame();
