@@ -9,7 +9,7 @@ static void zend_scoutapm_activate(void);
 static void zend_scoutapm_deactivate(void);
 static void zend_scoutapm_fcall_begin_handler(zend_execute_data *execute_data);
 static void zend_scoutapm_fcall_end_handler(zend_execute_data *execute_data);
-boolean_e is_observed_function(char *function_name);
+static boolean_e is_observed_function(char *function_name);
 
 static zend_module_entry scoutapm_module_entry = {
     STANDARD_MODULE_HEADER,
@@ -93,7 +93,7 @@ static void zend_scoutapm_fcall_end_handler(zend_execute_data *aexecute_data) {
 //    }
 }
 
-boolean_e is_observed_function(char *function_name)
+static boolean_e is_observed_function(char *function_name)
 {
     int i;
     const char *observe_functions[1] = {
