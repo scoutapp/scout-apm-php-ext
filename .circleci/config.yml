@@ -19,6 +19,7 @@ jobs:
       - run:
           name: "Benchmark"
           command: |
+            sudo apt install time
             ./benchmark.sh
             ./benchmark.sh -w
       - store_artifacts:
@@ -42,6 +43,7 @@ jobs:
       - run:
           name: "Benchmark"
           command: |
+            sudo apt install time
             ./benchmark.sh
             ./benchmark.sh -w
   "build-7.3":
@@ -63,6 +65,7 @@ jobs:
       - run:
           name: "Benchmark"
           command: |
+            sudo apt install time
             ./benchmark.sh
             ./benchmark.sh -w
 
