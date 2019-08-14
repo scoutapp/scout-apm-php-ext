@@ -4,7 +4,7 @@ set -euo pipefail
 
 PHP=`which php`
 PHP_DESCRIPTION="without scoutapm extension"
-PASSES=20
+PASSES=10
 ITERATIONS_PER_PASS=100000
 
 function usage {
