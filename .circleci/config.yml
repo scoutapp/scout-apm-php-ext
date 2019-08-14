@@ -20,6 +20,7 @@ jobs:
           name: "Benchmark"
           command: |
             ./benchmark.sh
+            ./benchmark.sh -w
       - store_artifacts:
           path: ~/repo/tests
   "build-7.2":
@@ -42,6 +43,7 @@ jobs:
           name: "Benchmark"
           command: |
             ./benchmark.sh
+            ./benchmark.sh -w
   "build-7.3":
     docker:
       - image: circleci/php:7.3-cli
@@ -62,6 +64,7 @@ jobs:
           name: "Benchmark"
           command: |
             ./benchmark.sh
+            ./benchmark.sh -w
 
 workflows:
   version: 2
