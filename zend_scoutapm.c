@@ -163,13 +163,11 @@ static void zend_scoutapm_fcall_begin_handler(zend_execute_data *execute_data) {
         return;
     }
 
-    // @todo take care of namespacing - https://github.com/scoutapp/scout-apm-php-ext/issues/2
     enter_stack_frame(ZSTR_VAL(execute_data->call->func->common.function_name), scoutapm_microtime());
 }
 
 static void zend_scoutapm_fcall_end_handler(zend_execute_data *execute_data)
 {
-    // @todo take care of namespacing - https://github.com/scoutapp/scout-apm-php-ext/issues/2
     if (is_observed_function(SCOUTAPM_CURRENT_STACK_FRAME.function_name)) {
         const double exit_time = scoutapm_microtime();
         record_observed_stack_frame(SCOUTAPM_CURRENT_STACK_FRAME.function_name, SCOUTAPM_CURRENT_STACK_FRAME.entered, exit_time);
