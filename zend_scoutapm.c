@@ -148,7 +148,7 @@ static void record_observed_stack_frame(const char *function_name, double microt
 
 static void enter_stack_frame(const char *entered_function_name, double microtime_entered)
 {
-    DEBUG("Entering stack frame for %s ...", entered_function_name);
+    DEBUG("Entering stack frame %s ...", entered_function_name);
     SCOUTAPM_G(current_function_stack) = realloc(
         SCOUTAPM_G(current_function_stack),
         (SCOUTAPM_G(stack_depth)+1) * sizeof(scoutapm_stack_frame)
@@ -163,7 +163,7 @@ static void enter_stack_frame(const char *entered_function_name, double microtim
 
 static void leave_stack_frame()
 {
-    DEBUG("Leaving stack frame...");
+    DEBUG("Leaving stack frame %s...", SCOUTAPM_CURRENT_STACK_FRAME.function_name);
     SCOUTAPM_G(current_function_stack) = realloc(
         SCOUTAPM_G(current_function_stack),
         (SCOUTAPM_G(stack_depth)-1) * sizeof(scoutapm_stack_frame)
@@ -173,20 +173,38 @@ static void leave_stack_frame()
 }
 
 static void zend_scoutapm_fcall_begin_handler(zend_execute_data *execute_data) {
-    char *stack_frame_name = "<unknown call>";
-
-    DEBUG("handling fcall_begin...");
+    char *stack_frame_name = malloc(2048);
 
     if (!execute_data->call) {
-        stack_frame_name = "<require file>";
-    }
-
-    if (execute_data->call && !execute_data->call->func->common.function_name) {
-        stack_frame_name = "<undefined function>\n";
-    }
-
-    if (execute_data->call && execute_data->call->func->common.function_name) {
-        stack_frame_name = ZSTR_VAL(execute_data->call->func->common.function_name);
+        zend_op n = execute_data->func->op_array.opcodes[(execute_data->opline - execute_data->func->op_array.opcodes) + 1];
+        if (n.extended_value == ZEND_EVAL) {
+            sprintf(stack_frame_name, "<evaled code:%s:%u>", ZSTR_VAL(execute_data->func->op_array.filename), n.lineno);
+        } else {
+            sprintf(stack_frame_name, "<required file>");
+            // @todo add back in
+//            zend_string *file = zval_get_string(EX_CONSTANT(n.op1));
+//            sprintf(stack_frame_name, "<required file:%s>", ZSTR_VAL(file));
+//            zend_string_release(file);
+        }
+    } else if (execute_data->call->func->common.fn_flags & ZEND_ACC_STATIC) {
+        sprintf(
+            stack_frame_name,
+            "%s::%s",
+            ZSTR_VAL(Z_CE(execute_data->call->This)->name),
+            ZSTR_VAL(execute_data->call->func->common.function_name)
+        );
+    } else if (Z_TYPE(execute_data->call->This) == IS_OBJECT) {
+        sprintf(
+            stack_frame_name,
+            "%s->%s",
+            ZSTR_VAL(Z_OBJCE(execute_data->call->This)->name),
+            ZSTR_VAL(execute_data->call->func->common.function_name)
+        );
+    } else if (execute_data->call->func->common.function_name) {
+        sprintf(stack_frame_name, "%s", ZSTR_VAL(execute_data->call->func->common.function_name));
+    } else {
+        DEBUG("POSSIBLE BUG : no stack frame name detected...\n");
+        sprintf(stack_frame_name, "<unknown name>");
     }
 
     enter_stack_frame(stack_frame_name, scoutapm_microtime());
@@ -196,7 +214,7 @@ static void zend_scoutapm_fcall_end_handler(zend_execute_data *execute_data)
 {
     DEBUG("handling fcall_end...\n");
     if (SCOUTAPM_G(stack_depth) == 0) {
-        DEBUG("POSSIBLE BUG: fcall_end called but nothing was in stack?\n");
+        DEBUG("POSSIBLE BUG: fcall_end called but nothing was in stack\n");
         return;
     }
     if (is_observed_function(SCOUTAPM_CURRENT_STACK_FRAME.function_name)) {
