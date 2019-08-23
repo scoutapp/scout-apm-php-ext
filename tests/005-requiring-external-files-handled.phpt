@@ -4,7 +4,7 @@ Requires to external files do not crash
 <?php if (!extension_loaded("scoutapm")) die("Skipped: scoutapm extension required."); ?>
 --FILE--
 <?php
-require 'external.php';
+require 'external.inc';
 echo "End.\n";
 ?>
 --EXPECTF--
