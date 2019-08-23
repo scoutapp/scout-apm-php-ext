@@ -75,15 +75,18 @@ static void zend_scoutapm_deactivate(void) {
 
 static PHP_RINIT_FUNCTION(scoutapm)
 {
+    DEBUG("Initialising stacks...");
     SCOUTAPM_G(stack_depth) = 0;
     SCOUTAPM_G(current_function_stack) = calloc(0, sizeof(scoutapm_stack_frame));
 
     SCOUTAPM_G(observed_stack_frames_count) = 0;
     SCOUTAPM_G(observed_stack_frames) = calloc(0, sizeof(scoutapm_stack_frame));
+    DEBUG("Stacks made\n");
 }
 
 static PHP_RSHUTDOWN_FUNCTION(scoutapm)
 {
+    DEBUG("Freeing stacks... ");
     if (SCOUTAPM_G(current_function_stack)) {
         free(SCOUTAPM_G(current_function_stack));
     }
@@ -93,11 +96,16 @@ static PHP_RSHUTDOWN_FUNCTION(scoutapm)
         free(SCOUTAPM_G(observed_stack_frames));
     }
     SCOUTAPM_G(observed_stack_frames_count) = 0;
+    DEBUG("Stacks freed\n");
 }
 
 // Note - useful for debugging, can probably be removed
 static void print_stack_frame(scoutapm_stack_frame *stack_frame, zend_long depth)
 {
+    if (SCOUT_APM_EXT_DEBUGGING != 1) {
+        return;
+    }
+
     php_printf("  Stack Record:\n");
     for (int i = 0; i < depth; i++) {
         php_printf(
@@ -124,6 +132,7 @@ static double scoutapm_microtime()
 
 static void record_observed_stack_frame(const char *function_name, double microtime_entered, double microtime_exited)
 {
+    DEBUG("Adding observed stack frame for %s ... ", function_name);
     SCOUTAPM_G(observed_stack_frames) = realloc(
         SCOUTAPM_G(observed_stack_frames),
         (SCOUTAPM_G(observed_stack_frames_count)+1) * sizeof(scoutapm_stack_frame)
@@ -134,10 +143,12 @@ static void record_observed_stack_frame(const char *function_name, double microt
         .exited = microtime_exited
     };
     SCOUTAPM_G(observed_stack_frames_count)++;
+    DEBUG("Done\n");
 }
 
 static void enter_stack_frame(const char *entered_function_name, double microtime_entered)
 {
+    DEBUG("Entering stack frame for %s ...", entered_function_name);
     SCOUTAPM_G(current_function_stack) = realloc(
         SCOUTAPM_G(current_function_stack),
         (SCOUTAPM_G(stack_depth)+1) * sizeof(scoutapm_stack_frame)
@@ -147,19 +158,34 @@ static void enter_stack_frame(const char *entered_function_name, double microtim
         .entered = microtime_entered,
     };
     SCOUTAPM_G(stack_depth)++;
+    DEBUG("Done\n");
 }
 
 static void leave_stack_frame()
 {
+    DEBUG("Leaving stack frame...");
     SCOUTAPM_G(current_function_stack) = realloc(
         SCOUTAPM_G(current_function_stack),
         (SCOUTAPM_G(stack_depth)-1) * sizeof(scoutapm_stack_frame)
     );
     SCOUTAPM_G(stack_depth)--;
+    DEBUG("Done\n");
 }
 
 static void zend_scoutapm_fcall_begin_handler(zend_execute_data *execute_data) {
+    DEBUG("handling fcall_begin...\n");
     if (!execute_data->call) {
+        DEBUG("no call in fcall_begin, skipping\n");
+        return;
+    }
+
+    if (!execute_data->call->func) {
+        DEBUG("no func in fcall_begin, skipping\n");
+        return;
+    }
+
+    if (!execute_data->call->func->common.function_name) {
+        DEBUG("no function name, skipping\n");
         return;
     }
 
@@ -168,6 +194,11 @@ static void zend_scoutapm_fcall_begin_handler(zend_execute_data *execute_data) {
 
 static void zend_scoutapm_fcall_end_handler(zend_execute_data *execute_data)
 {
+    DEBUG("handling fcall_end...\n");
+    if (SCOUTAPM_G(stack_depth) == 0) {
+        DEBUG("fcall_end but nothing was in stack?\n");
+        return;
+    }
     if (is_observed_function(SCOUTAPM_CURRENT_STACK_FRAME.function_name)) {
         const double exit_time = scoutapm_microtime();
         record_observed_stack_frame(SCOUTAPM_CURRENT_STACK_FRAME.function_name, SCOUTAPM_CURRENT_STACK_FRAME.entered, exit_time);
