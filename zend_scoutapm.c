@@ -179,35 +179,23 @@ static void zend_scoutapm_fcall_begin_handler(zend_execute_data *execute_data) {
     if (!execute_data->call) {
         zend_op n = execute_data->func->op_array.opcodes[(execute_data->opline - execute_data->func->op_array.opcodes) + 1];
         if (n.extended_value == ZEND_EVAL) {
-            stack_frame_name_size = snprintf(NULL, 0, "<evaled code:%s:%u>", ZSTR_VAL(execute_data->func->op_array.filename), n.lineno);
-            stack_frame_name = (char*)malloc(stack_frame_name_size);
-            sprintf(stack_frame_name, "<evaled code:%s:%u>", ZSTR_VAL(execute_data->func->op_array.filename), n.lineno);
+            DYNAMIC_MALLOC_SPRINTF(stack_frame_name, stack_frame_name_size, "<evaled code:%s:%u>", ZSTR_VAL(execute_data->func->op_array.filename), n.lineno);
         } else {
-            stack_frame_name_size = snprintf(NULL, 0, "<required file>");
-            stack_frame_name = (char*)malloc(stack_frame_name_size);
-            sprintf(stack_frame_name, "<required file>");
+            DYNAMIC_MALLOC_SPRINTF(stack_frame_name, stack_frame_name_size, "<required file>");
             // @todo add back in
 //            zend_string *file = zval_get_string(EX_CONSTANT(n.op1));
 //            sprintf(stack_frame_name, "<required file:%s>", ZSTR_VAL(file));
 //            zend_string_release(file);
         }
     } else if (execute_data->call->func->common.fn_flags & ZEND_ACC_STATIC) {
-        stack_frame_name_size = snprintf(NULL, 0, "%s::%s", ZSTR_VAL(Z_CE(execute_data->call->This)->name), ZSTR_VAL(execute_data->call->func->common.function_name));
-        stack_frame_name = (char*)malloc(stack_frame_name_size);
-        sprintf(stack_frame_name, "%s::%s", ZSTR_VAL(Z_CE(execute_data->call->This)->name), ZSTR_VAL(execute_data->call->func->common.function_name));
+        DYNAMIC_MALLOC_SPRINTF(stack_frame_name, stack_frame_name_size, "%s::%s", ZSTR_VAL(Z_CE(execute_data->call->This)->name), ZSTR_VAL(execute_data->call->func->common.function_name));
     } else if (Z_TYPE(execute_data->call->This) == IS_OBJECT) {
-        stack_frame_name_size = snprintf(NULL, 0, "%s->%s", ZSTR_VAL(Z_OBJCE(execute_data->call->This)->name), ZSTR_VAL(execute_data->call->func->common.function_name));
-        stack_frame_name = (char*)malloc(stack_frame_name_size);
-        sprintf(stack_frame_name, "%s->%s", ZSTR_VAL(Z_OBJCE(execute_data->call->This)->name), ZSTR_VAL(execute_data->call->func->common.function_name));
+        DYNAMIC_MALLOC_SPRINTF(stack_frame_name, stack_frame_name_size, "%s->%s", ZSTR_VAL(Z_OBJCE(execute_data->call->This)->name), ZSTR_VAL(execute_data->call->func->common.function_name));
     } else if (execute_data->call->func->common.function_name) {
-        stack_frame_name_size = snprintf(NULL, 0, "%s", ZSTR_VAL(execute_data->call->func->common.function_name));
-        stack_frame_name = (char*)malloc(stack_frame_name_size);
-        sprintf(stack_frame_name, "%s", ZSTR_VAL(execute_data->call->func->common.function_name));
+        DYNAMIC_MALLOC_SPRINTF(stack_frame_name, stack_frame_name_size, "%s", ZSTR_VAL(execute_data->call->func->common.function_name));
     } else {
         DEBUG("POSSIBLE BUG : no stack frame name detected...\n");
-        stack_frame_name_size = snprintf(NULL, 0, "<unknown name>");
-        stack_frame_name = (char*)malloc(stack_frame_name_size);
-        sprintf(stack_frame_name, "<unknown name>");
+        DYNAMIC_MALLOC_SPRINTF(stack_frame_name, stack_frame_name_size, "<unknown name>");
     }
 
     enter_stack_frame(stack_frame_name, scoutapm_microtime());
