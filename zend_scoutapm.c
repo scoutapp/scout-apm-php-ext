@@ -173,30 +173,30 @@ static void leave_stack_frame()
 }
 
 static void zend_scoutapm_fcall_begin_handler(zend_execute_data *execute_data) {
-    DEBUG("handling fcall_begin...\n");
+    char *stack_frame_name = "<unknown call>";
+
+    DEBUG("handling fcall_begin...");
+
     if (!execute_data->call) {
-        DEBUG("no call in fcall_begin, skipping\n");
-        return;
+        stack_frame_name = "<require file>";
     }
 
-    if (!execute_data->call->func) {
-        DEBUG("no func in fcall_begin, skipping\n");
-        return;
+    if (execute_data->call && !execute_data->call->func->common.function_name) {
+        stack_frame_name = "<undefined function>\n";
     }
 
-    if (!execute_data->call->func->common.function_name) {
-        DEBUG("no function name, skipping\n");
-        return;
+    if (execute_data->call && execute_data->call->func->common.function_name) {
+        stack_frame_name = ZSTR_VAL(execute_data->call->func->common.function_name);
     }
 
-    enter_stack_frame(ZSTR_VAL(execute_data->call->func->common.function_name), scoutapm_microtime());
+    enter_stack_frame(stack_frame_name, scoutapm_microtime());
 }
 
 static void zend_scoutapm_fcall_end_handler(zend_execute_data *execute_data)
 {
     DEBUG("handling fcall_end...\n");
     if (SCOUTAPM_G(stack_depth) == 0) {
-        DEBUG("fcall_end but nothing was in stack?\n");
+        DEBUG("POSSIBLE BUG: fcall_end called but nothing was in stack?\n");
         return;
     }
     if (is_observed_function(SCOUTAPM_CURRENT_STACK_FRAME.function_name)) {
