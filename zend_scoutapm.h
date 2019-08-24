@@ -50,9 +50,9 @@ ZEND_END_MODULE_GLOBALS(scoutapm)
 #endif
 
 #define DYNAMIC_MALLOC_SPRINTF(destString, sizeNeeded, fmt, ...) \
-    sizeNeeded = snprintf(NULL, 0, fmt, ##__VA_ARGS__); \
+    sizeNeeded = snprintf(NULL, 0, fmt, ##__VA_ARGS__) + 1; \
     destString = (char*)malloc(sizeNeeded); \
-    sprintf(destString, fmt, ##__VA_ARGS__)
+    snprintf(destString, sizeNeeded, fmt, ##__VA_ARGS__)
 
 #define SCOUTAPM_CURRENT_STACK_FRAME SCOUTAPM_G(current_function_stack)[SCOUTAPM_G(stack_depth)-1]
 
