@@ -17,6 +17,9 @@
 #define SCOUT_APM_EXT_NAME "scoutapm"
 #define SCOUT_APM_EXT_VERSION "0.0"
 
+// Extreme amounts of debugging, set to 1 to enable it and `make clean && make` (tests will fail...)
+#define SCOUT_APM_EXT_DEBUGGING 0
+
 typedef struct scoutapm_stack_frame {
     const char *function_name;
     double entered;
@@ -39,6 +42,17 @@ ZEND_END_MODULE_GLOBALS(scoutapm)
 #else
 #define SCOUTAPM_G(v) (scoutapm_globals.v)
 #endif
+
+#if SCOUT_APM_EXT_DEBUGGING == 1
+#define DEBUG(x, ...) php_printf(x, ##__VA_ARGS__)
+#else
+#define DEBUG(...) /**/
+#endif
+
+#define DYNAMIC_MALLOC_SPRINTF(destString, sizeNeeded, fmt, ...) \
+    sizeNeeded = snprintf(NULL, 0, fmt, ##__VA_ARGS__) + 1; \
+    destString = (char*)malloc(sizeNeeded); \
+    snprintf(destString, sizeNeeded, fmt, ##__VA_ARGS__)
 
 #define SCOUTAPM_CURRENT_STACK_FRAME SCOUTAPM_G(current_function_stack)[SCOUTAPM_G(stack_depth)-1]
 
