@@ -143,5 +143,8 @@ workflows:
   build:
     jobs:
       - "build-7.1"
+      - "build-7.1-zts"
       - "build-7.2"
+      - "build-7.2-zts"
       - "build-7.3"
+      - "build-7.3-zts"
