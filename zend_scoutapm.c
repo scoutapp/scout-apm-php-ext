@@ -27,7 +27,11 @@ static zend_module_entry scoutapm_module_entry = {
     PHP_RSHUTDOWN(scoutapm), // request shutdown
     NULL, // module information
     SCOUT_APM_EXT_VERSION,
-    STANDARD_MODULE_PROPERTIES
+    PHP_MODULE_GLOBALS(scoutapm),
+    NULL,
+    NULL,
+    NULL,
+    STANDARD_MODULE_PROPERTIES_EX
 };
 
 /*
