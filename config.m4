@@ -11,3 +11,7 @@ if test "$PHP_SCOUT_APM" != "no"; then
         zend_scoutapm.c,
         $ext_shared,, ,,yes)
 fi
+
+AC_CONFIG_COMMANDS_POST([
+  ln -s "$PHP_EXECUTABLE" build/php
+])

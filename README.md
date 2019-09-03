@@ -8,6 +8,10 @@ $ ./configure --enable-scoutapm
 $ make test
 ```
 
+Note: whilst a CMakeLists.txt exists, this project does NOT use CMake.
+The CMakeLists.txt exists so this project can be worked on in CLion.
+See <https://dev.to/jasny/developing-a-php-extension-in-clion-3oo1>.
+
 ## Building with specific PHP build
 
 ```bash
