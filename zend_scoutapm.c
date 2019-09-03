@@ -6,7 +6,7 @@ static double scoutapm_microtime();
 static void record_observed_stack_frame(const char *function_name, double microtime_entered, double microtime_exited);
 PHP_FUNCTION(scoutapm_get_calls);
 
-zif_handler original_handler_file_get_contents;
+SCOUT_DEFINE_OVERLOADED_FUNCTION(file_get_contents);
 
 ZEND_DECLARE_MODULE_GLOBALS(scoutapm)
 
@@ -38,21 +38,7 @@ static zend_module_entry scoutapm_module_entry = {
 ZEND_GET_MODULE(scoutapm);
 // */
 
-ZEND_NAMED_FUNCTION(scoutapm_file_get_contents)
-{
-    double entered = scoutapm_microtime();
-
-    int argc;
-    zval *args = NULL;
-
-    ZEND_PARSE_PARAMETERS_START(0, -1)
-        Z_PARAM_VARIADIC('+', args, argc)
-    ZEND_PARSE_PARAMETERS_END();
-
-    original_handler_file_get_contents(INTERNAL_FUNCTION_PARAM_PASSTHRU);
-
-    record_observed_stack_frame("file_get_contents", entered, scoutapm_microtime());
-}
+SCOUT_OVERLOADED_FUNCTION(file_get_contents)
 
 static PHP_RINIT_FUNCTION(scoutapm)
 {
@@ -63,13 +49,9 @@ static PHP_RINIT_FUNCTION(scoutapm)
 
     if (SCOUTAPM_G(handlers_set) != YES) {
         DEBUG("Overriding function handlers.\n");
-        zend_function *original_function_file_get_contents;
 
-        original_function_file_get_contents = zend_hash_str_find_ptr(EG(function_table), "file_get_contents", sizeof("file_get_contents")-1);
-        if (original_function_file_get_contents != NULL) {
-            original_handler_file_get_contents = original_function_file_get_contents->internal_function.handler;
-            original_function_file_get_contents->internal_function.handler = scoutapm_file_get_contents;
-        }
+        SCOUT_OVERLOAD_FUNCTION(file_get_contents)
+
         SCOUTAPM_G(handlers_set) = YES;
     } else {
         php_printf("Handlers have already been set, skipping.\n");

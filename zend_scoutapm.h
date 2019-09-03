@@ -48,4 +48,38 @@ ZEND_END_MODULE_GLOBALS(scoutapm)
 #define DEBUG(...) /**/
 #endif
 
+#ifndef SCOUT_DEFINE_OVERLOADED_FUNCTION
+#define SCOUT_DEFINE_OVERLOADED_FUNCTION(function_name) zif_handler original_handler_##function_name
+#endif
+
+#ifndef SCOUT_OVERLOADED_FUNCTION
+#define SCOUT_OVERLOADED_FUNCTION(function_name) \
+  ZEND_NAMED_FUNCTION(scoutapm_##function_name) \
+  { \
+    double entered = scoutapm_microtime(); \
+    int argc; \
+    zval *args = NULL; \
+    \
+    ZEND_PARSE_PARAMETERS_START(0, -1) \
+    Z_PARAM_VARIADIC('+', args, argc) \
+    ZEND_PARSE_PARAMETERS_END(); \
+    DEBUG("Hi")\
+    \
+    original_handler_##function_name(INTERNAL_FUNCTION_PARAM_PASSTHRU); \
+    \
+    record_observed_stack_frame(#function_name, entered, scoutapm_microtime()); \
+  }
+#endif
+
+#ifndef SCOUT_OVERLOAD_FUNCTION
+#define SCOUT_OVERLOAD_FUNCTION(function_name) \
+    zend_function *original_function_##function_name; \
+    \
+    original_function_##function_name = zend_hash_str_find_ptr(EG(function_table), #function_name, sizeof(#function_name)-1); \
+    if (original_function_##function_name != NULL) { \
+        original_handler_##function_name = original_function_##function_name->internal_function.handler; \
+        original_function_##function_name->internal_function.handler = scoutapm_##function_name; \
+    }
+#endif
+
 #endif //ZEND_SCOUTAPM_H
