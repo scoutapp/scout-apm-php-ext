@@ -123,10 +123,6 @@ static void record_observed_stack_frame(const char *function_name, double microt
 
 PHP_FUNCTION(scoutapm_get_calls)
 {
-    const char *item_key_function = "function";
-    const char *item_key_entered = "entered";
-    const char *item_key_exited = "exited";
-    const char *item_key_time_taken = "time_taken";
     zval item, arg_items;
     ZEND_PARSE_PARAMETERS_NONE();
 
@@ -137,26 +133,26 @@ PHP_FUNCTION(scoutapm_get_calls)
 
         add_assoc_str_ex(
             &item,
-            item_key_function, strlen(item_key_function),
+            SCOUT_GET_CALLS_KEY_FUNCTION, strlen(SCOUT_GET_CALLS_KEY_FUNCTION),
             zend_string_init(SCOUTAPM_G(observed_stack_frames)[i].function_name, strlen(SCOUTAPM_G(observed_stack_frames)[i].function_name), 0)
         );
 
         add_assoc_double_ex(
             &item,
-            item_key_entered, strlen(item_key_entered),
+            SCOUT_GET_CALLS_KEY_ENTERED, strlen(SCOUT_GET_CALLS_KEY_ENTERED),
             SCOUTAPM_G(observed_stack_frames)[i].entered
         );
 
         add_assoc_double_ex(
             &item,
-            item_key_exited, strlen(item_key_exited),
+            SCOUT_GET_CALLS_KEY_EXITED, strlen(SCOUT_GET_CALLS_KEY_EXITED),
             SCOUTAPM_G(observed_stack_frames)[i].exited
         );
 
         // Time taken is calculated here because float precision gets knocked off otherwise - so this is a useful metric
         add_assoc_double_ex(
             &item,
-            item_key_time_taken, strlen(item_key_time_taken),
+            SCOUT_GET_CALLS_KEY_TIME_TAKEN, strlen(SCOUT_GET_CALLS_KEY_TIME_TAKEN),
             SCOUTAPM_G(observed_stack_frames)[i].exited - SCOUTAPM_G(observed_stack_frames)[i].entered
         );
 
@@ -170,7 +166,7 @@ PHP_FUNCTION(scoutapm_get_calls)
 
         add_assoc_zval_ex(
             &item,
-            "argv", strlen("argv"),
+            SCOUT_GET_CALLS_KEY_ARGV, strlen(SCOUT_GET_CALLS_KEY_ARGV),
             &arg_items
         );
 

@@ -80,4 +80,10 @@ ZEND_END_MODULE_GLOBALS(scoutapm)
         original_function_##function_name->internal_function.handler = scoutapm_##function_name; \
     }
 
+#define SCOUT_GET_CALLS_KEY_FUNCTION "function"
+#define SCOUT_GET_CALLS_KEY_ENTERED "entered"
+#define SCOUT_GET_CALLS_KEY_EXITED "exited"
+#define SCOUT_GET_CALLS_KEY_TIME_TAKEN "time_taken"
+#define SCOUT_GET_CALLS_KEY_ARGV "argv"
+
 #endif //ZEND_SCOUTAPM_H
