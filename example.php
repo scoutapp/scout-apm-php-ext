@@ -1,4 +1,5 @@
 <?php
 
 file_get_contents(__FILE__);
-var_dump(scoutapm_get_calls()[0]);
+min(0, 1, 2);
+var_dump(scoutapm_get_calls()[1]);

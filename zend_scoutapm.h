@@ -24,6 +24,8 @@ typedef struct scoutapm_stack_frame {
     const char *function_name;
     double entered;
     double exited;
+    int argc;
+    zval *argv[5];
 } scoutapm_stack_frame;
 
 ZEND_BEGIN_MODULE_GLOBALS(scoutapm)
@@ -58,16 +60,15 @@ ZEND_END_MODULE_GLOBALS(scoutapm)
   { \
     double entered = scoutapm_microtime(); \
     int argc; \
-    zval *args = NULL; \
+    zval *argv = NULL; \
     \
     ZEND_PARSE_PARAMETERS_START(0, -1) \
-    Z_PARAM_VARIADIC('+', args, argc) \
+    Z_PARAM_VARIADIC('+', argv, argc) \
     ZEND_PARSE_PARAMETERS_END(); \
-    DEBUG("Hi")\
     \
     original_handler_##function_name(INTERNAL_FUNCTION_PARAM_PASSTHRU); \
     \
-    record_observed_stack_frame(#function_name, entered, scoutapm_microtime()); \
+    record_observed_stack_frame(#function_name, entered, scoutapm_microtime(), argc, argv); \
   }
 #endif
 

@@ -3,10 +3,11 @@
 static PHP_RINIT_FUNCTION(scoutapm);
 static PHP_RSHUTDOWN_FUNCTION(scoutapm);
 static double scoutapm_microtime();
-static void record_observed_stack_frame(const char *function_name, double microtime_entered, double microtime_exited);
+static void record_observed_stack_frame(const char *function_name, double microtime_entered, double microtime_exited, int argc, zval *argv);
 PHP_FUNCTION(scoutapm_get_calls);
 
 SCOUT_DEFINE_OVERLOADED_FUNCTION(file_get_contents);
+SCOUT_DEFINE_OVERLOADED_FUNCTION(min);
 
 ZEND_DECLARE_MODULE_GLOBALS(scoutapm)
 
@@ -39,6 +40,7 @@ ZEND_GET_MODULE(scoutapm);
 // */
 
 SCOUT_OVERLOADED_FUNCTION(file_get_contents)
+SCOUT_OVERLOADED_FUNCTION(min)
 
 static PHP_RINIT_FUNCTION(scoutapm)
 {
@@ -51,6 +53,7 @@ static PHP_RINIT_FUNCTION(scoutapm)
         DEBUG("Overriding function handlers.\n");
 
         SCOUT_OVERLOAD_FUNCTION(file_get_contents)
+        SCOUT_OVERLOAD_FUNCTION(min)
 
         SCOUTAPM_G(handlers_set) = YES;
     } else {
@@ -99,17 +102,26 @@ static double scoutapm_microtime()
     return (double)(tp.tv_sec + tp.tv_usec / 1000000.00);
 }
 
-static void record_observed_stack_frame(const char *function_name, double microtime_entered, double microtime_exited)
+static void record_observed_stack_frame(const char *function_name, double microtime_entered, double microtime_exited, int argc, zval *argv)
 {
     DEBUG("Adding observed stack frame for %s ... ", function_name);
     SCOUTAPM_G(observed_stack_frames) = realloc(
         SCOUTAPM_G(observed_stack_frames),
         (SCOUTAPM_G(observed_stack_frames_count)+1) * sizeof(scoutapm_stack_frame)
     );
+    zval *arg0 = NULL, *arg1 = NULL, *arg2 = NULL, *arg3 = NULL, *arg4 = NULL;
+    if (argc > 0) { arg0 = argv; }
+    if (argc > 1) { arg1 = argv + 1; }
+    if (argc > 2) { arg2 = argv + 2; }
+    if (argc > 3) { arg3 = argv + 3; }
+    if (argc > 4) { arg4 = argv + 4; }
+
     SCOUTAPM_G(observed_stack_frames)[SCOUTAPM_G(observed_stack_frames_count)] = (scoutapm_stack_frame){
         .function_name = function_name,
         .entered = microtime_entered,
-        .exited = microtime_exited
+        .exited = microtime_exited,
+        .argc = argc,
+        .argv = {arg0, arg1, arg2, arg3, arg4}
     };
     SCOUTAPM_G(observed_stack_frames_count)++;
     DEBUG("Done\n");
@@ -121,7 +133,7 @@ PHP_FUNCTION(scoutapm_get_calls)
     const char *item_key_entered = "entered";
     const char *item_key_exited = "exited";
     const char *item_key_time_taken = "time_taken";
-    zval item;
+    zval item, arg_items;
     ZEND_PARSE_PARAMETERS_NONE();
 
     array_init(return_value);
@@ -152,6 +164,16 @@ PHP_FUNCTION(scoutapm_get_calls)
             &item,
             item_key_time_taken, strlen(item_key_time_taken),
             SCOUTAPM_G(observed_stack_frames)[i].exited - SCOUTAPM_G(observed_stack_frames)[i].entered
+        );
+
+        array_init(&arg_items);
+        for (int j = 0; j < SCOUTAPM_G(observed_stack_frames)[i].argc; j++) {
+            add_next_index_zval(&arg_items, (SCOUTAPM_G(observed_stack_frames)[i].argv[j]));
+        }
+        add_assoc_zval_ex(
+            &item,
+            "argv", strlen("argv"),
+            &arg_items
         );
 
         add_next_index_zval(return_value, &item);
