@@ -1,13 +1,24 @@
 cmake_minimum_required(VERSION 3.9)
-project(scoutapm)
+project(scoutapm C)
 
-set(CMAKE_CXX_STANDARD 11)
+set(SOURCE_FILES zend_scoutapm.c zend_scoutapm.h)
 
-include_directories(/home/james/workspace/php-src/main)
-include_directories(/home/james/workspace/php-src/Zend)
-include_directories(/home/james/workspace/php-src)
-
-add_executable(scoutapm
-        zend_scoutapm.c
-        zend_scoutapm.h
+execute_process(
+        COMMAND php-config --include-dir
+        OUTPUT_VARIABLE PHP_SOURCE
 )
+string(REGEX REPLACE "\n$" "" PHP_SOURCE "${PHP_SOURCE}")
+message("Using source directory: ${PHP_SOURCE}")
+
+include_directories(${PHP_SOURCE})
+include_directories(${PHP_SOURCE}/main)
+include_directories(${PHP_SOURCE}/Zend)
+include_directories(${PHP_SOURCE}/TSRM)
+include_directories(${PROJECT_SOURCE_DIR})
+
+add_custom_target(configure
+        COMMAND phpize && ./configure
+        DEPENDS ${SOURCE_FILES}
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+
+add_library(___ EXCLUDE_FROM_ALL ${SOURCE_FILES})
