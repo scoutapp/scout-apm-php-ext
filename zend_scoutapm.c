@@ -40,7 +40,6 @@ ZEND_GET_MODULE(scoutapm);
 // */
 
 SCOUT_OVERLOADED_FUNCTION(file_get_contents)
-SCOUT_OVERLOADED_FUNCTION(min)
 
 static PHP_RINIT_FUNCTION(scoutapm)
 {
@@ -53,7 +52,6 @@ static PHP_RINIT_FUNCTION(scoutapm)
         DEBUG("Overriding function handlers.\n");
 
         SCOUT_OVERLOAD_FUNCTION(file_get_contents)
-        SCOUT_OVERLOAD_FUNCTION(min)
 
         SCOUTAPM_G(handlers_set) = YES;
     } else {
@@ -109,20 +107,20 @@ static void record_observed_stack_frame(const char *function_name, double microt
         SCOUTAPM_G(observed_stack_frames),
         (SCOUTAPM_G(observed_stack_frames_count)+1) * sizeof(scoutapm_stack_frame)
     );
-    zval *arg0 = NULL, *arg1 = NULL, *arg2 = NULL, *arg3 = NULL, *arg4 = NULL;
-    if (argc > 0) { arg0 = argv; }
-    if (argc > 1) { arg1 = argv + 1; }
-    if (argc > 2) { arg2 = argv + 2; }
-    if (argc > 3) { arg3 = argv + 3; }
-    if (argc > 4) { arg4 = argv + 4; }
 
-    SCOUTAPM_G(observed_stack_frames)[SCOUTAPM_G(observed_stack_frames_count)] = (scoutapm_stack_frame){
-        .function_name = function_name,
-        .entered = microtime_entered,
-        .exited = microtime_exited,
-        .argc = argc,
-        .argv = {arg0, arg1, arg2, arg3, arg4}
-    };
+    SCOUTAPM_G(observed_stack_frames)[SCOUTAPM_G(observed_stack_frames_count)].function_name = strdup(function_name);
+    SCOUTAPM_G(observed_stack_frames)[SCOUTAPM_G(observed_stack_frames_count)].entered = microtime_entered;
+    SCOUTAPM_G(observed_stack_frames)[SCOUTAPM_G(observed_stack_frames_count)].exited = microtime_exited;
+    SCOUTAPM_G(observed_stack_frames)[SCOUTAPM_G(observed_stack_frames_count)].argc = argc;
+    SCOUTAPM_G(observed_stack_frames)[SCOUTAPM_G(observed_stack_frames_count)].argv = malloc(sizeof(zval) * argc);
+
+    for (int i = 0; i < argc; i++) {
+        ZVAL_COPY(
+            &(SCOUTAPM_G(observed_stack_frames)[SCOUTAPM_G(observed_stack_frames_count)].argv[i]),
+            &(argv[i])
+        );
+    }
+
     SCOUTAPM_G(observed_stack_frames_count)++;
     DEBUG("Done\n");
 }
@@ -168,8 +166,12 @@ PHP_FUNCTION(scoutapm_get_calls)
 
         array_init(&arg_items);
         for (int j = 0; j < SCOUTAPM_G(observed_stack_frames)[i].argc; j++) {
-            add_next_index_zval(&arg_items, (SCOUTAPM_G(observed_stack_frames)[i].argv[j]));
+            add_next_index_zval(&arg_items, &(SCOUTAPM_G(observed_stack_frames)[i].argv[j]));
+            zval_ptr_dtor(&(SCOUTAPM_G(observed_stack_frames)[i].argv[j]));
         }
+        free(SCOUTAPM_G(observed_stack_frames)[i].argv);
+        free((void*)SCOUTAPM_G(observed_stack_frames)[i].function_name);
+
         add_assoc_zval_ex(
             &item,
             "argv", strlen("argv"),

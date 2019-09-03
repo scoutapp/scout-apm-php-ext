@@ -13,6 +13,7 @@
 #include <zend_extensions.h>
 #include <zend_compile.h>
 #include <zend_exceptions.h>
+#include "ext/standard/php_var.h"
 
 #define SCOUT_APM_EXT_NAME "scoutapm"
 #define SCOUT_APM_EXT_VERSION "0.0"
@@ -25,7 +26,7 @@ typedef struct scoutapm_stack_frame {
     double entered;
     double exited;
     int argc;
-    zval *argv[5];
+    zval *argv;
 } scoutapm_stack_frame;
 
 ZEND_BEGIN_MODULE_GLOBALS(scoutapm)
@@ -50,11 +51,8 @@ ZEND_END_MODULE_GLOBALS(scoutapm)
 #define DEBUG(...) /**/
 #endif
 
-#ifndef SCOUT_DEFINE_OVERLOADED_FUNCTION
 #define SCOUT_DEFINE_OVERLOADED_FUNCTION(function_name) zif_handler original_handler_##function_name
-#endif
 
-#ifndef SCOUT_OVERLOADED_FUNCTION
 #define SCOUT_OVERLOADED_FUNCTION(function_name) \
   ZEND_NAMED_FUNCTION(scoutapm_##function_name) \
   { \
@@ -63,16 +61,16 @@ ZEND_END_MODULE_GLOBALS(scoutapm)
     zval *argv = NULL; \
     \
     ZEND_PARSE_PARAMETERS_START(0, -1) \
-    Z_PARAM_VARIADIC('+', argv, argc) \
+        Z_PARAM_VARIADIC(' ', argv, argc) \
     ZEND_PARSE_PARAMETERS_END(); \
+    \
+    /*for (int i = 0; i < argc; i++) { php_debug_zval_dump(argv + i, 0); }*/\
     \
     original_handler_##function_name(INTERNAL_FUNCTION_PARAM_PASSTHRU); \
     \
     record_observed_stack_frame(#function_name, entered, scoutapm_microtime(), argc, argv); \
   }
-#endif
 
-#ifndef SCOUT_OVERLOAD_FUNCTION
 #define SCOUT_OVERLOAD_FUNCTION(function_name) \
     zend_function *original_function_##function_name; \
     \
@@ -81,6 +79,5 @@ ZEND_END_MODULE_GLOBALS(scoutapm)
         original_handler_##function_name = original_function_##function_name->internal_function.handler; \
         original_function_##function_name->internal_function.handler = scoutapm_##function_name; \
     }
-#endif
 
 #endif //ZEND_SCOUTAPM_H

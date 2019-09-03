@@ -45,7 +45,7 @@ array(0) {
 SHOULD be logged
 array(1) {
   [0]=>
-  array(4) {
+  array(5) {
     ["function"]=>
     string(17) "file_get_contents"
     ["entered"]=>
@@ -54,5 +54,10 @@ array(1) {
     float(%f)
     ["time_taken"]=>
     float(%f)
+    ["argv"]=>
+    array(1) {
+      [0]=>
+      string(%d) "%s/tests/004-namespaced-fgc-is-not-logged.php"
+    }
   }
 }
