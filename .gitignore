@@ -69,4 +69,4 @@ libtool
 .Trashes
 
 # Ignored because CMake isn't really used apart from to tell CLion where to find libraries
-cmake-build-debug
+cmake-build-*
