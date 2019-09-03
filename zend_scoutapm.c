@@ -33,11 +33,7 @@ static zend_module_entry scoutapm_module_entry = {
     STANDARD_MODULE_PROPERTIES_EX
 };
 
-/*
- * Do not export this module, so it cannot be registered with `extension=scoutapm.so` - must be `zend_extension=`
- * Instead, see `zend_scoutapm_startup` - we load the module there.*/
 ZEND_GET_MODULE(scoutapm);
-// */
 
 SCOUT_OVERLOADED_FUNCTION(file_get_contents)
 
