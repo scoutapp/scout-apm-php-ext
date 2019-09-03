@@ -27,8 +27,7 @@ typedef struct scoutapm_stack_frame {
 } scoutapm_stack_frame;
 
 ZEND_BEGIN_MODULE_GLOBALS(scoutapm)
-    zend_long stack_depth;
-    scoutapm_stack_frame *current_function_stack;
+    zend_bool handlers_set;
     zend_long observed_stack_frames_count;
     scoutapm_stack_frame *observed_stack_frames;
 ZEND_END_MODULE_GLOBALS(scoutapm)
@@ -48,12 +47,5 @@ ZEND_END_MODULE_GLOBALS(scoutapm)
 #else
 #define DEBUG(...) /**/
 #endif
-
-#define DYNAMIC_MALLOC_SPRINTF(destString, sizeNeeded, fmt, ...) \
-    sizeNeeded = snprintf(NULL, 0, fmt, ##__VA_ARGS__) + 1; \
-    destString = (char*)malloc(sizeNeeded); \
-    snprintf(destString, sizeNeeded, fmt, ##__VA_ARGS__)
-
-#define SCOUTAPM_CURRENT_STACK_FRAME SCOUTAPM_G(current_function_stack)[SCOUTAPM_G(stack_depth)-1]
 
 #endif //ZEND_SCOUTAPM_H

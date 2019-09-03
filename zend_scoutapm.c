@@ -2,13 +2,11 @@
 
 static PHP_RINIT_FUNCTION(scoutapm);
 static PHP_RSHUTDOWN_FUNCTION(scoutapm);
-static int zend_scoutapm_startup(zend_extension*);
-static void zend_scoutapm_activate(void);
-static void zend_scoutapm_deactivate(void);
-static void zend_scoutapm_fcall_begin_handler(zend_execute_data *execute_data);
-static void zend_scoutapm_fcall_end_handler(zend_execute_data *execute_data);
-static boolean_e is_observed_function(const char *function_name);
+static double scoutapm_microtime();
+static void record_observed_stack_frame(const char *function_name, double microtime_entered, double microtime_exited);
 PHP_FUNCTION(scoutapm_get_calls);
+
+zif_handler original_handler_file_get_contents;
 
 ZEND_DECLARE_MODULE_GLOBALS(scoutapm)
 
@@ -36,66 +34,51 @@ static zend_module_entry scoutapm_module_entry = {
 
 /*
  * Do not export this module, so it cannot be registered with `extension=scoutapm.so` - must be `zend_extension=`
- * Instead, see `zend_scoutapm_startup` - we load the module there.
+ * Instead, see `zend_scoutapm_startup` - we load the module there.*/
 ZEND_GET_MODULE(scoutapm);
- */
+// */
 
-zend_extension_version_info extension_version_info = {
-    ZEND_EXTENSION_API_NO,
-    ZEND_EXTENSION_BUILD_ID
-};
+ZEND_NAMED_FUNCTION(scoutapm_file_get_contents)
+{
+    double entered = scoutapm_microtime();
 
-zend_extension zend_extension_entry = {
-    SCOUT_APM_EXT_NAME,
-    SCOUT_APM_EXT_VERSION,
-    "Scout APM",
-    "https://scoutapm.com/",
-    "Copyright 2019",
-    zend_scoutapm_startup, // extension startup
-    NULL, // extension shutdown
-    zend_scoutapm_activate, // request startup
-    zend_scoutapm_deactivate, // request shutdown
-    NULL, // message handler
-    NULL, // compiler op_array_ahndler
-    NULL, // VM statement_handler
-    zend_scoutapm_fcall_begin_handler, // VM fcall_begin_handler
-    zend_scoutapm_fcall_end_handler, // VM_fcall_end_handler
-    NULL, // compiler op_array_ctor
-    NULL, // compiler op_array_dtor
-    STANDARD_ZEND_EXTENSION_PROPERTIES
-};
+    int argc;
+    zval *args = NULL;
 
-static int zend_scoutapm_startup(zend_extension *ze) {
-    return zend_startup_module(&scoutapm_module_entry);
-}
+    ZEND_PARSE_PARAMETERS_START(0, -1)
+        Z_PARAM_VARIADIC('+', args, argc)
+    ZEND_PARSE_PARAMETERS_END();
 
-static void zend_scoutapm_activate(void) {
-    CG(compiler_options) |= ZEND_COMPILE_EXTENDED_INFO;
-}
+    original_handler_file_get_contents(INTERNAL_FUNCTION_PARAM_PASSTHRU);
 
-static void zend_scoutapm_deactivate(void) {
-    CG(compiler_options) |= ZEND_COMPILE_EXTENDED_INFO;
+    record_observed_stack_frame("file_get_contents", entered, scoutapm_microtime());
 }
 
 static PHP_RINIT_FUNCTION(scoutapm)
 {
     DEBUG("Initialising stacks...");
-    SCOUTAPM_G(stack_depth) = 0;
-    SCOUTAPM_G(current_function_stack) = calloc(0, sizeof(scoutapm_stack_frame));
-
     SCOUTAPM_G(observed_stack_frames_count) = 0;
     SCOUTAPM_G(observed_stack_frames) = calloc(0, sizeof(scoutapm_stack_frame));
     DEBUG("Stacks made\n");
+
+    if (SCOUTAPM_G(handlers_set) != YES) {
+        DEBUG("Overriding function handlers.\n");
+        zend_function *original_function_file_get_contents;
+
+        original_function_file_get_contents = zend_hash_str_find_ptr(EG(function_table), "file_get_contents", sizeof("file_get_contents")-1);
+        if (original_function_file_get_contents != NULL) {
+            original_handler_file_get_contents = original_function_file_get_contents->internal_function.handler;
+            original_function_file_get_contents->internal_function.handler = scoutapm_file_get_contents;
+        }
+        SCOUTAPM_G(handlers_set) = YES;
+    } else {
+        php_printf("Handlers have already been set, skipping.\n");
+    }
 }
 
 static PHP_RSHUTDOWN_FUNCTION(scoutapm)
 {
     DEBUG("Freeing stacks... ");
-    if (SCOUTAPM_G(current_function_stack)) {
-        free(SCOUTAPM_G(current_function_stack));
-    }
-    SCOUTAPM_G(stack_depth) = 0;
-
     if (SCOUTAPM_G(observed_stack_frames)) {
         free(SCOUTAPM_G(observed_stack_frames));
     }
@@ -150,76 +133,6 @@ static void record_observed_stack_frame(const char *function_name, double microt
     DEBUG("Done\n");
 }
 
-static void enter_stack_frame(const char *entered_function_name, double microtime_entered)
-{
-    DEBUG("Entering stack frame %s ...", entered_function_name);
-    SCOUTAPM_G(current_function_stack) = realloc(
-        SCOUTAPM_G(current_function_stack),
-        (SCOUTAPM_G(stack_depth)+1) * sizeof(scoutapm_stack_frame)
-    );
-    SCOUTAPM_G(current_function_stack)[SCOUTAPM_G(stack_depth)] = (scoutapm_stack_frame){
-        .function_name = entered_function_name,
-        .entered = microtime_entered,
-    };
-    SCOUTAPM_G(stack_depth)++;
-    DEBUG("Done\n");
-}
-
-static void leave_stack_frame()
-{
-    DEBUG("Leaving stack frame %s...", SCOUTAPM_CURRENT_STACK_FRAME.function_name);
-    SCOUTAPM_G(current_function_stack) = realloc(
-        SCOUTAPM_G(current_function_stack),
-        (SCOUTAPM_G(stack_depth)-1) * sizeof(scoutapm_stack_frame)
-    );
-    SCOUTAPM_G(stack_depth)--;
-    DEBUG("Done\n");
-}
-
-static void zend_scoutapm_fcall_begin_handler(zend_execute_data *execute_data) {
-    size_t stack_frame_name_size;
-    char *stack_frame_name;
-
-    if (!execute_data->call) {
-        zend_op n = execute_data->func->op_array.opcodes[(execute_data->opline - execute_data->func->op_array.opcodes) + 1];
-        if (n.extended_value == ZEND_EVAL) {
-            DYNAMIC_MALLOC_SPRINTF(stack_frame_name, stack_frame_name_size, "<evaled code:%s:%u>", ZSTR_VAL(execute_data->func->op_array.filename), n.lineno);
-        } else {
-            DYNAMIC_MALLOC_SPRINTF(stack_frame_name, stack_frame_name_size, "<required file>");
-            // @todo add back in
-//            zend_string *file = zval_get_string(EX_CONSTANT(n.op1));
-//            sprintf(stack_frame_name, "<required file:%s>", ZSTR_VAL(file));
-//            zend_string_release(file);
-        }
-    } else if (execute_data->call->func->common.fn_flags & ZEND_ACC_STATIC) {
-        DYNAMIC_MALLOC_SPRINTF(stack_frame_name, stack_frame_name_size, "%s::%s", ZSTR_VAL(Z_CE(execute_data->call->This)->name), ZSTR_VAL(execute_data->call->func->common.function_name));
-    } else if (Z_TYPE(execute_data->call->This) == IS_OBJECT) {
-        DYNAMIC_MALLOC_SPRINTF(stack_frame_name, stack_frame_name_size, "%s->%s", ZSTR_VAL(Z_OBJCE(execute_data->call->This)->name), ZSTR_VAL(execute_data->call->func->common.function_name));
-    } else if (execute_data->call->func->common.function_name) {
-        DYNAMIC_MALLOC_SPRINTF(stack_frame_name, stack_frame_name_size, "%s", ZSTR_VAL(execute_data->call->func->common.function_name));
-    } else {
-        DEBUG("POSSIBLE BUG : no stack frame name detected...\n");
-        DYNAMIC_MALLOC_SPRINTF(stack_frame_name, stack_frame_name_size, "<unknown name>");
-    }
-
-    enter_stack_frame(stack_frame_name, scoutapm_microtime());
-}
-
-static void zend_scoutapm_fcall_end_handler(zend_execute_data *execute_data)
-{
-    DEBUG("handling fcall_end...\n");
-    if (SCOUTAPM_G(stack_depth) == 0) {
-        DEBUG("POSSIBLE BUG: fcall_end called but nothing was in stack\n");
-        return;
-    }
-    if (is_observed_function(SCOUTAPM_CURRENT_STACK_FRAME.function_name)) {
-        const double exit_time = scoutapm_microtime();
-        record_observed_stack_frame(SCOUTAPM_CURRENT_STACK_FRAME.function_name, SCOUTAPM_CURRENT_STACK_FRAME.entered, exit_time);
-    }
-
-    leave_stack_frame();
-}
-
 PHP_FUNCTION(scoutapm_get_calls)
 {
     const char *item_key_function = "function";
@@ -228,8 +141,6 @@ PHP_FUNCTION(scoutapm_get_calls)
     const char *item_key_time_taken = "time_taken";
     zval item;
     ZEND_PARSE_PARAMETERS_NONE();
-
-//    print_stack_frame(SCOUTAPM_G(observed_stack_frames), SCOUTAPM_G(observed_stack_frames_count));
 
     array_init(return_value);
 
@@ -266,20 +177,4 @@ PHP_FUNCTION(scoutapm_get_calls)
 
     SCOUTAPM_G(observed_stack_frames) = realloc(SCOUTAPM_G(observed_stack_frames), 0);
     SCOUTAPM_G(observed_stack_frames_count) = 0;
-}
-
-static boolean_e is_observed_function(const char *function_name)
-{
-    int i;
-    const char *observe_functions[1] = {
-        "file_get_contents"
-    };
-
-    for (i = 0; i < 1; i++) {
-        if (strcmp(function_name, observe_functions[i]) == 0) {
-            return YES;
-        }
-    }
-
-    return NO;
 }
