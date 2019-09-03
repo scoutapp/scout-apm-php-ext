@@ -44,12 +44,12 @@ static PHP_RINIT_FUNCTION(scoutapm)
     SCOUTAPM_G(observed_stack_frames) = calloc(0, sizeof(scoutapm_stack_frame));
     DEBUG("Stacks made\n");
 
-    if (SCOUTAPM_G(handlers_set) != YES) {
+    if (SCOUTAPM_G(handlers_set) != 1) {
         DEBUG("Overriding function handlers.\n");
 
         SCOUT_OVERLOAD_FUNCTION(file_get_contents)
 
-        SCOUTAPM_G(handlers_set) = YES;
+        SCOUTAPM_G(handlers_set) = 1;
     } else {
         php_printf("Handlers have already been set, skipping.\n");
     }
