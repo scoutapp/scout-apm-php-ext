@@ -7,7 +7,6 @@ static void record_observed_stack_frame(const char *function_name, double microt
 PHP_FUNCTION(scoutapm_get_calls);
 
 SCOUT_DEFINE_OVERLOADED_FUNCTION(file_get_contents);
-SCOUT_DEFINE_OVERLOADED_FUNCTION(min);
 
 ZEND_DECLARE_MODULE_GLOBALS(scoutapm)
 
@@ -51,7 +50,7 @@ static PHP_RINIT_FUNCTION(scoutapm)
 
         SCOUTAPM_G(handlers_set) = 1;
     } else {
-        php_printf("Handlers have already been set, skipping.\n");
+        DEBUG("Handlers have already been set, skipping.\n");
     }
 }
 
@@ -63,26 +62,6 @@ static PHP_RSHUTDOWN_FUNCTION(scoutapm)
     }
     SCOUTAPM_G(observed_stack_frames_count) = 0;
     DEBUG("Stacks freed\n");
-}
-
-// Note - useful for debugging, can probably be removed
-static void print_stack_frame(scoutapm_stack_frame *stack_frame, zend_long depth)
-{
-    if (SCOUT_APM_EXT_DEBUGGING != 1) {
-        return;
-    }
-
-    php_printf("  Stack Record:\n");
-    for (int i = 0; i < depth; i++) {
-        php_printf(
-            "    %d:%s\n      + %f\n      - %f\n",
-            i,
-            stack_frame[i].function_name,
-            stack_frame[i].entered,
-            stack_frame[i].exited
-        );
-    }
-    php_printf("\n");
 }
 
 // @todo we could just use already implemented microtime(true) ?
