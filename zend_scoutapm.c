@@ -34,6 +34,7 @@ static zend_module_entry scoutapm_module_entry = {
 
 ZEND_GET_MODULE(scoutapm);
 
+// @todo look into making just one function overloader
 SCOUT_OVERLOADED_FUNCTION(file_get_contents)
 
 static PHP_RINIT_FUNCTION(scoutapm)
@@ -46,6 +47,7 @@ static PHP_RINIT_FUNCTION(scoutapm)
     if (SCOUTAPM_G(handlers_set) != 1) {
         DEBUG("Overriding function handlers.\n");
 
+        // @todo this could be configurable by INI if more dynamic
         SCOUT_OVERLOAD_FUNCTION(file_get_contents)
 
         SCOUTAPM_G(handlers_set) = 1;
