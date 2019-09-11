@@ -20,7 +20,7 @@ do
   key="$1"
   case $key in
       -w|--with-scoutapm)
-      PHP="`which php` -d extension=`pwd`/modules/scoutapm.so"
+      PHP="`which php` -d zend_extension=`pwd`/modules/scoutapm.so"
       PHP_DESCRIPTION="with scoutapm extension ENABLED"
       shift
       ;;

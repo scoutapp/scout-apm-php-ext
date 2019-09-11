@@ -2,6 +2,7 @@
 
 static PHP_RINIT_FUNCTION(scoutapm);
 static PHP_RSHUTDOWN_FUNCTION(scoutapm);
+static int zend_scoutapm_startup(zend_extension*);
 static double scoutapm_microtime();
 static void record_observed_stack_frame(const char *function_name, double microtime_entered, double microtime_exited, int argc, zval *argv);
 PHP_FUNCTION(scoutapm_get_calls);
@@ -32,7 +33,39 @@ static zend_module_entry scoutapm_module_entry = {
     STANDARD_MODULE_PROPERTIES_EX
 };
 
+/*
+ * Do not export this module, so it cannot be registered with `extension=scoutapm.so` - must be `zend_extension=`
+ * Instead, see `zend_scoutapm_startup` - we load the module there.
 ZEND_GET_MODULE(scoutapm);
+ */
+zend_extension_version_info extension_version_info = {
+    ZEND_EXTENSION_API_NO,
+    ZEND_EXTENSION_BUILD_ID
+};
+
+zend_extension zend_extension_entry = {
+    SCOUT_APM_EXT_NAME,
+    SCOUT_APM_EXT_VERSION,
+    "Scout APM",
+    "https://scoutapm.com/",
+    "Copyright 2019",
+    zend_scoutapm_startup, // extension startup
+    NULL, // extension shutdown
+    NULL, // request startup
+    NULL, // request shutdown
+    NULL, // message handler
+    NULL, // compiler op_array_ahndler
+    NULL, // VM statement_handler
+    NULL, // VM fcall_begin_handler
+    NULL, // VM_fcall_end_handler
+    NULL, // compiler op_array_ctor
+    NULL, // compiler op_array_dtor
+    STANDARD_ZEND_EXTENSION_PROPERTIES
+};
+
+static int zend_scoutapm_startup(zend_extension *ze) {
+    return zend_startup_module(&scoutapm_module_entry);
+}
 
 // @todo look into making just one function overloader
 SCOUT_OVERLOADED_FUNCTION(file_get_contents)

@@ -9,7 +9,7 @@ PHP_ARG_ENABLE([scoutapm],
 if test "$PHP_SCOUT_APM" != "no"; then
   PHP_NEW_EXTENSION(scoutapm,
         zend_scoutapm.c,
-        $ext_shared)
+        $ext_shared,, ,,yes)
 fi
 
 AC_CONFIG_COMMANDS_POST([
