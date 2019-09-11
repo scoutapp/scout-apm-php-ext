@@ -28,3 +28,16 @@ $ make test
 docker build .
 docker run -v $PWD/modules:/v <hash_from_build>
 ```
+
+## Debugging
+
+Use `gdb` (e.g. in CLion) to debug. Once running, php-src has a GDB
+helper:
+
+```
+source /path/to/php-src/.gdbinit
+printzv <thing>
+print_ht <thing>
+zbacktrace
+print_cvs
+```

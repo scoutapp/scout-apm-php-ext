@@ -40,6 +40,7 @@ shtool
 /config.guess
 /config.h
 /config.h.in
+/config.h.in~
 /config.sub
 /config.nice
 /configure.in
@@ -69,4 +70,4 @@ libtool
 .Trashes
 
 # Ignored because CMake isn't really used apart from to tell CLion where to find libraries
-cmake-build-debug
+cmake-build-*
