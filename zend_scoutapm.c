@@ -108,15 +108,14 @@ static void record_observed_stack_frame(const char *function_name, double microt
     SCOUTAPM_G(observed_stack_frames)[SCOUTAPM_G(observed_stack_frames_count)].entered = microtime_entered;
     SCOUTAPM_G(observed_stack_frames)[SCOUTAPM_G(observed_stack_frames_count)].exited = microtime_exited;
     SCOUTAPM_G(observed_stack_frames)[SCOUTAPM_G(observed_stack_frames_count)].argc = argc;
-    // @todo causing a crash - fix
-//    SCOUTAPM_G(observed_stack_frames)[SCOUTAPM_G(observed_stack_frames_count)].argv = malloc(sizeof(zval) * argc);
+    SCOUTAPM_G(observed_stack_frames)[SCOUTAPM_G(observed_stack_frames_count)].argv = calloc(argc, sizeof(zval));
 
-//    for (int i = 0; i < argc; i++) {
-//        ZVAL_COPY(
-//            &(SCOUTAPM_G(observed_stack_frames)[SCOUTAPM_G(observed_stack_frames_count)].argv[i]),
-//            &(argv[i])
-//        );
-//    }
+    for (int i = 0; i < argc; i++) {
+        ZVAL_COPY(
+            &(SCOUTAPM_G(observed_stack_frames)[SCOUTAPM_G(observed_stack_frames_count)].argv[i]),
+            &(argv[i])
+        );
+    }
 
     SCOUTAPM_G(observed_stack_frames_count)++;
     DEBUG("Done\n");
@@ -124,7 +123,7 @@ static void record_observed_stack_frame(const char *function_name, double microt
 
 PHP_FUNCTION(scoutapm_get_calls)
 {
-    zval item, arg_items;
+    zval item, arg_items, arg_item;
     ZEND_PARSE_PARAMETERS_NONE();
 
     DEBUG("scoutapm_get_calls: preparing return value... ");
@@ -159,19 +158,20 @@ PHP_FUNCTION(scoutapm_get_calls)
             SCOUTAPM_G(observed_stack_frames)[i].exited - SCOUTAPM_G(observed_stack_frames)[i].entered
         );
 
-        // @todo causing a crash - fix
-//        array_init(&arg_items);
-//        for (int j = 0; j < SCOUTAPM_G(observed_stack_frames)[i].argc; j++) {
-//            add_next_index_zval(&arg_items, &(SCOUTAPM_G(observed_stack_frames)[i].argv[j]));
-//            zval_ptr_dtor(&(SCOUTAPM_G(observed_stack_frames)[i].argv[j]));
-//        }
-//        free(SCOUTAPM_G(observed_stack_frames)[i].argv);
+        array_init(&arg_items);
+        for (int j = 0; j < SCOUTAPM_G(observed_stack_frames)[i].argc; j++) {
+            // Must copy the argument to a new zval, otherwise it gets freed and we get segfault.
+            ZVAL_COPY(&arg_item, &(SCOUTAPM_G(observed_stack_frames)[i].argv[j]));
+            add_next_index_zval(&arg_items, &arg_item);
+            zval_ptr_dtor(&(SCOUTAPM_G(observed_stack_frames)[i].argv[j]));
+        }
+        free(SCOUTAPM_G(observed_stack_frames)[i].argv);
 
-//        add_assoc_zval_ex(
-//            &item,
-//            SCOUT_GET_CALLS_KEY_ARGV, strlen(SCOUT_GET_CALLS_KEY_ARGV),
-//            &arg_items
-//        );
+        add_assoc_zval_ex(
+            &item,
+            SCOUT_GET_CALLS_KEY_ARGV, strlen(SCOUT_GET_CALLS_KEY_ARGV),
+            &arg_items
+        );
 
         add_next_index_zval(return_value, &item);
 
