@@ -51,6 +51,10 @@ ZEND_END_MODULE_GLOBALS(scoutapm)
 #define DEBUG(...) /**/
 #endif
 
+#ifndef zif_handler
+typedef void (*zif_handler)(INTERNAL_FUNCTION_PARAMETERS);
+#endif
+
 #define SCOUT_DEFINE_OVERLOADED_FUNCTION(function_name) zif_handler original_handler_##function_name
 
 #define SCOUT_OVERLOADED_FUNCTION(function_name) \

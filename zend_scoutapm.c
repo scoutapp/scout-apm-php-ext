@@ -35,22 +35,7 @@ static zend_module_entry scoutapm_module_entry = {
 ZEND_GET_MODULE(scoutapm);
 
 // @todo look into making just one function overloader
-ZEND_NAMED_FUNCTION(scoutapm_file_get_contents)
-  {
-    double entered = scoutapm_microtime();
-    int argc;
-    zval *argv = NULL;
-
-    ZEND_PARSE_PARAMETERS_START(0, -1)
-        Z_PARAM_VARIADIC(' ', argv, argc)
-    ZEND_PARSE_PARAMETERS_END();
-
-    /*for (int i = 0; i < argc; i++) { php_debug_zval_dump(argv + i, 0); }*/
-
-    original_handler_file_get_contents(INTERNAL_FUNCTION_PARAM_PASSTHRU);
-
-    record_observed_stack_frame("file_get_contents", entered, scoutapm_microtime(), argc, argv);
-  }
+SCOUT_OVERLOADED_FUNCTION(file_get_contents)
 
 static PHP_RINIT_FUNCTION(scoutapm)
 {
