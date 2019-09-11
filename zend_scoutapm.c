@@ -35,7 +35,22 @@ static zend_module_entry scoutapm_module_entry = {
 ZEND_GET_MODULE(scoutapm);
 
 // @todo look into making just one function overloader
-SCOUT_OVERLOADED_FUNCTION(file_get_contents)
+ZEND_NAMED_FUNCTION(scoutapm_file_get_contents)
+  {
+    double entered = scoutapm_microtime();
+    int argc;
+    zval *argv = NULL;
+
+    ZEND_PARSE_PARAMETERS_START(0, -1)
+        Z_PARAM_VARIADIC(' ', argv, argc)
+    ZEND_PARSE_PARAMETERS_END();
+
+    /*for (int i = 0; i < argc; i++) { php_debug_zval_dump(argv + i, 0); }*/
+
+    original_handler_file_get_contents(INTERNAL_FUNCTION_PARAM_PASSTHRU);
+
+    record_observed_stack_frame("file_get_contents", entered, scoutapm_microtime(), argc, argv);
+  }
 
 static PHP_RINIT_FUNCTION(scoutapm)
 {
@@ -79,7 +94,11 @@ static double scoutapm_microtime()
 
 static void record_observed_stack_frame(const char *function_name, double microtime_entered, double microtime_exited, int argc, zval *argv)
 {
-    DEBUG("Adding observed stack frame for %s ... ", function_name);
+    if (argc > 0) {
+        DEBUG("Adding observed stack frame for %s (%s) ... ", function_name, Z_STRVAL(argv[0]));
+    } else {
+        DEBUG("Adding observed stack frame for %s ... ", function_name);
+    }
     SCOUTAPM_G(observed_stack_frames) = realloc(
         SCOUTAPM_G(observed_stack_frames),
         (SCOUTAPM_G(observed_stack_frames_count)+1) * sizeof(scoutapm_stack_frame)
@@ -89,14 +108,15 @@ static void record_observed_stack_frame(const char *function_name, double microt
     SCOUTAPM_G(observed_stack_frames)[SCOUTAPM_G(observed_stack_frames_count)].entered = microtime_entered;
     SCOUTAPM_G(observed_stack_frames)[SCOUTAPM_G(observed_stack_frames_count)].exited = microtime_exited;
     SCOUTAPM_G(observed_stack_frames)[SCOUTAPM_G(observed_stack_frames_count)].argc = argc;
-    SCOUTAPM_G(observed_stack_frames)[SCOUTAPM_G(observed_stack_frames_count)].argv = malloc(sizeof(zval) * argc);
+    // @todo causing a crash - fix
+//    SCOUTAPM_G(observed_stack_frames)[SCOUTAPM_G(observed_stack_frames_count)].argv = malloc(sizeof(zval) * argc);
 
-    for (int i = 0; i < argc; i++) {
-        ZVAL_COPY(
-            &(SCOUTAPM_G(observed_stack_frames)[SCOUTAPM_G(observed_stack_frames_count)].argv[i]),
-            &(argv[i])
-        );
-    }
+//    for (int i = 0; i < argc; i++) {
+//        ZVAL_COPY(
+//            &(SCOUTAPM_G(observed_stack_frames)[SCOUTAPM_G(observed_stack_frames_count)].argv[i]),
+//            &(argv[i])
+//        );
+//    }
 
     SCOUTAPM_G(observed_stack_frames_count)++;
     DEBUG("Done\n");
@@ -106,6 +126,8 @@ PHP_FUNCTION(scoutapm_get_calls)
 {
     zval item, arg_items;
     ZEND_PARSE_PARAMETERS_NONE();
+
+    DEBUG("scoutapm_get_calls: preparing return value... ");
 
     array_init(return_value);
 
@@ -137,23 +159,27 @@ PHP_FUNCTION(scoutapm_get_calls)
             SCOUTAPM_G(observed_stack_frames)[i].exited - SCOUTAPM_G(observed_stack_frames)[i].entered
         );
 
-        array_init(&arg_items);
-        for (int j = 0; j < SCOUTAPM_G(observed_stack_frames)[i].argc; j++) {
-            add_next_index_zval(&arg_items, &(SCOUTAPM_G(observed_stack_frames)[i].argv[j]));
-            zval_ptr_dtor(&(SCOUTAPM_G(observed_stack_frames)[i].argv[j]));
-        }
-        free(SCOUTAPM_G(observed_stack_frames)[i].argv);
-        free((void*)SCOUTAPM_G(observed_stack_frames)[i].function_name);
+        // @todo causing a crash - fix
+//        array_init(&arg_items);
+//        for (int j = 0; j < SCOUTAPM_G(observed_stack_frames)[i].argc; j++) {
+//            add_next_index_zval(&arg_items, &(SCOUTAPM_G(observed_stack_frames)[i].argv[j]));
+//            zval_ptr_dtor(&(SCOUTAPM_G(observed_stack_frames)[i].argv[j]));
+//        }
+//        free(SCOUTAPM_G(observed_stack_frames)[i].argv);
 
-        add_assoc_zval_ex(
-            &item,
-            SCOUT_GET_CALLS_KEY_ARGV, strlen(SCOUT_GET_CALLS_KEY_ARGV),
-            &arg_items
-        );
+//        add_assoc_zval_ex(
+//            &item,
+//            SCOUT_GET_CALLS_KEY_ARGV, strlen(SCOUT_GET_CALLS_KEY_ARGV),
+//            &arg_items
+//        );
 
         add_next_index_zval(return_value, &item);
+
+        free((void*)SCOUTAPM_G(observed_stack_frames)[i].function_name);
     }
 
     SCOUTAPM_G(observed_stack_frames) = realloc(SCOUTAPM_G(observed_stack_frames), 0);
     SCOUTAPM_G(observed_stack_frames_count) = 0;
+
+    DEBUG("done.\n");
 }
