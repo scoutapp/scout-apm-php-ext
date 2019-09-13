@@ -55,33 +55,16 @@ ZEND_END_MODULE_GLOBALS(scoutapm)
 typedef void (*zif_handler)(INTERNAL_FUNCTION_PARAMETERS);
 #endif
 
-#define SCOUT_DEFINE_OVERLOADED_FUNCTION(function_name) zif_handler original_handler_##function_name
-
-#define SCOUT_OVERLOADED_FUNCTION(function_name) \
-  ZEND_NAMED_FUNCTION(scoutapm_##function_name) \
-  { \
-    double entered = scoutapm_microtime(); \
-    int argc; \
-    zval *argv = NULL; \
-    \
-    ZEND_PARSE_PARAMETERS_START(0, -1) \
-        Z_PARAM_VARIADIC(' ', argv, argc) \
-    ZEND_PARSE_PARAMETERS_END(); \
-    \
-    /*for (int i = 0; i < argc; i++) { php_debug_zval_dump(argv + i, 0); }*/\
-    \
-    original_handler_##function_name(INTERNAL_FUNCTION_PARAM_PASSTHRU); \
-    \
-    record_observed_stack_frame(#function_name, entered, scoutapm_microtime(), argc, argv); \
-  }
-
 #define SCOUT_OVERLOAD_FUNCTION(function_name) \
-    zend_function *original_function_##function_name; \
-    \
-    original_function_##function_name = zend_hash_str_find_ptr(EG(function_table), #function_name, sizeof(#function_name)-1); \
-    if (original_function_##function_name != NULL) { \
-        original_handler_##function_name = original_function_##function_name->internal_function.handler; \
-        original_function_##function_name->internal_function.handler = scoutapm_##function_name; \
+    original_function = zend_hash_str_find_ptr(EG(function_table), function_name, sizeof(function_name) - 1); \
+    if (original_function != NULL) { \
+        handler_index = handler_index_for_function(function_name); \
+        if (handler_index < 0) { \
+            zend_throw_exception(NULL, "ScoutAPM did not define a handler index for "function_name, 0); \
+            return FAILURE;\
+        } \
+        original_handlers[handler_index] = original_function->internal_function.handler; \
+        original_function->internal_function.handler = scoutapm_overloaded_handler; \
     }
 
 #define SCOUT_GET_CALLS_KEY_FUNCTION "function"

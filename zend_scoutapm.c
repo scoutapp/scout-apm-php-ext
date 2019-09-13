@@ -5,9 +5,18 @@ static PHP_RSHUTDOWN_FUNCTION(scoutapm);
 static int zend_scoutapm_startup(zend_extension*);
 static double scoutapm_microtime();
 static void record_observed_stack_frame(const char *function_name, double microtime_entered, double microtime_exited, int argc, zval *argv);
+static int handler_index_for_function(const char *function_to_lookup);
 PHP_FUNCTION(scoutapm_get_calls);
 
-SCOUT_DEFINE_OVERLOADED_FUNCTION(file_get_contents);
+struct {
+    const char *function_name;
+    int index;
+} handler_lookup[] = {
+    // define each function we want to overload, which maps to an index in the `original_handlers` array
+    "file_get_contents", 0,
+};
+// handlers count needs to be the number of handler lookups defined above.
+zif_handler original_handlers[1];
 
 ZEND_DECLARE_MODULE_GLOBALS(scoutapm)
 
@@ -67,8 +76,40 @@ static int zend_scoutapm_startup(zend_extension *ze) {
     return zend_startup_module(&scoutapm_module_entry);
 }
 
-// @todo look into making just one function overloader
-SCOUT_OVERLOADED_FUNCTION(file_get_contents)
+ZEND_NAMED_FUNCTION(scoutapm_overloaded_handler)
+{
+    int handler_index;
+    double entered = scoutapm_microtime();
+    int argc;
+    zval *argv = NULL;
+    const char *called_function;
+
+    // Practically speaking, this should never happen, but throw an exception so we can get feedback at least
+    // This would only happen if we overwrite a function that doesn't have a function_name.
+    if (!execute_data->func || !execute_data->func->common.function_name) {
+        zend_throw_exception(NULL, "ScoutAPM overwrote a handler for a function we did not expect (no function name in execute_data)", 0);
+        return;
+    }
+
+    called_function = ZSTR_VAL(execute_data->func->common.function_name);
+
+    ZEND_PARSE_PARAMETERS_START(0, -1)
+        Z_PARAM_VARIADIC(' ', argv, argc)
+    ZEND_PARSE_PARAMETERS_END();
+
+    handler_index = handler_index_for_function(called_function);
+
+    // Again - practically speaking, this shouldn't happen as long as we defined the handlers properly
+    if (handler_index < 0) {
+        zend_throw_exception(NULL, "ScoutAPM overwrote a handler for a function it didn't define a handler for", 0);
+        return;
+    }
+
+    original_handlers[handler_index](INTERNAL_FUNCTION_PARAM_PASSTHRU);
+
+    record_observed_stack_frame(called_function, entered, scoutapm_microtime(), argc, argv);
+}
+
 
 static PHP_RINIT_FUNCTION(scoutapm)
 {
@@ -80,13 +121,18 @@ static PHP_RINIT_FUNCTION(scoutapm)
     if (SCOUTAPM_G(handlers_set) != 1) {
         DEBUG("Overriding function handlers.\n");
 
+        zend_function *original_function;
+        int handler_index;
+
         // @todo this could be configurable by INI if more dynamic
-        SCOUT_OVERLOAD_FUNCTION(file_get_contents)
+        SCOUT_OVERLOAD_FUNCTION("file_get_contents")
 
         SCOUTAPM_G(handlers_set) = 1;
     } else {
         DEBUG("Handlers have already been set, skipping.\n");
     }
+
+    return SUCCESS;
 }
 
 static PHP_RSHUTDOWN_FUNCTION(scoutapm)
@@ -97,6 +143,22 @@ static PHP_RSHUTDOWN_FUNCTION(scoutapm)
     }
     SCOUTAPM_G(observed_stack_frames_count) = 0;
     DEBUG("Stacks freed\n");
+
+    return SUCCESS;
+}
+
+static int handler_index_for_function(const char *function_to_lookup)
+{
+    int i = 0;
+    const char *current = handler_lookup[i].function_name;
+    while (current) {
+        if (strcmp(current, function_to_lookup) == 0) {
+            return handler_lookup[i].index;
+        }
+        current = handler_lookup[++i].function_name;
+    }
+
+    return -1;
 }
 
 // @todo we could just use already implemented microtime(true) ?
