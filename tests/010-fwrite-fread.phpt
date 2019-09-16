@@ -1,7 +1,7 @@
 --TEST--
 Calls to fwrite and fread are logged
 --SKIPIF--
-<?php if (!extension_loaded("scoutapm")) die("Skipped: scoutapm extension required."); ?>
+<?php if (!extension_loaded("scoutapm")) die("skip scoutapm extension required."); ?>
 --FILE--
 <?php
 $fh = tmpfile();

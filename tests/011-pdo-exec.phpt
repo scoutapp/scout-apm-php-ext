@@ -1,9 +1,9 @@
 --TEST--
 Calls to PDO::exec are logged
 --SKIPIF--
-<?php if (!extension_loaded("scoutapm")) die("Skipped: scoutapm extension required."); ?>
-<?php if (!extension_loaded("PDO")) die("Skipped: PDO extension required."); ?>
-<?php if (!extension_loaded("pdo_sqlite")) die("Skipped: pdo_sqlite extension required."); ?>
+<?php if (!extension_loaded("scoutapm")) die("skip scoutapm extension required."); ?>
+<?php if (!extension_loaded("PDO")) die("skip PDO extension required."); ?>
+<?php if (!extension_loaded("pdo_sqlite")) die("skip pdo_sqlite extension required."); ?>
 --FILE--
 <?php
 $dbh = new PDO('sqlite::memory:');

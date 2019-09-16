@@ -1,7 +1,7 @@
 --TEST--
 Ensures that calls to scoutapm_get_calls() clears the call list
 --SKIPIF--
-<?php if (!extension_loaded("scoutapm")) die("Skipped: scoutapm extension required."); ?>
+<?php if (!extension_loaded("scoutapm")) die("skip scoutapm extension required."); ?>
 --FILE--
 <?php
 file_get_contents(__FILE__);

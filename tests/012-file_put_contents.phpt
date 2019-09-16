@@ -1,7 +1,7 @@
 --TEST--
 Calls to file_put_contents are logged
 --SKIPIF--
-<?php if (!extension_loaded("scoutapm")) die("Skipped: scoutapm extension required."); ?>
+<?php if (!extension_loaded("scoutapm")) die("skip scoutapm extension required."); ?>
 --FILE--
 <?php
 $file = tempnam(sys_get_temp_dir(), 'scout-apm-php-ext-test');
