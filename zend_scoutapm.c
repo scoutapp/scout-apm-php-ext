@@ -147,6 +147,15 @@ static PHP_RINIT_FUNCTION(scoutapm)
 static PHP_RSHUTDOWN_FUNCTION(scoutapm)
 {
     DEBUG("Freeing stacks... ");
+
+    for (int i = 0; i < SCOUTAPM_G(observed_stack_frames_count); i++) {
+        for (int j = 0; j < SCOUTAPM_G(observed_stack_frames)[i].argc; j++) {
+            zval_ptr_dtor(&(SCOUTAPM_G(observed_stack_frames)[i].argv[j]));
+        }
+        free(SCOUTAPM_G(observed_stack_frames)[i].argv);
+        free((void*)SCOUTAPM_G(observed_stack_frames)[i].function_name);
+    }
+
     if (SCOUTAPM_G(observed_stack_frames)) {
         free(SCOUTAPM_G(observed_stack_frames));
     }
