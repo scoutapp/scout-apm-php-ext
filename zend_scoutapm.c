@@ -20,9 +20,10 @@ struct {
     "fwrite", 3,
     "pdo->exec", 4,
     "pdo->query", 5,
+    "pdostatement->execute", 6,
 };
 // handlers count needs to be the number of handler lookups defined above.
-zif_handler original_handlers[6];
+zif_handler original_handlers[7];
 
 ZEND_DECLARE_MODULE_GLOBALS(scoutapm)
 
@@ -131,6 +132,7 @@ static PHP_RINIT_FUNCTION(scoutapm)
         SCOUT_OVERLOAD_FUNCTION("fread")
         SCOUT_OVERLOAD_METHOD("pdo", "exec")
         SCOUT_OVERLOAD_METHOD("pdo", "query")
+        SCOUT_OVERLOAD_METHOD("pdostatement", "execute")
 
         SCOUTAPM_G(handlers_set) = 1;
     } else {
