@@ -128,23 +128,7 @@ static PHP_RINIT_FUNCTION(scoutapm)
         SCOUT_OVERLOAD_FUNCTION("curl_exec")
         SCOUT_OVERLOAD_FUNCTION("fwrite")
         SCOUT_OVERLOAD_FUNCTION("fread")
-
-        ce = zend_hash_str_find_ptr(CG(class_table), "pdo", sizeof("pdo") - 1);
-        if (ce != NULL) {
-            original_function = zend_hash_str_find_ptr(&ce->function_table, "exec", sizeof("exec")-1);
-
-            if (original_function != NULL) {
-                handler_index = handler_index_for_function("pdo""->""exec");
-
-                if (handler_index < 0) {
-                    zend_throw_exception(NULL, "ScoutAPM did not define a handler index for ""pdo" "->" "exec", 0);
-                    return FAILURE;
-                }
-
-                original_handlers[handler_index] = original_function->internal_function.handler;
-                original_function->internal_function.handler = scoutapm_overloaded_handler;
-            }
-        }
+        SCOUT_OVERLOAD_METHOD("pdo", "exec")
 
         SCOUTAPM_G(handlers_set) = 1;
     } else {
