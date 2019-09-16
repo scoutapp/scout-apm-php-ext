@@ -15,15 +15,16 @@ struct {
 } handler_lookup[] = {
     // define each function we want to overload, which maps to an index in the `original_handlers` array
     "file_get_contents", 0,
-    "curl_exec", 1,
-    "fread", 2,
-    "fwrite", 3,
-    "pdo->exec", 4,
-    "pdo->query", 5,
-    "pdostatement->execute", 6,
+    "file_put_contents", 1,
+    "curl_exec", 2,
+    "fread", 3,
+    "fwrite", 4,
+    "pdo->exec", 5,
+    "pdo->query", 6,
+    "pdostatement->execute", 7,
 };
 // handlers count needs to be the number of handler lookups defined above.
-zif_handler original_handlers[7];
+zif_handler original_handlers[8];
 
 ZEND_DECLARE_MODULE_GLOBALS(scoutapm)
 
@@ -127,6 +128,7 @@ static PHP_RINIT_FUNCTION(scoutapm)
 
         // @todo this could be configurable by INI if more dynamic
         SCOUT_OVERLOAD_FUNCTION("file_get_contents")
+        SCOUT_OVERLOAD_FUNCTION("file_put_contents")
         SCOUT_OVERLOAD_FUNCTION("curl_exec")
         SCOUT_OVERLOAD_FUNCTION("fwrite")
         SCOUT_OVERLOAD_FUNCTION("fread")
