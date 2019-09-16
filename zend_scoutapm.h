@@ -55,6 +55,11 @@ ZEND_END_MODULE_GLOBALS(scoutapm)
 typedef void (*zif_handler)(INTERNAL_FUNCTION_PARAMETERS);
 #endif
 
+#define DYNAMIC_MALLOC_SPRINTF(destString, sizeNeeded, fmt, ...) \
+    sizeNeeded = snprintf(NULL, 0, fmt, ##__VA_ARGS__) + 1; \
+    destString = (char*)malloc(sizeNeeded); \
+    snprintf(destString, sizeNeeded, fmt, ##__VA_ARGS__)
+
 #define SCOUT_OVERLOAD_FUNCTION(function_name) \
     original_function = zend_hash_str_find_ptr(EG(function_table), function_name, sizeof(function_name) - 1); \
     if (original_function != NULL) { \

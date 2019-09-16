@@ -6,6 +6,7 @@ static int zend_scoutapm_startup(zend_extension*);
 static double scoutapm_microtime();
 static void record_observed_stack_frame(const char *function_name, double microtime_entered, double microtime_exited, int argc, zval *argv);
 static int handler_index_for_function(const char *function_to_lookup);
+static const char* determine_function_name(zend_execute_data *execute_data);
 PHP_FUNCTION(scoutapm_get_calls);
 
 struct {
@@ -17,9 +18,10 @@ struct {
     "curl_exec", 1,
     "fread", 2,
     "fwrite", 3,
+    "pdo->exec", 4,
 };
 // handlers count needs to be the number of handler lookups defined above.
-zif_handler original_handlers[4];
+zif_handler original_handlers[5];
 
 ZEND_DECLARE_MODULE_GLOBALS(scoutapm)
 
@@ -87,14 +89,8 @@ ZEND_NAMED_FUNCTION(scoutapm_overloaded_handler)
     zval *argv = NULL;
     const char *called_function;
 
-    // Practically speaking, this should never happen, but throw an exception so we can get feedback at least
-    // This would only happen if we overwrite a function that doesn't have a function_name.
-    if (!execute_data->func || !execute_data->func->common.function_name) {
-        zend_throw_exception(NULL, "ScoutAPM overwrote a handler for a function we did not expect (no function name in execute_data)", 0);
-        return;
-    }
-
-    called_function = ZSTR_VAL(execute_data->func->common.function_name);
+    // note - no strdup needed as we copy it in record_observed_stack_frame
+    called_function = determine_function_name(execute_data);
 
     ZEND_PARSE_PARAMETERS_START(0, -1)
         Z_PARAM_VARIADIC(' ', argv, argc)
@@ -102,7 +98,7 @@ ZEND_NAMED_FUNCTION(scoutapm_overloaded_handler)
 
     handler_index = handler_index_for_function(called_function);
 
-    // Again - practically speaking, this shouldn't happen as long as we defined the handlers properly
+    // Practically speaking, this shouldn't happen as long as we defined the handlers properly
     if (handler_index < 0) {
         zend_throw_exception(NULL, "ScoutAPM overwrote a handler for a function it didn't define a handler for", 0);
         return;
@@ -112,7 +108,6 @@ ZEND_NAMED_FUNCTION(scoutapm_overloaded_handler)
 
     record_observed_stack_frame(called_function, entered, scoutapm_microtime(), argc, argv);
 }
-
 
 static PHP_RINIT_FUNCTION(scoutapm)
 {
@@ -126,12 +121,30 @@ static PHP_RINIT_FUNCTION(scoutapm)
 
         zend_function *original_function;
         int handler_index;
+        zend_class_entry *ce;
 
         // @todo this could be configurable by INI if more dynamic
         SCOUT_OVERLOAD_FUNCTION("file_get_contents")
         SCOUT_OVERLOAD_FUNCTION("curl_exec")
         SCOUT_OVERLOAD_FUNCTION("fwrite")
         SCOUT_OVERLOAD_FUNCTION("fread")
+
+        ce = zend_hash_str_find_ptr(CG(class_table), "pdo", sizeof("pdo") - 1);
+        if (ce != NULL) {
+            original_function = zend_hash_str_find_ptr(&ce->function_table, "exec", sizeof("exec")-1);
+
+            if (original_function != NULL) {
+                handler_index = handler_index_for_function("pdo""->""exec");
+
+                if (handler_index < 0) {
+                    zend_throw_exception(NULL, "ScoutAPM did not define a handler index for ""pdo" "->" "exec", 0);
+                    return FAILURE;
+                }
+
+                original_handlers[handler_index] = original_function->internal_function.handler;
+                original_function->internal_function.handler = scoutapm_overloaded_handler;
+            }
+        }
 
         SCOUTAPM_G(handlers_set) = 1;
     } else {
@@ -153,12 +166,41 @@ static PHP_RSHUTDOWN_FUNCTION(scoutapm)
     return SUCCESS;
 }
 
+static const char* determine_function_name(zend_execute_data *execute_data)
+{
+    int len;
+    char *ret;
+
+    if (!execute_data->func) {
+        return "<not a function call>";
+    }
+
+    if (execute_data->func->common.fn_flags & ZEND_ACC_STATIC) {
+        DYNAMIC_MALLOC_SPRINTF(ret, len, "%s::%s",
+            ZSTR_VAL(Z_CE(execute_data->This)->name),
+            ZSTR_VAL(execute_data->func->common.function_name)
+        );
+        return ret;
+    }
+
+    if (Z_TYPE(execute_data->This) == IS_OBJECT) {
+        DYNAMIC_MALLOC_SPRINTF(ret, len, "%s->%s",
+            ZSTR_VAL(Z_OBJCE(execute_data->This)->name),
+            ZSTR_VAL(execute_data->func->common.function_name)
+        );
+        return ret;
+    }
+
+    return ZSTR_VAL(execute_data->func->common.function_name);
+}
+
 static int handler_index_for_function(const char *function_to_lookup)
 {
     int i = 0;
     const char *current = handler_lookup[i].function_name;
+    // @todo fix bug where current is still set, but out of bounds, so causes segfault, rather than returning -1
     while (current) {
-        if (strcmp(current, function_to_lookup) == 0) {
+        if (strcasecmp(current, function_to_lookup) == 0) {
             return handler_lookup[i].index;
         }
         current = handler_lookup[++i].function_name;
