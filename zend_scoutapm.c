@@ -15,6 +15,7 @@ static void record_observed_stack_frame(const char *function_name, double microt
 static int handler_index_for_function(const char *function_to_lookup);
 static const char* determine_function_name(zend_execute_data *execute_data);
 
+/* This is simply a map of function names to an index in original_handlers */
 struct {
     const char *function_name;
     int index;
@@ -34,11 +35,13 @@ zif_handler original_handlers[8];
 
 ZEND_DECLARE_MODULE_GLOBALS(scoutapm)
 
+/* a PHP module defines what functions it exports */
 static const zend_function_entry scoutapm_functions[] = {
     PHP_FE(scoutapm_get_calls, NULL)
     PHP_FE_END
 };
 
+/* scoutapm_module_entry provides the metadata/information for PHP about this PHP module */
 static zend_module_entry scoutapm_module_entry = {
     STANDARD_MODULE_HEADER,
     SCOUT_APM_EXT_NAME,

@@ -26,6 +26,7 @@
 
 PHP_FUNCTION(scoutapm_get_calls);
 
+/* Describes information we store about a recorded stack frame */
 typedef struct scoutapm_stack_frame {
     const char *function_name;
     double entered;
@@ -34,37 +35,44 @@ typedef struct scoutapm_stack_frame {
     zval *argv;
 } scoutapm_stack_frame;
 
+/* These are the "module globals". In non-ZTS mode, they're just regular variables, but means in ZTS mode they get handled properly */
 ZEND_BEGIN_MODULE_GLOBALS(scoutapm)
     zend_bool handlers_set;
     zend_long observed_stack_frames_count;
     scoutapm_stack_frame *observed_stack_frames;
 ZEND_END_MODULE_GLOBALS(scoutapm)
 
-#ifndef ZEND_PARSE_PARAMETERS_NONE
-#define ZEND_PARSE_PARAMETERS_NONE() if (zend_parse_parameters_none() != SUCCESS) { return; }
-#endif
-
+/* Accessor for "module globals" for non-ZTS and ZTS modes. */
 #ifdef ZTS
 #define SCOUTAPM_G(v) ZEND_MODULE_GLOBALS_ACCESSOR(scoutapm, v)
 #else
 #define SCOUTAPM_G(v) (scoutapm_globals.v)
 #endif
 
+/* zif_handler is not always defined, so define this roughly equivalent */
+#ifndef zif_handler
+typedef void (*zif_handler)(INTERNAL_FUNCTION_PARAMETERS);
+#endif
+
+/* Sometimes this isn't defined, so define it in that case */
+#ifndef ZEND_PARSE_PARAMETERS_NONE
+#define ZEND_PARSE_PARAMETERS_NONE() if (zend_parse_parameters_none() != SUCCESS) { return; }
+#endif
+
+/* The debugging toggle allows us to output unnecessary amounts of information. Because it's a preprocessor flag, this stuff is compiled out */
 #if SCOUT_APM_EXT_DEBUGGING == 1
 #define SCOUTAPM_DEBUG_MESSAGE(x, ...) php_printf(x, ##__VA_ARGS__)
 #else
 #define SCOUTAPM_DEBUG_MESSAGE(...) /**/
 #endif
 
-#ifndef zif_handler
-typedef void (*zif_handler)(INTERNAL_FUNCTION_PARAMETERS);
-#endif
-
+/* Shortcut defined to allow using a `char *` with snprintf - determine the size first, allocate, then snprintf */
 #define DYNAMIC_MALLOC_SPRINTF(destString, sizeNeeded, fmt, ...) \
     sizeNeeded = snprintf(NULL, 0, fmt, ##__VA_ARGS__) + 1; \
     destString = (char*)malloc(sizeNeeded); \
     snprintf(destString, sizeNeeded, fmt, ##__VA_ARGS__)
 
+/* overload a regular function by wrapping its handler with our own handler */
 #define SCOUT_OVERLOAD_FUNCTION(function_name) \
     original_function = zend_hash_str_find_ptr(EG(function_table), function_name, sizeof(function_name) - 1); \
     if (original_function != NULL) { \
@@ -77,6 +85,7 @@ typedef void (*zif_handler)(INTERNAL_FUNCTION_PARAMETERS);
         original_function->internal_function.handler = scoutapm_overloaded_handler; \
     }
 
+/* Don't use this macro directly, use SCOUT_OVERLOAD_STATIC_METHOD or SCOUT_OVERLOAD_METHOD for consistency */
 #define SCOUT_OVERLOAD_CLASS_ENTRY_FUNCTION(lowercase_class_name, instance_or_static, method_name) \
     ce = zend_hash_str_find_ptr(CG(class_table), lowercase_class_name, sizeof(lowercase_class_name) - 1); \
     if (ce != NULL) { \
@@ -91,9 +100,14 @@ typedef void (*zif_handler)(INTERNAL_FUNCTION_PARAMETERS);
             original_function->internal_function.handler = scoutapm_overloaded_handler; \
         } \
     }
+
+/* overload a static class method by wrapping its handler with our own handler */
 #define SCOUT_OVERLOAD_STATIC_METHOD(lowercase_class_name, method_name) SCOUT_OVERLOAD_CLASS_ENTRY_FUNCTION(lowercase_class_name, "::", method_name)
+
+/* overload an instance class method by wrapping its handler with our own handler */
 #define SCOUT_OVERLOAD_METHOD(lowercase_class_name, method_name) SCOUT_OVERLOAD_CLASS_ENTRY_FUNCTION(lowercase_class_name, "->", method_name)
 
+/* these are the string keys used in scoutapm_get_calls associative array return value */
 #define SCOUT_GET_CALLS_KEY_FUNCTION "function"
 #define SCOUT_GET_CALLS_KEY_ENTERED "entered"
 #define SCOUT_GET_CALLS_KEY_EXITED "exited"
