@@ -14,5 +14,5 @@ foreach (explode("\n", $phpinfo) as $line) {
 var_dump(extension_loaded('scoutapm'));
 ?>
 --EXPECTF--
-string(52) "    with scoutapm v%d.%d, Copyright %d, by Scout APM"
+string(%d) "    with scoutapm v%s, Copyright %d, by Scout APM"
 bool(true)

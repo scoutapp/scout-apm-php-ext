@@ -51,6 +51,7 @@
             <file name="EXPERIMENTAL" role="doc" />
             <file name="CREDITS" role="doc" />
             <dir name="tests">
+                <file name="external.inc" role="test" />
                 <file name="001-check-ext-loaded.phpt" role="test" />
                 <file name="002-file_get_contents.phpt" role="test" />
                 <file name="003-scoutapm_get_calls-clears-calls-list.phpt" role="test" />
