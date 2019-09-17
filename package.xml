@@ -37,8 +37,8 @@
     </stability>
     <license uri="https://opensource.org/licenses/MIT">MIT</license>
     <notes>
-        - Added extra compiler flags in development mode with --enable-scoutapm-dev
-        - Fixied compilation errors surfaced by --enable-scoutapm-dev option
+        - Added extra compiler flags in development mode with `--enable-scoutapm-dev`
+        - Fixed compilation errors surfaced by `--enable-scoutapm-dev` option
         - Added missing file `external.inc` in tests
     </notes>
     <!-- End Current Release -->
