@@ -21,14 +21,14 @@ struct {
     int index;
 } handler_lookup[] = {
     /* define each function we want to overload, which maps to an index in the `original_handlers` array */
-    "file_get_contents", 0,
-    "file_put_contents", 1,
-    "curl_exec", 2,
-    "fread", 3,
-    "fwrite", 4,
-    "pdo->exec", 5,
-    "pdo->query", 6,
-    "pdostatement->execute", 7,
+    {"file_get_contents", 0},
+    {"file_put_contents", 1},
+    {"curl_exec", 2},
+    {"fread", 3},
+    {"fwrite", 4},
+    {"pdo->exec", 5},
+    {"pdo->query", 6},
+    {"pdostatement->execute", 7},
 };
 /* handlers count needs to be the number of handler lookups defined above. */
 zif_handler original_handlers[8];
@@ -138,6 +138,10 @@ ZEND_NAMED_FUNCTION(scoutapm_overloaded_handler)
  */
 static PHP_RINIT_FUNCTION(scoutapm)
 {
+    zend_function *original_function;
+    int handler_index;
+    zend_class_entry *ce;
+
     SCOUTAPM_DEBUG_MESSAGE("Initialising stacks...");
     SCOUTAPM_G(observed_stack_frames_count) = 0;
     SCOUTAPM_G(observed_stack_frames) = calloc(0, sizeof(scoutapm_stack_frame));
@@ -145,10 +149,6 @@ static PHP_RINIT_FUNCTION(scoutapm)
 
     if (SCOUTAPM_G(handlers_set) != 1) {
         SCOUTAPM_DEBUG_MESSAGE("Overriding function handlers.\n");
-
-        zend_function *original_function;
-        int handler_index;
-        zend_class_entry *ce;
 
         /* @todo make overloaded functions configurable? https://github.com/scoutapp/scout-apm-php-ext/issues/30 */
         SCOUT_OVERLOAD_FUNCTION("file_get_contents")
