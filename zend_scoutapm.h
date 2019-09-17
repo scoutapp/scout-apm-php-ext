@@ -21,6 +21,8 @@
 // Extreme amounts of debugging, set to 1 to enable it and `make clean && make` (tests will fail...)
 #define SCOUT_APM_EXT_DEBUGGING 0
 
+PHP_FUNCTION(scoutapm_get_calls);
+
 typedef struct scoutapm_stack_frame {
     const char *function_name;
     double entered;

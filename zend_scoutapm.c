@@ -7,7 +7,6 @@ static double scoutapm_microtime();
 static void record_observed_stack_frame(const char *function_name, double microtime_entered, double microtime_exited, int argc, zval *argv);
 static int handler_index_for_function(const char *function_to_lookup);
 static const char* determine_function_name(zend_execute_data *execute_data);
-PHP_FUNCTION(scoutapm_get_calls);
 
 struct {
     const char *function_name;
