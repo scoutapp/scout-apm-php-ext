@@ -51,9 +51,9 @@ ZEND_END_MODULE_GLOBALS(scoutapm)
 #endif
 
 #if SCOUT_APM_EXT_DEBUGGING == 1
-#define DEBUG(x, ...) php_printf(x, ##__VA_ARGS__)
+#define SCOUTAPM_DEBUG_MESSAGE(x, ...) php_printf(x, ##__VA_ARGS__)
 #else
-#define DEBUG(...) /**/
+#define SCOUTAPM_DEBUG_MESSAGE(...) /**/
 #endif
 
 #ifndef zif_handler

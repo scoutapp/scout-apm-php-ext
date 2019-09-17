@@ -135,13 +135,13 @@ ZEND_NAMED_FUNCTION(scoutapm_overloaded_handler)
  */
 static PHP_RINIT_FUNCTION(scoutapm)
 {
-    DEBUG("Initialising stacks...");
+    SCOUTAPM_DEBUG_MESSAGE("Initialising stacks...");
     SCOUTAPM_G(observed_stack_frames_count) = 0;
     SCOUTAPM_G(observed_stack_frames) = calloc(0, sizeof(scoutapm_stack_frame));
-    DEBUG("Stacks made\n");
+    SCOUTAPM_DEBUG_MESSAGE("Stacks made\n");
 
     if (SCOUTAPM_G(handlers_set) != 1) {
-        DEBUG("Overriding function handlers.\n");
+        SCOUTAPM_DEBUG_MESSAGE("Overriding function handlers.\n");
 
         zend_function *original_function;
         int handler_index;
@@ -159,7 +159,7 @@ static PHP_RINIT_FUNCTION(scoutapm)
 
         SCOUTAPM_G(handlers_set) = 1;
     } else {
-        DEBUG("Handlers have already been set, skipping.\n");
+        SCOUTAPM_DEBUG_MESSAGE("Handlers have already been set, skipping.\n");
     }
 
     return SUCCESS;
@@ -171,7 +171,7 @@ static PHP_RINIT_FUNCTION(scoutapm)
  */
 static PHP_RSHUTDOWN_FUNCTION(scoutapm)
 {
-    DEBUG("Freeing stacks... ");
+    SCOUTAPM_DEBUG_MESSAGE("Freeing stacks... ");
 
     for (int i = 0; i < SCOUTAPM_G(observed_stack_frames_count); i++) {
         for (int j = 0; j < SCOUTAPM_G(observed_stack_frames)[i].argc; j++) {
@@ -185,7 +185,7 @@ static PHP_RSHUTDOWN_FUNCTION(scoutapm)
         free(SCOUTAPM_G(observed_stack_frames));
     }
     SCOUTAPM_G(observed_stack_frames_count) = 0;
-    DEBUG("Stacks freed\n");
+    SCOUTAPM_DEBUG_MESSAGE("Stacks freed\n");
 
     return SUCCESS;
 }
@@ -262,9 +262,9 @@ static double scoutapm_microtime()
 static void record_observed_stack_frame(const char *function_name, double microtime_entered, double microtime_exited, int argc, zval *argv)
 {
     if (argc > 0) {
-        DEBUG("Adding observed stack frame for %s (%s) ... ", function_name, Z_STRVAL(argv[0]));
+        SCOUTAPM_DEBUG_MESSAGE("Adding observed stack frame for %s (%s) ... ", function_name, Z_STRVAL(argv[0]));
     } else {
-        DEBUG("Adding observed stack frame for %s ... ", function_name);
+        SCOUTAPM_DEBUG_MESSAGE("Adding observed stack frame for %s ... ", function_name);
     }
     SCOUTAPM_G(observed_stack_frames) = realloc(
         SCOUTAPM_G(observed_stack_frames),
@@ -285,7 +285,7 @@ static void record_observed_stack_frame(const char *function_name, double microt
     }
 
     SCOUTAPM_G(observed_stack_frames_count)++;
-    DEBUG("Done\n");
+    SCOUTAPM_DEBUG_MESSAGE("Done\n");
 }
 
 /* {{{ proto array scoutapm_get_calls()
@@ -295,7 +295,7 @@ PHP_FUNCTION(scoutapm_get_calls)
     zval item, arg_items, arg_item;
     ZEND_PARSE_PARAMETERS_NONE();
 
-    DEBUG("scoutapm_get_calls: preparing return value... ");
+    SCOUTAPM_DEBUG_MESSAGE("scoutapm_get_calls: preparing return value... ");
 
     array_init(return_value);
 
@@ -350,6 +350,6 @@ PHP_FUNCTION(scoutapm_get_calls)
     SCOUTAPM_G(observed_stack_frames) = realloc(SCOUTAPM_G(observed_stack_frames), 0);
     SCOUTAPM_G(observed_stack_frames_count) = 0;
 
-    DEBUG("done.\n");
+    SCOUTAPM_DEBUG_MESSAGE("done.\n");
 }
 /* }}} */
