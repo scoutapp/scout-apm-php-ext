@@ -11,7 +11,7 @@ jobs:
           name: "Build"
           command: |
             phpize
-            ./configure --enable-scoutapm
+            ./configure --enable-scoutapm --enable-scoutapm-dev
             make
       - run:
           name: "Run tests"
@@ -35,7 +35,7 @@ jobs:
           name: "Build"
           command: |
             phpize
-            ./configure --enable-scoutapm
+            ./configure --enable-scoutapm --enable-scoutapm-dev
             make
       - run:
           name: "Run tests"
@@ -59,7 +59,7 @@ jobs:
           name: "Build"
           command: |
             phpize
-            ./configure --enable-scoutapm
+            ./configure --enable-scoutapm --enable-scoutapm-dev
             make
       - run:
           name: "Run tests"
@@ -81,7 +81,7 @@ jobs:
           name: "Build"
           command: |
             phpize
-            ./configure --enable-scoutapm
+            ./configure --enable-scoutapm --enable-scoutapm-dev
             make
       - run:
           name: "Run tests"
@@ -103,7 +103,7 @@ jobs:
           name: "Build"
           command: |
             phpize
-            ./configure --enable-scoutapm
+            ./configure --enable-scoutapm --enable-scoutapm-dev
             make
       - run:
           name: "Run tests"
@@ -125,7 +125,7 @@ jobs:
           name: "Build"
           command: |
             phpize
-            ./configure --enable-scoutapm
+            ./configure --enable-scoutapm --enable-scoutapm-dev
             make
       - run:
           name: "Run tests"

@@ -17,7 +17,7 @@ include_directories(${PHP_SOURCE}/TSRM)
 include_directories(${PROJECT_SOURCE_DIR})
 
 add_custom_target(configure
-        COMMAND phpize && ./configure
+        COMMAND phpize && ./configure --enable-scoutapm-dev
         DEPENDS ${SOURCE_FILES}
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
