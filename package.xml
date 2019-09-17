@@ -25,11 +25,12 @@
         <active>yes</active>
     </lead>
 
+    <!-- Current Release -->
     <date>2019-09-17</date>
-    <time>09:15:00</time>
+    <time>10:00:00</time>
     <version>
-        <release>0.0.1</release>
-        <api>0.0.1</api>
+        <release>0.0.2</release>
+        <api>0.0.2</api>
     </version>
     <stability>
         <release>alpha</release>
@@ -37,9 +38,11 @@
     </stability>
     <license uri="https://opensource.org/licenses/MIT">MIT</license>
     <notes>
-        - Basic monitoring of file_get_contents, file_put_contents, fwrite, fread, curl_exec, PDO->exec, PDO->query, PDOStatement->execute
-        - Provides function scoutapm_get_calls() to return a list of recorded function calls
+        - Added extra compiler flags in development mode with --enable-scoutapm-dev
+        - Fixied compilation errors surfaced by --enable-scoutapm-dev option
+        - Added missing file `external.inc` in tests
     </notes>
+    <!-- End Current Release -->
 
     <contents>
         <dir name="/">
@@ -70,6 +73,7 @@
             </dir>
         </dir>
     </contents>
+
     <dependencies>
         <required>
             <php>
@@ -82,4 +86,24 @@
     </dependencies>
     <providesextension>scoutapm</providesextension>
     <zendextsrcrelease />
+
+    <changelog>
+        <release>
+            <date>2019-09-17</date>
+            <time>09:15:00</time>
+            <version>
+                <release>0.0.1</release>
+                <api>0.0.1</api>
+            </version>
+            <stability>
+                <release>alpha</release>
+                <api>alpha</api>
+            </stability>
+            <license uri="https://opensource.org/licenses/MIT">MIT</license>
+            <notes>
+                - Basic monitoring of file_get_contents, file_put_contents, fwrite, fread, curl_exec, PDO->exec, PDO->query, PDOStatement->execute
+                - Provides function scoutapm_get_calls() to return a list of recorded function calls
+            </notes>
+        </release>
+    </changelog>
 </package>
