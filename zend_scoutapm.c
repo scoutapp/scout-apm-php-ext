@@ -5,9 +5,26 @@ static PHP_RSHUTDOWN_FUNCTION(scoutapm);
 static int zend_scoutapm_startup(zend_extension*);
 static double scoutapm_microtime();
 static void record_observed_stack_frame(const char *function_name, double microtime_entered, double microtime_exited, int argc, zval *argv);
+static int handler_index_for_function(const char *function_to_lookup);
+static const char* determine_function_name(zend_execute_data *execute_data);
 PHP_FUNCTION(scoutapm_get_calls);
 
-SCOUT_DEFINE_OVERLOADED_FUNCTION(file_get_contents);
+struct {
+    const char *function_name;
+    int index;
+} handler_lookup[] = {
+    // define each function we want to overload, which maps to an index in the `original_handlers` array
+    "file_get_contents", 0,
+    "file_put_contents", 1,
+    "curl_exec", 2,
+    "fread", 3,
+    "fwrite", 4,
+    "pdo->exec", 5,
+    "pdo->query", 6,
+    "pdostatement->execute", 7,
+};
+// handlers count needs to be the number of handler lookups defined above.
+zif_handler original_handlers[8];
 
 ZEND_DECLARE_MODULE_GLOBALS(scoutapm)
 
@@ -67,8 +84,33 @@ static int zend_scoutapm_startup(zend_extension *ze) {
     return zend_startup_module(&scoutapm_module_entry);
 }
 
-// @todo look into making just one function overloader
-SCOUT_OVERLOADED_FUNCTION(file_get_contents)
+ZEND_NAMED_FUNCTION(scoutapm_overloaded_handler)
+{
+    int handler_index;
+    double entered = scoutapm_microtime();
+    int argc;
+    zval *argv = NULL;
+    const char *called_function;
+
+    // note - no strdup needed as we copy it in record_observed_stack_frame
+    called_function = determine_function_name(execute_data);
+
+    ZEND_PARSE_PARAMETERS_START(0, -1)
+        Z_PARAM_VARIADIC(' ', argv, argc)
+    ZEND_PARSE_PARAMETERS_END();
+
+    handler_index = handler_index_for_function(called_function);
+
+    // Practically speaking, this shouldn't happen as long as we defined the handlers properly
+    if (handler_index < 0) {
+        zend_throw_exception(NULL, "ScoutAPM overwrote a handler for a function it didn't define a handler for", 0);
+        return;
+    }
+
+    original_handlers[handler_index](INTERNAL_FUNCTION_PARAM_PASSTHRU);
+
+    record_observed_stack_frame(called_function, entered, scoutapm_microtime(), argc, argv);
+}
 
 static PHP_RINIT_FUNCTION(scoutapm)
 {
@@ -80,23 +122,90 @@ static PHP_RINIT_FUNCTION(scoutapm)
     if (SCOUTAPM_G(handlers_set) != 1) {
         DEBUG("Overriding function handlers.\n");
 
+        zend_function *original_function;
+        int handler_index;
+        zend_class_entry *ce;
+
         // @todo this could be configurable by INI if more dynamic
-        SCOUT_OVERLOAD_FUNCTION(file_get_contents)
+        SCOUT_OVERLOAD_FUNCTION("file_get_contents")
+        SCOUT_OVERLOAD_FUNCTION("file_put_contents")
+        SCOUT_OVERLOAD_FUNCTION("curl_exec")
+        SCOUT_OVERLOAD_FUNCTION("fwrite")
+        SCOUT_OVERLOAD_FUNCTION("fread")
+        SCOUT_OVERLOAD_METHOD("pdo", "exec")
+        SCOUT_OVERLOAD_METHOD("pdo", "query")
+        SCOUT_OVERLOAD_METHOD("pdostatement", "execute")
 
         SCOUTAPM_G(handlers_set) = 1;
     } else {
         DEBUG("Handlers have already been set, skipping.\n");
     }
+
+    return SUCCESS;
 }
 
 static PHP_RSHUTDOWN_FUNCTION(scoutapm)
 {
     DEBUG("Freeing stacks... ");
+
+    for (int i = 0; i < SCOUTAPM_G(observed_stack_frames_count); i++) {
+        for (int j = 0; j < SCOUTAPM_G(observed_stack_frames)[i].argc; j++) {
+            zval_ptr_dtor(&(SCOUTAPM_G(observed_stack_frames)[i].argv[j]));
+        }
+        free(SCOUTAPM_G(observed_stack_frames)[i].argv);
+        free((void*)SCOUTAPM_G(observed_stack_frames)[i].function_name);
+    }
+
     if (SCOUTAPM_G(observed_stack_frames)) {
         free(SCOUTAPM_G(observed_stack_frames));
     }
     SCOUTAPM_G(observed_stack_frames_count) = 0;
     DEBUG("Stacks freed\n");
+
+    return SUCCESS;
+}
+
+static const char* determine_function_name(zend_execute_data *execute_data)
+{
+    int len;
+    char *ret;
+
+    if (!execute_data->func) {
+        return "<not a function call>";
+    }
+
+    if (execute_data->func->common.fn_flags & ZEND_ACC_STATIC) {
+        DYNAMIC_MALLOC_SPRINTF(ret, len, "%s::%s",
+            ZSTR_VAL(Z_CE(execute_data->This)->name),
+            ZSTR_VAL(execute_data->func->common.function_name)
+        );
+        return ret;
+    }
+
+    if (Z_TYPE(execute_data->This) == IS_OBJECT) {
+        DYNAMIC_MALLOC_SPRINTF(ret, len, "%s->%s",
+            ZSTR_VAL(Z_OBJCE(execute_data->This)->name),
+            ZSTR_VAL(execute_data->func->common.function_name)
+        );
+        return ret;
+    }
+
+    return ZSTR_VAL(execute_data->func->common.function_name);
+}
+
+static int handler_index_for_function(const char *function_to_lookup)
+{
+    int i = 0;
+    const char *current = handler_lookup[i].function_name;
+    // @todo fix bug where current is still set, but out of bounds, so causes segfault, rather than returning -1
+    while (current) {
+        if (strcasecmp(current, function_to_lookup) == 0) {
+            return handler_lookup[i].index;
+        }
+        current = handler_lookup[++i].function_name;
+    }
+
+    return -1;
 }
 
 // @todo we could just use already implemented microtime(true) ?
