@@ -50,7 +50,7 @@ ZEND_END_MODULE_GLOBALS(scoutapm)
 #endif
 
 /* zif_handler is not always defined, so define this roughly equivalent */
-#ifndef zif_handler
+#if PHP_VERSION_ID < 70200
 typedef void (*zif_handler)(INTERNAL_FUNCTION_PARAMETERS);
 #endif
 
