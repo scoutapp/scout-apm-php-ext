@@ -1,6 +1,9 @@
-//
-// Created by james on 09/08/2019.
-//
+/*
+ * Scout APM extension for PHP
+ *
+ * Copyright (C) 2019-
+ * For license information, please see the LICENSE file.
+ */
 
 #ifndef ZEND_SCOUTAPM_H
 #define ZEND_SCOUTAPM_H
@@ -18,7 +21,7 @@
 #define SCOUT_APM_EXT_NAME "scoutapm"
 #define SCOUT_APM_EXT_VERSION "0.0"
 
-// Extreme amounts of debugging, set to 1 to enable it and `make clean && make` (tests will fail...)
+/* Extreme amounts of debugging, set to 1 to enable it and `make clean && make` (tests will fail...) */
 #define SCOUT_APM_EXT_DEBUGGING 0
 
 PHP_FUNCTION(scoutapm_get_calls);
@@ -97,4 +100,4 @@ typedef void (*zif_handler)(INTERNAL_FUNCTION_PARAMETERS);
 #define SCOUT_GET_CALLS_KEY_TIME_TAKEN "time_taken"
 #define SCOUT_GET_CALLS_KEY_ARGV "argv"
 
-#endif //ZEND_SCOUTAPM_H
+#endif /* ZEND_SCOUTAPM_H */
