@@ -44,14 +44,14 @@ static const zend_function_entry scoutapm_functions[] = {
 /* scoutapm_module_entry provides the metadata/information for PHP about this PHP module */
 static zend_module_entry scoutapm_module_entry = {
     STANDARD_MODULE_HEADER,
-    SCOUT_APM_EXT_NAME,
+    PHP_SCOUTAPM_NAME,
     scoutapm_functions,             /* function entries */
     NULL,                           /* module init */
     NULL,                           /* module shutdown */
     PHP_RINIT(scoutapm),            /* request init */
     PHP_RSHUTDOWN(scoutapm),        /* request shutdown */
     NULL,                           /* module information */
-    SCOUT_APM_EXT_VERSION,          /* module version */
+    PHP_SCOUTAPM_VERSION,           /* module version */
     PHP_MODULE_GLOBALS(scoutapm),   /* module global variables */
     NULL,
     NULL,
@@ -73,8 +73,8 @@ zend_extension_version_info extension_version_info = {
 
 /* zend_extension_entry provides the metadata/information for PHP about this zend extension */
 zend_extension zend_extension_entry = {
-    (char*) SCOUT_APM_EXT_NAME,
-    (char*) SCOUT_APM_EXT_VERSION,
+    (char*) PHP_SCOUTAPM_NAME,
+    (char*) PHP_SCOUTAPM_VERSION,
     (char*) "Scout APM",
     (char*) "https://scoutapm.com/",
     (char*) "Copyright 2019",
