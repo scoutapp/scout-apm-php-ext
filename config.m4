@@ -8,7 +8,7 @@ PHP_ARG_ENABLE([scoutapm],
 
 PHP_ARG_ENABLE([scoutapm-dev],
   [whether to enable scoutapm developer build flags],
-  [AS_HELP_STRING([--enable-xdebug-dev],
+  [AS_HELP_STRING([--enable-scoutapm-dev],
     [Enable scoutapm developer flags])],
   ,[no])
 
