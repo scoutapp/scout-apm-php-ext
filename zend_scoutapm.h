@@ -19,7 +19,7 @@
 #include "ext/standard/php_var.h"
 
 #define SCOUT_APM_EXT_NAME "scoutapm"
-#define SCOUT_APM_EXT_VERSION "0.0"
+#define SCOUT_APM_EXT_VERSION "0.0.1"
 
 /* Extreme amounts of debugging, set to 1 to enable it and `make clean && make` (tests will fail...) */
 #define SCOUT_APM_EXT_DEBUGGING 0

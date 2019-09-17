@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package
+        packagerversion="1.9.4" version="2.0"
+        xmlns="http://pear.php.net/dtd/package-2.0"
+        xmlns:tasks="http://pear.php.net/dtd/tasks-1.0"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0 http://pear.php.net/dtd/tasks-1.0.xsd http://pear.php.net/dtd/package-2.0 http://pear.php.net/dtd/package-2.0.xsd">
+    <name>scoutapm</name>
+    <channel>pecl.php.net</channel>
+    <summary>Native Extension Component for ScoutAPM's PHP Agent</summary>
+    <description>
+        ScoutAPM's extension for PHP provides additional capabilities to application monitoring over just using the
+        base PHP userland library.
+    </description>
+    <lead>
+        <name>Chris Schneider</name>
+        <user>cschneid</user>
+        <email>chris@scoutapm.com</email>
+        <active>yes</active>
+    </lead>
+    <lead>
+        <name>James Titcumb</name>
+        <user>asgrim</user>
+        <email>james@asgrim.com</email>
+        <active>yes</active>
+    </lead>
+
+    <date>2019-09-17</date>
+    <time>09:15:00</time>
+    <version>
+        <release>0.0.1</release>
+        <api>0.0.1</api>
+    </version>
+    <stability>
+        <release>alpha</release>
+        <api>alpha</api>
+    </stability>
+    <license uri="https://opensource.org/licenses/MIT">MIT</license>
+    <notes>
+        - Basic monitoring of file_get_contents, file_put_contents, fwrite, fread, curl_exec, PDO->exec, PDO->query, PDOStatement->execute
+        - Provides function scoutapm_get_calls() to return a list of recorded function calls
+    </notes>
+
+    <contents>
+        <dir name="/">
+            <file name="config.m4" role="src" />
+            <file name="zend_scoutapm.c" role="src" />
+            <file name="zend_scoutapm.h" role="src" />
+            <file name="README.md" role="doc" />
+            <file name="LICENSE" role="doc" />
+            <file name="EXPERIMENTAL" role="doc" />
+            <file name="CREDITS" role="doc" />
+            <dir name="tests">
+                <file name="001-check-ext-loaded.phpt" role="test" />
+                <file name="002-file_get_contents.phpt" role="test" />
+                <file name="003-scoutapm_get_calls-clears-calls-list.phpt" role="test" />
+                <file name="004-namespaced-fgc-is-not-logged.phpt" role="test" />
+                <file name="005-requiring-external-files-handled.phpt" role="test" />
+                <file name="006-anonymous-classes-handled.phpt" role="test" />
+                <file name="007-evaled-code-handled.phpt" role="test" />
+                <file name="008-class-with-no-constructor-call-handled.phpt" role="test" />
+                <file name="009-curl_exec.phpt" role="test" />
+                <file name="010-fwrite-fread.phpt" role="test" />
+                <file name="011-pdo-exec.phpt" role="test" />
+                <file name="011-pdo-query.phpt" role="test" />
+                <file name="011-pdostatement-execute.phpt" role="test" />
+                <file name="012-file_put_contents.phpt" role="test" />
+                <file name="013-fix-memory-leak-when-scoutapm_get_calls-not-called.phpt" role="test" />
+            </dir>
+        </dir>
+    </contents>
+    <dependencies>
+        <required>
+            <php>
+                <min>7.1.0</min>
+            </php>
+            <pearinstaller>
+                <min>1.9.1</min>
+            </pearinstaller>
+        </required>
+    </dependencies>
+    <providesextension>scoutapm</providesextension>
+    <zendextsrcrelease />
+</package>
