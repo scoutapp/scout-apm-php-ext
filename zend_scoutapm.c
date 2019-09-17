@@ -68,16 +68,16 @@ ZEND_GET_MODULE(scoutapm);
 /* extension_version_info is used by PHP */
 zend_extension_version_info extension_version_info = {
     ZEND_EXTENSION_API_NO,
-    ZEND_EXTENSION_BUILD_ID
+    (char*) ZEND_EXTENSION_BUILD_ID
 };
 
 /* zend_extension_entry provides the metadata/information for PHP about this zend extension */
 zend_extension zend_extension_entry = {
-    SCOUT_APM_EXT_NAME,
-    SCOUT_APM_EXT_VERSION,
-    "Scout APM",
-    "https://scoutapm.com/",
-    "Copyright 2019",
+    (char*) SCOUT_APM_EXT_NAME,
+    (char*) SCOUT_APM_EXT_VERSION,
+    (char*) "Scout APM",
+    (char*) "https://scoutapm.com/",
+    (char*) "Copyright 2019",
     zend_scoutapm_startup,  /* extension startup */
     NULL,                   /* extension shutdown */
     NULL,                   /* request startup */
