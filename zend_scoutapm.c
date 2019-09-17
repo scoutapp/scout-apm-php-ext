@@ -248,6 +248,8 @@ static void record_observed_stack_frame(const char *function_name, double microt
     DEBUG("Done\n");
 }
 
+/* {{{ proto array scoutapm_get_calls()
+   Fetch all the recorded function or method calls. */
 PHP_FUNCTION(scoutapm_get_calls)
 {
     zval item, arg_items, arg_item;
@@ -310,3 +312,4 @@ PHP_FUNCTION(scoutapm_get_calls)
 
     DEBUG("done.\n");
 }
+/* }}} */
