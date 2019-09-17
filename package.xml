@@ -9,8 +9,7 @@
     <channel>pecl.php.net</channel>
     <summary>Native Extension Component for ScoutAPM's PHP Agent</summary>
     <description>
-        ScoutAPM's extension for PHP provides additional capabilities to application monitoring over just using the
-        base PHP userland library.
+        ScoutAPM's extension for PHP provides additional capabilities to application monitoring over just using the base PHP userland library.
     </description>
     <lead>
         <name>Chris Schneider</name>
