@@ -7,9 +7,8 @@ Calls to PDO::exec are logged
 --FILE--
 <?php
 $dbh = new PDO('sqlite::memory:');
-echo $dbh->exec("CREATE TABLE foo (col INT PRIMARY KEY)");
-echo $dbh->exec("INSERT INTO foo (col) VALUES (1), (2) ");
-echo "\n";
+$dbh->exec("CREATE TABLE foo (col INT PRIMARY KEY)");
+$dbh->exec("INSERT INTO foo (col) VALUES (1), (2) ");
 
 $calls = scoutapm_get_calls();
 var_dump($calls[0]['function']);
@@ -18,7 +17,6 @@ var_dump($calls[1]['function']);
 var_dump($calls[1]['argv'][0]);
 ?>
 --EXPECTF--
-02
 string(9) "PDO->exec"
 string(38) "CREATE TABLE foo (col INT PRIMARY KEY)"
 string(9) "PDO->exec"
