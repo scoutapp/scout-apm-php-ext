@@ -50,6 +50,7 @@ print_cvs
  - Copy the current release into a new `changelog.release` element
  - Update the current release section (date/time/version/stability/notes)
  - `pecl package-validate` to check everything looks good
+ - Increase/verify `PHP_SCOUTAPM_VERSION` version listed in `zend_scoutapm.h`
  - Commit update to `package.xml`
  - Rebuild from scratch (`full-clean.sh`, then build as above)
  - `make test` to ensure everything passes locally

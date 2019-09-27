@@ -44,14 +44,14 @@ static const zend_function_entry scoutapm_functions[] = {
 /* scoutapm_module_entry provides the metadata/information for PHP about this PHP module */
 static zend_module_entry scoutapm_module_entry = {
     STANDARD_MODULE_HEADER,
-    SCOUT_APM_EXT_NAME,
+    PHP_SCOUTAPM_NAME,
     scoutapm_functions,             /* function entries */
     NULL,                           /* module init */
     NULL,                           /* module shutdown */
     PHP_RINIT(scoutapm),            /* request init */
     PHP_RSHUTDOWN(scoutapm),        /* request shutdown */
     NULL,                           /* module information */
-    SCOUT_APM_EXT_VERSION,          /* module version */
+    PHP_SCOUTAPM_VERSION,           /* module version */
     PHP_MODULE_GLOBALS(scoutapm),   /* module global variables */
     NULL,
     NULL,
@@ -73,8 +73,8 @@ zend_extension_version_info extension_version_info = {
 
 /* zend_extension_entry provides the metadata/information for PHP about this zend extension */
 zend_extension zend_extension_entry = {
-    (char*) SCOUT_APM_EXT_NAME,
-    (char*) SCOUT_APM_EXT_VERSION,
+    (char*) PHP_SCOUTAPM_NAME,
+    (char*) PHP_SCOUTAPM_VERSION,
     (char*) "Scout APM",
     (char*) "https://scoutapm.com/",
     (char*) "Copyright 2019",
@@ -174,10 +174,12 @@ static PHP_RINIT_FUNCTION(scoutapm)
  */
 static PHP_RSHUTDOWN_FUNCTION(scoutapm)
 {
+    int i, j;
+
     SCOUTAPM_DEBUG_MESSAGE("Freeing stacks... ");
 
-    for (int i = 0; i < SCOUTAPM_G(observed_stack_frames_count); i++) {
-        for (int j = 0; j < SCOUTAPM_G(observed_stack_frames)[i].argc; j++) {
+    for (i = 0; i < SCOUTAPM_G(observed_stack_frames_count); i++) {
+        for (j = 0; j < SCOUTAPM_G(observed_stack_frames)[i].argc; j++) {
             zval_ptr_dtor(&(SCOUTAPM_G(observed_stack_frames)[i].argv[j]));
         }
         free(SCOUTAPM_G(observed_stack_frames)[i].argv);
@@ -264,6 +266,8 @@ static double scoutapm_microtime()
  */
 static void record_observed_stack_frame(const char *function_name, double microtime_entered, double microtime_exited, int argc, zval *argv)
 {
+    int i;
+
     if (argc > 0) {
         SCOUTAPM_DEBUG_MESSAGE("Adding observed stack frame for %s (%s) ... ", function_name, Z_STRVAL(argv[0]));
     } else {
@@ -280,7 +284,7 @@ static void record_observed_stack_frame(const char *function_name, double microt
     SCOUTAPM_G(observed_stack_frames)[SCOUTAPM_G(observed_stack_frames_count)].argc = argc;
     SCOUTAPM_G(observed_stack_frames)[SCOUTAPM_G(observed_stack_frames_count)].argv = calloc(argc, sizeof(zval));
 
-    for (int i = 0; i < argc; i++) {
+    for (i = 0; i < argc; i++) {
         ZVAL_COPY(
             &(SCOUTAPM_G(observed_stack_frames)[SCOUTAPM_G(observed_stack_frames_count)].argv[i]),
             &(argv[i])
@@ -295,6 +299,7 @@ static void record_observed_stack_frame(const char *function_name, double microt
    Fetch all the recorded function or method calls recorded by the ScoutAPM extension. */
 PHP_FUNCTION(scoutapm_get_calls)
 {
+    int i, j;
     zval item, arg_items, arg_item;
     ZEND_PARSE_PARAMETERS_NONE();
 
@@ -302,7 +307,7 @@ PHP_FUNCTION(scoutapm_get_calls)
 
     array_init(return_value);
 
-    for (int i = 0; i < SCOUTAPM_G(observed_stack_frames_count); i++) {
+    for (i = 0; i < SCOUTAPM_G(observed_stack_frames_count); i++) {
         array_init(&item);
 
         add_assoc_str_ex(
@@ -331,7 +336,7 @@ PHP_FUNCTION(scoutapm_get_calls)
         );
 
         array_init(&arg_items);
-        for (int j = 0; j < SCOUTAPM_G(observed_stack_frames)[i].argc; j++) {
+        for (j = 0; j < SCOUTAPM_G(observed_stack_frames)[i].argc; j++) {
             /* Must copy the argument to a new zval, otherwise it gets freed and we get segfault. */
             ZVAL_COPY(&arg_item, &(SCOUTAPM_G(observed_stack_frames)[i].argv[j]));
             add_next_index_zval(&arg_items, &arg_item);
