@@ -1,5 +1,7 @@
 # Scout APM PHP Extension
 
+[![CircleCI](https://circleci.com/gh/scoutapp/scout-apm-php-ext/tree/master.svg?style=svg)](https://circleci.com/gh/scoutapp/scout-apm-php-ext/tree/master)
+
 ## Building
 
 ```bash
