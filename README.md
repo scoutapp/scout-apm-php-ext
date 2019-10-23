@@ -2,6 +2,40 @@
 
 [![CircleCI](https://circleci.com/gh/scoutapp/scout-apm-php-ext/tree/master.svg?style=svg)](https://circleci.com/gh/scoutapp/scout-apm-php-ext/tree/master)
 
+The Scout APM PHP extension allows instrumentation of internal PHP
+functions that can't be done in regular PHP. The `scout-apm-php`
+package detects if the `scoutapm` extension is loaded and will
+automatically send this data if available.
+
+Functions currently instrumented are:
+
+ * `file_get_contents`
+ * `file_put_contents`
+ * `curl_exec`
+ * `fread`
+ * `fwrite`
+ * `PDO->exec`
+ * `PDO->query`
+ * `PDOStatement->execute`
+
+If you would like another function instrumented, please let us know on
+[our issues](https://github.com/scoutapp/scout-apm-php-ext/issues).
+
+## Installing from PECL
+
+The Scout APM extension is available to install using
+[PECL](https://pecl.php.net/package/scoutapm).
+
+**Note:** since the stability is in "alpha" stage, you must append the
+`-alpha` flag, for example:
+
+```bash
+$ sudo pecl install scoutapm-alpha
+```
+
+You may need to add `zend_extension=scoutapm.so` into your `php.ini` to
+enable the extension.
+
 ## Building
 
 ```bash
