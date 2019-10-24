@@ -38,6 +38,326 @@ default_job: &default_job
         path: ~/repo/tests
 
 jobs:
+  "build-7.1.0":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.0
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.1.0-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.0
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.1.1":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.1
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.1.1-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.1
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.1.2":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.2
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.1.2-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.2
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.1.3":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.3
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.1.3-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.3
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.1.4":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.4
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.1.4-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.4
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.1.5":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.5
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.1.5-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.5
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.1.6":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.6
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.1.6-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.6
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.1.7":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.7
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.1.7-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.7
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.1.8":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.8
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.1.8-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.8
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.1.9":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.9
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.1.9-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.9
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.1.10":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.10
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.1.10-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.10
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.1.11":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.11
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.1.11-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.11
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.1.12":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.12
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.1.12-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.12
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.1.13":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.13
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.1.13-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.13
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.1.14":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.14
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.1.14-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.14
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.1.15":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.15
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.1.15-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.15
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.1.16":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.16
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.1.16-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.16
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.1.17":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.17
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.1.17-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.17
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.1.18":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.18
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.1.18-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.18
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.1.19":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.19
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.1.19-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.19
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.1.20":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.20
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.1.20-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.20
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.1.21":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.21
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.1.21-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.21
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.1.22":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.22
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.1.22-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.22
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.1.23":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.23
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.1.23-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.23
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.1.24":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.24
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.1.24-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.24
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.1.25":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.25
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.1.25-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.25
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.1.26":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.26
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.1.26-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.26
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.1.27":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.27
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.1.27-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.27
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.1.28":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.28
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.1.28-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.28
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.1.29":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.29
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.1.29-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.29
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.1.30":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.30
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.1.30-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.30
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.1.31":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.31
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.1.31-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.31
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
   "build-7.1.32":
     <<: *default_job
     environment:
@@ -47,6 +367,246 @@ jobs:
     <<: *default_job
     environment:
       SCOUT_PHP_VERSION: 7.1.32
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.2.0":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.2.0
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.2.0-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.2.0
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.2.1":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.2.1
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.2.1-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.2.1
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.2.2":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.2.2
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.2.2-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.2.2
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.2.3":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.2.3
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.2.3-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.2.3
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.2.4":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.2.4
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.2.4-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.2.4
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.2.5":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.2.5
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.2.5-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.2.5
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.2.6":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.2.6
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.2.6-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.2.6
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.2.7":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.2.7
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.2.7-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.2.7
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.2.8":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.2.8
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.2.8-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.2.8
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.2.9":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.2.9
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.2.9-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.2.9
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.2.10":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.2.10
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.2.10-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.2.10
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.2.11":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.2.11
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.2.11-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.2.11
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.2.12":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.2.12
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.2.12-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.2.12
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.2.13":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.2.13
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.2.13-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.2.13
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.2.14":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.2.14
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.2.14-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.2.14
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.2.15":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.2.15
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.2.15-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.2.15
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.2.16":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.2.16
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.2.16-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.2.16
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.2.17":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.2.17
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.2.17-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.2.17
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.2.18":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.2.18
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.2.18-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.2.18
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.2.19":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.2.19
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.2.19-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.2.19
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.2.20":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.2.20
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.2.20-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.2.20
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.2.21":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.2.21
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.2.21-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.2.21
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.2.22":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.2.22
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.2.22-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.2.22
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.2.23":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.2.23
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.2.23-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.2.23
       SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
   "build-7.2.24":
     <<: *default_job
@@ -58,12 +618,268 @@ jobs:
     environment:
       SCOUT_PHP_VERSION: 7.2.24
       SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.3.0":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.3.0
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.3.0-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.3.0
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.3.1":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.3.1
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.3.1-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.3.1
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.3.2":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.3.2
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.3.2-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.3.2
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.3.3":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.3.3
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.3.3-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.3.3
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.3.4":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.3.4
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.3.4-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.3.4
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.3.5":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.3.5
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.3.5-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.3.5
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.3.6":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.3.6
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.3.6-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.3.6
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.3.7":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.3.7
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.3.7-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.3.7
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.3.8":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.3.8
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.3.8-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.3.8
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.3.9":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.3.9
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.3.9-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.3.9
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.3.10":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.3.10
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.3.10-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.3.10
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.3.11":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.3.11
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.3.11-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.3.11
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
 
 workflows:
   version: 2
   build:
     jobs:
+      - "build-7.1.0"
+      - "build-7.1.0-zts"
+      - "build-7.1.1"
+      - "build-7.1.1-zts"
+      - "build-7.1.2"
+      - "build-7.1.2-zts"
+      - "build-7.1.3"
+      - "build-7.1.3-zts"
+      - "build-7.1.4"
+      - "build-7.1.4-zts"
+      - "build-7.1.5"
+      - "build-7.1.5-zts"
+      - "build-7.1.6"
+      - "build-7.1.6-zts"
+      - "build-7.1.7"
+      - "build-7.1.7-zts"
+      - "build-7.1.8"
+      - "build-7.1.8-zts"
+      - "build-7.1.9"
+      - "build-7.1.9-zts"
+      - "build-7.1.10"
+      - "build-7.1.10-zts"
+      - "build-7.1.11"
+      - "build-7.1.11-zts"
+      - "build-7.1.12"
+      - "build-7.1.12-zts"
+      - "build-7.1.13"
+      - "build-7.1.13-zts"
+      - "build-7.1.14"
+      - "build-7.1.14-zts"
+      - "build-7.1.15"
+      - "build-7.1.15-zts"
+      - "build-7.1.16"
+      - "build-7.1.16-zts"
+      - "build-7.1.17"
+      - "build-7.1.17-zts"
+      - "build-7.1.18"
+      - "build-7.1.18-zts"
+      - "build-7.1.19"
+      - "build-7.1.19-zts"
+      - "build-7.1.20"
+      - "build-7.1.20-zts"
+      - "build-7.1.21"
+      - "build-7.1.21-zts"
+      - "build-7.1.22"
+      - "build-7.1.22-zts"
+      - "build-7.1.23"
+      - "build-7.1.23-zts"
+      - "build-7.1.24"
+      - "build-7.1.24-zts"
+      - "build-7.1.25"
+      - "build-7.1.25-zts"
+      - "build-7.1.26"
+      - "build-7.1.26-zts"
+      - "build-7.1.27"
+      - "build-7.1.27-zts"
+      - "build-7.1.28"
+      - "build-7.1.28-zts"
+      - "build-7.1.29"
+      - "build-7.1.29-zts"
+      - "build-7.1.30"
+      - "build-7.1.30-zts"
+      - "build-7.1.31"
+      - "build-7.1.31-zts"
       - "build-7.1.32"
       - "build-7.1.32-zts"
+      - "build-7.2.0"
+      - "build-7.2.0-zts"
+      - "build-7.2.1"
+      - "build-7.2.1-zts"
+      - "build-7.2.2"
+      - "build-7.2.2-zts"
+      - "build-7.2.3"
+      - "build-7.2.3-zts"
+      - "build-7.2.4"
+      - "build-7.2.4-zts"
+      - "build-7.2.5"
+      - "build-7.2.5-zts"
+      - "build-7.2.6"
+      - "build-7.2.6-zts"
+      - "build-7.2.7"
+      - "build-7.2.7-zts"
+      - "build-7.2.8"
+      - "build-7.2.8-zts"
+      - "build-7.2.9"
+      - "build-7.2.9-zts"
+      - "build-7.2.10"
+      - "build-7.2.10-zts"
+      - "build-7.2.11"
+      - "build-7.2.11-zts"
+      - "build-7.2.12"
+      - "build-7.2.12-zts"
+      - "build-7.2.13"
+      - "build-7.2.13-zts"
+      - "build-7.2.14"
+      - "build-7.2.14-zts"
+      - "build-7.2.15"
+      - "build-7.2.15-zts"
+      - "build-7.2.16"
+      - "build-7.2.16-zts"
+      - "build-7.2.17"
+      - "build-7.2.17-zts"
+      - "build-7.2.18"
+      - "build-7.2.18-zts"
+      - "build-7.2.19"
+      - "build-7.2.19-zts"
+      - "build-7.2.20"
+      - "build-7.2.20-zts"
+      - "build-7.2.21"
+      - "build-7.2.21-zts"
+      - "build-7.2.22"
+      - "build-7.2.22-zts"
+      - "build-7.2.23"
+      - "build-7.2.23-zts"
       - "build-7.2.24"
       - "build-7.2.24-zts"
+      - "build-7.3.0"
+      - "build-7.3.0-zts"
+      - "build-7.3.1"
+      - "build-7.3.1-zts"
+      - "build-7.3.2"
+      - "build-7.3.2-zts"
+      - "build-7.3.3"
+      - "build-7.3.3-zts"
+      - "build-7.3.4"
+      - "build-7.3.4-zts"
+      - "build-7.3.5"
+      - "build-7.3.5-zts"
+      - "build-7.3.6"
+      - "build-7.3.6-zts"
+      - "build-7.3.7"
+      - "build-7.3.7-zts"
+      - "build-7.3.8"
+      - "build-7.3.8-zts"
+      - "build-7.3.9"
+      - "build-7.3.9-zts"
+      - "build-7.3.10"
+      - "build-7.3.10-zts"
+      - "build-7.3.11"
+      - "build-7.3.11-zts"
