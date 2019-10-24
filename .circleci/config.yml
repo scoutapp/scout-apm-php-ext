@@ -6,14 +6,14 @@ default_job: &default_job
   working_directory: ~/repo
   steps:
     - run:
-        name: "Install PHP $SCOUT_PHP_VERSION"
+        name: "Install PHP"
         command: |
           sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install software-properties-common build-essential autoconf libcurl4-openssl-dev libxml2-dev
           cd /tmp
           wget https://www.php.net/distributions/php-$SCOUT_PHP_VERSION.tar.gz
           tar zxf php-$SCOUT_PHP_VERSION.tar.gz
           cd php-$SCOUT_PHP_VERSION
-          ./configure --with-curl
+          ./configure --with-curl $SCOUT_CONFIGURE_OPTS
           make -j$(nproc)
           sudo make install
           cd ~/repo
@@ -38,18 +38,32 @@ default_job: &default_job
         path: ~/repo/tests
 
 jobs:
-  "build-7.1":
+  "build-7.1.32":
     <<: *default_job
     environment:
-      SCOUT_PHP_VERSION=7.1.9
-  "build-7.2":
+      SCOUT_PHP_VERSION: 7.1.32
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.1.32-zts":
     <<: *default_job
     environment:
-      SCOUT_PHP_VERSION=7.2.1
+      SCOUT_PHP_VERSION: 7.1.32
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.2.24":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.2.24
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.2.24-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.2.24
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
 
 workflows:
   version: 2
   build:
     jobs:
-      - "build-7.1"
-      - "build-7.2"
+      - "build-7.1.32"
+      - "build-7.1.32-zts"
+      - "build-7.2.24"
+      - "build-7.2.24-zts"
