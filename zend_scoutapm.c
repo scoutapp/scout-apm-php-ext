@@ -105,7 +105,7 @@ static int zend_scoutapm_startup(zend_extension *ze) {
  * This handles ALL recorded calls by grabbing all arguments (we treat it as a variadic), finding the "original" handler
  * for the function and calling it. Once the function is called, record how long it took.
  */
-ZEND_NAMED_FUNCTION(scoutapm_overloaded_handler)
+ZEND_NAMED_FUNCTION(scoutapm_default_handler)
 {
     int handler_index;
     double entered = scoutapm_microtime();
@@ -151,14 +151,14 @@ static PHP_RINIT_FUNCTION(scoutapm)
         SCOUTAPM_DEBUG_MESSAGE("Overriding function handlers.\n");
 
         /* @todo make overloaded functions configurable? https://github.com/scoutapp/scout-apm-php-ext/issues/30 */
-        SCOUT_OVERLOAD_FUNCTION("file_get_contents")
-        SCOUT_OVERLOAD_FUNCTION("file_put_contents")
-        SCOUT_OVERLOAD_FUNCTION("curl_exec")
-        SCOUT_OVERLOAD_FUNCTION("fwrite")
-        SCOUT_OVERLOAD_FUNCTION("fread")
-        SCOUT_OVERLOAD_METHOD("pdo", "exec")
-        SCOUT_OVERLOAD_METHOD("pdo", "query")
-        SCOUT_OVERLOAD_METHOD("pdostatement", "execute")
+        SCOUT_OVERLOAD_FUNCTION("file_get_contents", scoutapm_default_handler)
+        SCOUT_OVERLOAD_FUNCTION("file_put_contents", scoutapm_default_handler)
+        SCOUT_OVERLOAD_FUNCTION("curl_exec", scoutapm_default_handler)
+        SCOUT_OVERLOAD_FUNCTION("fwrite", scoutapm_default_handler)
+        SCOUT_OVERLOAD_FUNCTION("fread", scoutapm_default_handler)
+        SCOUT_OVERLOAD_METHOD("pdo", "exec", scoutapm_default_handler)
+        SCOUT_OVERLOAD_METHOD("pdo", "query", scoutapm_default_handler)
+        SCOUT_OVERLOAD_METHOD("pdostatement", "execute", scoutapm_default_handler)
 
         SCOUTAPM_G(handlers_set) = 1;
     } else {
