@@ -27,7 +27,7 @@
 PHP_FUNCTION(scoutapm_get_calls);
 
 /* Describes information we store about a recorded stack frame */
-typedef struct scoutapm_stack_frame {
+typedef struct _scoutapm_stack_frame {
     const char *function_name;
     double entered;
     double exited;
@@ -35,11 +35,19 @@ typedef struct scoutapm_stack_frame {
     zval *argv;
 } scoutapm_stack_frame;
 
+typedef struct _scoutapm_disconnected_call_argument_store {
+    const char *reference;
+    int argc;
+    zval *argv;
+} scoutapm_disconnected_call_argument_store;
+
 /* These are the "module globals". In non-ZTS mode, they're just regular variables, but means in ZTS mode they get handled properly */
 ZEND_BEGIN_MODULE_GLOBALS(scoutapm)
     zend_bool handlers_set;
     zend_long observed_stack_frames_count;
     scoutapm_stack_frame *observed_stack_frames;
+    zend_long disconnected_call_argument_store_count;
+    scoutapm_disconnected_call_argument_store *disconnected_call_argument_store;
 ZEND_END_MODULE_GLOBALS(scoutapm)
 
 /* Accessor for "module globals" for non-ZTS and ZTS modes. */

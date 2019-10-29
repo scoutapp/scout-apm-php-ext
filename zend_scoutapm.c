@@ -5,6 +5,7 @@
  * For license information, please see the LICENSE file.
  */
 
+#include <curl/curl.h>
 #include "zend_scoutapm.h"
 
 static PHP_RINIT_FUNCTION(scoutapm);
@@ -23,12 +24,13 @@ struct {
     /* define each function we want to overload, which maps to an index in the `original_handlers` array */
     {"file_get_contents", 0},
     {"file_put_contents", 1},
-    {"curl_exec", 2},
-    {"fread", 3},
-    {"fwrite", 4},
-    {"pdo->exec", 5},
-    {"pdo->query", 6},
-    {"pdostatement->execute", 7},
+    {"curl_setopt", 2},
+    {"curl_exec", 3},
+    {"fread", 4},
+    {"fwrite", 5},
+    {"pdo->exec", 6},
+    {"pdo->query", 7},
+    {"pdostatement->execute", 8},
 };
 /* handlers count needs to be the number of handler lookups defined above. */
 zif_handler original_handlers[8];
@@ -101,9 +103,71 @@ static int zend_scoutapm_startup(zend_extension *ze) {
     return zend_startup_module(&scoutapm_module_entry);
 }
 
+ZEND_NAMED_FUNCTION(scoutapm_curl_setopt_handler)
+{
+    zval *zid, *zvalue;
+    zend_long options;
+
+    ZEND_PARSE_PARAMETERS_START(3, 3)
+            Z_PARAM_RESOURCE(zid)
+            Z_PARAM_LONG(options)
+            Z_PARAM_ZVAL(zvalue)
+    ZEND_PARSE_PARAMETERS_END();
+
+    if (options == CURLOPT_URL) {
+        // @todo free all the allocated stuff here
+        SCOUTAPM_G(disconnected_call_argument_store) = realloc(
+            SCOUTAPM_G(disconnected_call_argument_store),
+            (SCOUTAPM_G(disconnected_call_argument_store_count)+1) * sizeof(scoutapm_disconnected_call_argument_store)
+        );
+
+        // @todo make unique
+        SCOUTAPM_G(disconnected_call_argument_store)[SCOUTAPM_G(disconnected_call_argument_store_count)].reference = "curl_exec";
+        SCOUTAPM_G(disconnected_call_argument_store)[SCOUTAPM_G(disconnected_call_argument_store_count)].argc = 1;
+        SCOUTAPM_G(disconnected_call_argument_store)[SCOUTAPM_G(disconnected_call_argument_store_count)].argv = calloc(1, sizeof(zval));
+        ZVAL_COPY(
+            SCOUTAPM_G(disconnected_call_argument_store)[SCOUTAPM_G(disconnected_call_argument_store_count)].argv,
+            zvalue
+        );
+    }
+
+    original_handlers[handler_index_for_function(determine_function_name(execute_data))](INTERNAL_FUNCTION_PARAM_PASSTHRU);
+}
+
+ZEND_NAMED_FUNCTION(scoutapm_curl_exec_handler)
+{
+    int handler_index;
+    double entered = scoutapm_microtime();
+    zval *resource_id;
+    const char *called_function;
+    int argc;
+    zval *argv = NULL;
+
+    called_function = determine_function_name(execute_data);
+
+    ZEND_PARSE_PARAMETERS_START(1, 1)
+        Z_PARAM_RESOURCE(resource_id)
+    ZEND_PARSE_PARAMETERS_END();
+
+    handler_index = handler_index_for_function(called_function);
+
+    /* Practically speaking, this shouldn't happen as long as we defined the handlers properly */
+    if (handler_index < 0) {
+        zend_throw_exception(NULL, "ScoutAPM overwrote a handler for a function it didn't define a handler for", 0);
+        return;
+    }
+
+    // @todo fetch this dynamically, because this is wrong....
+    argc = SCOUTAPM_G(disconnected_call_argument_store)[SCOUTAPM_G(disconnected_call_argument_store_count)].argc;
+    argv = SCOUTAPM_G(disconnected_call_argument_store)[SCOUTAPM_G(disconnected_call_argument_store_count)].argv;
+
+    record_observed_stack_frame(called_function, entered, scoutapm_microtime(), argc, argv);
+}
+
 /*
- * This handles ALL recorded calls by grabbing all arguments (we treat it as a variadic), finding the "original" handler
- * for the function and calling it. Once the function is called, record how long it took.
+ * This handles most recorded calls by grabbing all arguments (we treat it as a variadic), finding the "original" handler
+ * for the function and calling it. Once the function is called, record how long it took. Some "special" calls (e.g.
+ * curl_exec) have special handling because the arguments to curl_exec don't indicate the URL, for example.
  */
 ZEND_NAMED_FUNCTION(scoutapm_default_handler)
 {
@@ -145,6 +209,8 @@ static PHP_RINIT_FUNCTION(scoutapm)
     SCOUTAPM_DEBUG_MESSAGE("Initialising stacks...");
     SCOUTAPM_G(observed_stack_frames_count) = 0;
     SCOUTAPM_G(observed_stack_frames) = calloc(0, sizeof(scoutapm_stack_frame));
+    SCOUTAPM_G(disconnected_call_argument_store_count) = 0;
+    SCOUTAPM_G(disconnected_call_argument_store) = calloc(0, sizeof(scoutapm_disconnected_call_argument_store));
     SCOUTAPM_DEBUG_MESSAGE("Stacks made\n");
 
     if (SCOUTAPM_G(handlers_set) != 1) {
@@ -153,12 +219,13 @@ static PHP_RINIT_FUNCTION(scoutapm)
         /* @todo make overloaded functions configurable? https://github.com/scoutapp/scout-apm-php-ext/issues/30 */
         SCOUT_OVERLOAD_FUNCTION("file_get_contents", scoutapm_default_handler)
         SCOUT_OVERLOAD_FUNCTION("file_put_contents", scoutapm_default_handler)
-        SCOUT_OVERLOAD_FUNCTION("curl_exec", scoutapm_default_handler)
-        SCOUT_OVERLOAD_FUNCTION("fwrite", scoutapm_default_handler)
-        SCOUT_OVERLOAD_FUNCTION("fread", scoutapm_default_handler)
+        SCOUT_OVERLOAD_FUNCTION("curl_setopt", scoutapm_curl_setopt_handler)
+        SCOUT_OVERLOAD_FUNCTION("curl_exec", scoutapm_curl_exec_handler)
+        SCOUT_OVERLOAD_FUNCTION("fwrite", scoutapm_default_handler) // <--------
+        SCOUT_OVERLOAD_FUNCTION("fread", scoutapm_default_handler) // <--------
         SCOUT_OVERLOAD_METHOD("pdo", "exec", scoutapm_default_handler)
         SCOUT_OVERLOAD_METHOD("pdo", "query", scoutapm_default_handler)
-        SCOUT_OVERLOAD_METHOD("pdostatement", "execute", scoutapm_default_handler)
+        SCOUT_OVERLOAD_METHOD("pdostatement", "execute", scoutapm_default_handler) // <--------
 
         SCOUTAPM_G(handlers_set) = 1;
     } else {
