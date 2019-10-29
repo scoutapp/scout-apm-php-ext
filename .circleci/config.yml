@@ -38,15 +38,15 @@ default_job: &default_job
         path: ~/repo/tests
 
 jobs:
-  "build-7.1.0":
+  "build-7.1.9":
     <<: *default_job
     environment:
-      SCOUT_PHP_VERSION: 7.1.0
+      SCOUT_PHP_VERSION: 7.1.9
       SCOUT_CONFIGURE_OPTS: --enable-debug
-  "build-7.1.0-zts":
+  "build-7.1.9-zts":
     <<: *default_job
     environment:
-      SCOUT_PHP_VERSION: 7.1.0
+      SCOUT_PHP_VERSION: 7.1.9
       SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
   "build-7.1.32":
     <<: *default_job
@@ -103,8 +103,8 @@ workflows:
   version: 2
   build:
     jobs:
-      - "build-7.1.0"
-      - "build-7.1.0-zts"
+      - "build-7.1.9"
+      - "build-7.1.9-zts"
       - "build-7.1.32"
       - "build-7.1.32-zts"
       - "build-7.2.0"
