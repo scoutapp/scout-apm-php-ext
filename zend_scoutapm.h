@@ -42,8 +42,8 @@ typedef struct _scoutapm_disconnected_call_argument_store {
 } scoutapm_disconnected_call_argument_store;
 
 typedef struct _handler_lookup {
-    const char *function_name;
     int index;
+    const char *function_name;
 } indexed_handler_lookup;
 
 /* These are the "module globals". In non-ZTS mode, they're just regular variables, but means in ZTS mode they get handled properly */
