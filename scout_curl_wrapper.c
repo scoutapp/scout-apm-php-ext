@@ -7,18 +7,7 @@
 
 #include <curl/curl.h>
 #include "zend_scoutapm.h"
-
-extern ZEND_NAMED_FUNCTION(scoutapm_default_handler);
-extern double scoutapm_microtime();
-extern void record_arguments_for_call(const char *call_reference, int argc, zval *argv);
-extern zend_long find_index_for_recorded_arguments(const char *call_reference);
-extern void record_observed_stack_frame(const char *function_name, double microtime_entered, double microtime_exited, int argc, zval *argv);
-extern int handler_index_for_function(const char *function_to_lookup);
-extern const char* determine_function_name(zend_execute_data *execute_data);
-
-ZEND_EXTERN_MODULE_GLOBALS(scoutapm);
-extern indexed_handler_lookup handler_lookup[];
-extern zif_handler original_handlers[];
+#include "scout_extern.h"
 
 ZEND_NAMED_FUNCTION(scoutapm_curl_setopt_handler)
 {
