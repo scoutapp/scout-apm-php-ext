@@ -300,9 +300,12 @@ zend_long find_index_for_recorded_arguments(const char *call_reference)
 {
     zend_long i = 0;
     for (; i <= SCOUTAPM_G(disconnected_call_argument_store_count); i++) {
-        if (strcasecmp(
-            SCOUTAPM_G(disconnected_call_argument_store)[i].reference,
-            call_reference) == 0) {
+        if (SCOUTAPM_G(disconnected_call_argument_store)[i].reference
+            && strcasecmp(
+                SCOUTAPM_G(disconnected_call_argument_store)[i].reference,
+                call_reference
+            ) == 0
+        ) {
             return i;
         }
     }
