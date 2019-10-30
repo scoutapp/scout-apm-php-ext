@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.9)
 project(scoutapm C)
 
-set(SOURCE_FILES zend_scoutapm.c scout_curl_wrapper.c scout_extern.h zend_scoutapm.h)
+set(SOURCE_FILES zend_scoutapm.c scout_curl_wrapper.c scout_file_wrapper.c scout_extern.h zend_scoutapm.h)
 
 execute_process(
         COMMAND php-config --include-dir

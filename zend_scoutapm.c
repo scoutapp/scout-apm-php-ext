@@ -7,18 +7,23 @@
 
 #include "zend_scoutapm.h"
 
-static PHP_RINIT_FUNCTION(scoutapm);
-static PHP_RSHUTDOWN_FUNCTION(scoutapm);
-static int zend_scoutapm_startup(zend_extension*);
 double scoutapm_microtime();
 void record_arguments_for_call(const char *call_reference, int argc, zval *argv);
 zend_long find_index_for_recorded_arguments(const char *call_reference);
 void record_observed_stack_frame(const char *function_name, double microtime_entered, double microtime_exited, int argc, zval *argv);
 int handler_index_for_function(const char *function_to_lookup);
 const char* determine_function_name(zend_execute_data *execute_data);
-ZEND_NAMED_FUNCTION(scoutapm_curl_setopt_handler);
-ZEND_NAMED_FUNCTION(scoutapm_curl_exec_handler);
 
+static PHP_RINIT_FUNCTION(scoutapm);
+static PHP_RSHUTDOWN_FUNCTION(scoutapm);
+static int zend_scoutapm_startup(zend_extension*);
+
+extern ZEND_NAMED_FUNCTION(scoutapm_curl_setopt_handler);
+extern ZEND_NAMED_FUNCTION(scoutapm_curl_exec_handler);
+extern ZEND_NAMED_FUNCTION(scoutapm_fopen_handler);
+extern ZEND_NAMED_FUNCTION(scoutapm_fread_handler);
+
+// @todo flip index/function_name to make definition easier?
 /* This is simply a map of function names to an index in original_handlers */
 indexed_handler_lookup handler_lookup[] = {
     /* define each function we want to overload, which maps to an index in the `original_handlers` array */
@@ -26,14 +31,15 @@ indexed_handler_lookup handler_lookup[] = {
     {"file_put_contents", 1},
     {"curl_setopt", 2},
     {"curl_exec", 3},
-    {"fread", 4},
-    {"fwrite", 5},
-    {"pdo->exec", 6},
-    {"pdo->query", 7},
-    {"pdostatement->execute", 8},
+    {"fopen", 4},
+    {"fread", 5},
+    {"fwrite", 6},
+    {"pdo->exec", 7},
+    {"pdo->query", 8},
+    {"pdostatement->execute", 9},
 };
 /* handlers count needs to be the number of handler lookups defined above. */
-zif_handler original_handlers[9];
+zif_handler original_handlers[10];
 
 ZEND_DECLARE_MODULE_GLOBALS(scoutapm)
 
@@ -161,8 +167,9 @@ static PHP_RINIT_FUNCTION(scoutapm)
         SCOUT_OVERLOAD_FUNCTION("file_put_contents", scoutapm_default_handler)
         SCOUT_OVERLOAD_FUNCTION("curl_setopt", scoutapm_curl_setopt_handler)
         SCOUT_OVERLOAD_FUNCTION("curl_exec", scoutapm_curl_exec_handler)
+        SCOUT_OVERLOAD_FUNCTION("fopen", scoutapm_fopen_handler)
         SCOUT_OVERLOAD_FUNCTION("fwrite", scoutapm_default_handler) // <--------
-        SCOUT_OVERLOAD_FUNCTION("fread", scoutapm_default_handler) // <--------
+        SCOUT_OVERLOAD_FUNCTION("fread", scoutapm_fread_handler)
         SCOUT_OVERLOAD_METHOD("pdo", "exec", scoutapm_default_handler)
         SCOUT_OVERLOAD_METHOD("pdo", "query", scoutapm_default_handler)
         SCOUT_OVERLOAD_METHOD("pdostatement", "execute", scoutapm_default_handler) // <--------
@@ -269,6 +276,8 @@ double scoutapm_microtime()
 
 void record_arguments_for_call(const char *call_reference, int argc, zval *argv)
 {
+    zend_long i = 0;
+
     // @todo free all the allocated stuff here
     SCOUTAPM_G(disconnected_call_argument_store) = realloc(
         SCOUTAPM_G(disconnected_call_argument_store),
@@ -278,10 +287,13 @@ void record_arguments_for_call(const char *call_reference, int argc, zval *argv)
     SCOUTAPM_G(disconnected_call_argument_store)[SCOUTAPM_G(disconnected_call_argument_store_count)].reference = call_reference;
     SCOUTAPM_G(disconnected_call_argument_store)[SCOUTAPM_G(disconnected_call_argument_store_count)].argc = argc;
     SCOUTAPM_G(disconnected_call_argument_store)[SCOUTAPM_G(disconnected_call_argument_store_count)].argv = calloc(argc, sizeof(zval));
-    ZVAL_COPY(
-        SCOUTAPM_G(disconnected_call_argument_store)[SCOUTAPM_G(disconnected_call_argument_store_count)].argv,
-        argv
-    );
+
+    for(; i <= argc; i++) {
+        ZVAL_COPY(
+            &SCOUTAPM_G(disconnected_call_argument_store)[SCOUTAPM_G(disconnected_call_argument_store_count)].argv[i],
+            &argv[i]
+        );
+    }
 }
 
 zend_long find_index_for_recorded_arguments(const char *call_reference)
