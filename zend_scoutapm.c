@@ -10,9 +10,11 @@
 
 static PHP_RINIT_FUNCTION(scoutapm);
 static PHP_RSHUTDOWN_FUNCTION(scoutapm);
+ZEND_NAMED_FUNCTION(scoutapm_default_handler);
 static int zend_scoutapm_startup(zend_extension*);
 static double scoutapm_microtime();
 static void record_arguments_for_call(const char *call_reference, int argc, zval *argv);
+static zend_long find_index_for_recorded_arguments(const char *call_reference);
 static void record_observed_stack_frame(const char *function_name, double microtime_entered, double microtime_exited, int argc, zval *argv);
 static int handler_index_for_function(const char *function_to_lookup);
 static const char* determine_function_name(zend_execute_data *execute_data);
@@ -129,8 +131,7 @@ ZEND_NAMED_FUNCTION(scoutapm_curl_exec_handler)
     double entered = scoutapm_microtime();
     zval *resource_id;
     const char *called_function;
-    int argc;
-    zval *argv = NULL;
+    zend_long recorded_arguments_index;
 
     called_function = determine_function_name(execute_data);
 
@@ -146,11 +147,25 @@ ZEND_NAMED_FUNCTION(scoutapm_curl_exec_handler)
         return;
     }
 
-    // @todo fetch this dynamically, because this is wrong....
-    argc = SCOUTAPM_G(disconnected_call_argument_store)[SCOUTAPM_G(disconnected_call_argument_store_count)].argc;
-    argv = SCOUTAPM_G(disconnected_call_argument_store)[SCOUTAPM_G(disconnected_call_argument_store_count)].argv;
+    // @todo make call reference actually unique
+    recorded_arguments_index = find_index_for_recorded_arguments("curl_exec");
 
-    record_observed_stack_frame(called_function, entered, scoutapm_microtime(), argc, argv);
+    if (recorded_arguments_index < 0) {
+        // @todo maybe log a warning? happens if we call curl_exec without setting the URL...
+        scoutapm_default_handler(INTERNAL_FUNCTION_PARAM_PASSTHRU);
+        return;
+    }
+
+    // @todo segfault happens here if handler_index too high - https://github.com/scoutapp/scout-apm-php-ext/issues/41
+    original_handlers[handler_index](INTERNAL_FUNCTION_PARAM_PASSTHRU);
+
+    record_observed_stack_frame(
+        called_function,
+        entered,
+        scoutapm_microtime(),
+        SCOUTAPM_G(disconnected_call_argument_store)[recorded_arguments_index].argc,
+        SCOUTAPM_G(disconnected_call_argument_store)[recorded_arguments_index].argv
+    );
 }
 
 /*
@@ -332,6 +347,20 @@ static void record_arguments_for_call(const char *call_reference, int argc, zval
         SCOUTAPM_G(disconnected_call_argument_store)[SCOUTAPM_G(disconnected_call_argument_store_count)].argv,
         argv
     );
+}
+
+static zend_long find_index_for_recorded_arguments(const char *call_reference)
+{
+    zend_long i = 0;
+    for (; i <= SCOUTAPM_G(disconnected_call_argument_store_count); i++) {
+        if (strcasecmp(
+            SCOUTAPM_G(disconnected_call_argument_store)[i].reference,
+            call_reference) == 0) {
+            return i;
+        }
+    }
+
+    return -1;
 }
 
 /*
