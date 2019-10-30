@@ -41,6 +41,11 @@ typedef struct _scoutapm_disconnected_call_argument_store {
     zval *argv;
 } scoutapm_disconnected_call_argument_store;
 
+typedef struct _handler_lookup {
+    const char *function_name;
+    int index;
+} indexed_handler_lookup;
+
 /* These are the "module globals". In non-ZTS mode, they're just regular variables, but means in ZTS mode they get handled properly */
 ZEND_BEGIN_MODULE_GLOBALS(scoutapm)
     zend_bool handlers_set;

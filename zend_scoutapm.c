@@ -5,25 +5,22 @@
  * For license information, please see the LICENSE file.
  */
 
-#include <curl/curl.h>
 #include "zend_scoutapm.h"
 
 static PHP_RINIT_FUNCTION(scoutapm);
 static PHP_RSHUTDOWN_FUNCTION(scoutapm);
-ZEND_NAMED_FUNCTION(scoutapm_default_handler);
 static int zend_scoutapm_startup(zend_extension*);
-static double scoutapm_microtime();
-static void record_arguments_for_call(const char *call_reference, int argc, zval *argv);
-static zend_long find_index_for_recorded_arguments(const char *call_reference);
-static void record_observed_stack_frame(const char *function_name, double microtime_entered, double microtime_exited, int argc, zval *argv);
-static int handler_index_for_function(const char *function_to_lookup);
-static const char* determine_function_name(zend_execute_data *execute_data);
+double scoutapm_microtime();
+void record_arguments_for_call(const char *call_reference, int argc, zval *argv);
+zend_long find_index_for_recorded_arguments(const char *call_reference);
+void record_observed_stack_frame(const char *function_name, double microtime_entered, double microtime_exited, int argc, zval *argv);
+int handler_index_for_function(const char *function_to_lookup);
+const char* determine_function_name(zend_execute_data *execute_data);
+ZEND_NAMED_FUNCTION(scoutapm_curl_setopt_handler);
+ZEND_NAMED_FUNCTION(scoutapm_curl_exec_handler);
 
 /* This is simply a map of function names to an index in original_handlers */
-struct {
-    const char *function_name;
-    int index;
-} handler_lookup[] = {
+indexed_handler_lookup handler_lookup[] = {
     /* define each function we want to overload, which maps to an index in the `original_handlers` array */
     {"file_get_contents", 0},
     {"file_put_contents", 1},
@@ -104,68 +101,6 @@ zend_extension zend_extension_entry = {
  */
 static int zend_scoutapm_startup(zend_extension *ze) {
     return zend_startup_module(&scoutapm_module_entry);
-}
-
-ZEND_NAMED_FUNCTION(scoutapm_curl_setopt_handler)
-{
-    zval *zid, *zvalue;
-    zend_long options;
-
-    ZEND_PARSE_PARAMETERS_START(3, 3)
-            Z_PARAM_RESOURCE(zid)
-            Z_PARAM_LONG(options)
-            Z_PARAM_ZVAL(zvalue)
-    ZEND_PARSE_PARAMETERS_END();
-
-    if (options == CURLOPT_URL) {
-        // @todo make call reference actually unique
-        record_arguments_for_call("curl_exec", 1, zvalue);
-    }
-
-    original_handlers[handler_index_for_function(determine_function_name(execute_data))](INTERNAL_FUNCTION_PARAM_PASSTHRU);
-}
-
-ZEND_NAMED_FUNCTION(scoutapm_curl_exec_handler)
-{
-    int handler_index;
-    double entered = scoutapm_microtime();
-    zval *resource_id;
-    const char *called_function;
-    zend_long recorded_arguments_index;
-
-    called_function = determine_function_name(execute_data);
-
-    ZEND_PARSE_PARAMETERS_START(1, 1)
-        Z_PARAM_RESOURCE(resource_id)
-    ZEND_PARSE_PARAMETERS_END();
-
-    handler_index = handler_index_for_function(called_function);
-
-    /* Practically speaking, this shouldn't happen as long as we defined the handlers properly */
-    if (handler_index < 0) {
-        zend_throw_exception(NULL, "ScoutAPM overwrote a handler for a function it didn't define a handler for", 0);
-        return;
-    }
-
-    // @todo make call reference actually unique
-    recorded_arguments_index = find_index_for_recorded_arguments("curl_exec");
-
-    if (recorded_arguments_index < 0) {
-        // @todo maybe log a warning? happens if we call curl_exec without setting the URL...
-        scoutapm_default_handler(INTERNAL_FUNCTION_PARAM_PASSTHRU);
-        return;
-    }
-
-    // @todo segfault happens here if handler_index too high - https://github.com/scoutapp/scout-apm-php-ext/issues/41
-    original_handlers[handler_index](INTERNAL_FUNCTION_PARAM_PASSTHRU);
-
-    record_observed_stack_frame(
-        called_function,
-        entered,
-        scoutapm_microtime(),
-        SCOUTAPM_G(disconnected_call_argument_store)[recorded_arguments_index].argc,
-        SCOUTAPM_G(disconnected_call_argument_store)[recorded_arguments_index].argv
-    );
 }
 
 /*
@@ -272,7 +207,7 @@ static PHP_RSHUTDOWN_FUNCTION(scoutapm)
  * is `ClassName::methodName` for static methods, `ClassName->methodName` for instance methods, and `functionName` for
  * regular functions.
  */
-static const char* determine_function_name(zend_execute_data *execute_data)
+const char* determine_function_name(zend_execute_data *execute_data)
 {
     int len;
     char *ret;
@@ -303,7 +238,7 @@ static const char* determine_function_name(zend_execute_data *execute_data)
 /*
  * In our handler_lookup, find what the "index" in our overridden handlers is for a particular function name
  */
-static int handler_index_for_function(const char *function_to_lookup)
+int handler_index_for_function(const char *function_to_lookup)
 {
     int i = 0;
     const char *current = handler_lookup[i].function_name;
@@ -322,7 +257,7 @@ static int handler_index_for_function(const char *function_to_lookup)
  * Using gettimeofday, determine the time using microsecond precision, and return as a double.
  * @todo consider using HR monotonic time? https://github.com/scoutapp/scout-apm-php-ext/issues/23
  */
-static double scoutapm_microtime()
+double scoutapm_microtime()
 {
     struct timeval tp = {0};
     if (gettimeofday(&tp, NULL)) {
@@ -332,7 +267,7 @@ static double scoutapm_microtime()
     return (double)(tp.tv_sec + tp.tv_usec / 1000000.00);
 }
 
-static void record_arguments_for_call(const char *call_reference, int argc, zval *argv)
+void record_arguments_for_call(const char *call_reference, int argc, zval *argv)
 {
     // @todo free all the allocated stuff here
     SCOUTAPM_G(disconnected_call_argument_store) = realloc(
@@ -349,7 +284,7 @@ static void record_arguments_for_call(const char *call_reference, int argc, zval
     );
 }
 
-static zend_long find_index_for_recorded_arguments(const char *call_reference)
+zend_long find_index_for_recorded_arguments(const char *call_reference)
 {
     zend_long i = 0;
     for (; i <= SCOUTAPM_G(disconnected_call_argument_store_count); i++) {
@@ -367,7 +302,7 @@ static zend_long find_index_for_recorded_arguments(const char *call_reference)
  * Helper function to handle memory allocation for recorded stack frames. Called each time a function has completed
  * that we're interested in.
  */
-static void record_observed_stack_frame(const char *function_name, double microtime_entered, double microtime_exited, int argc, zval *argv)
+void record_observed_stack_frame(const char *function_name, double microtime_entered, double microtime_exited, int argc, zval *argv)
 {
     int i;
 

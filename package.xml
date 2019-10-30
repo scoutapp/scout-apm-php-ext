@@ -46,6 +46,7 @@
         <dir name="/">
             <file name="config.m4" role="src" />
             <file name="zend_scoutapm.c" role="src" />
+            <file name="scout_curl_wrapper.c" role="src" />
             <file name="zend_scoutapm.h" role="src" />
             <file name="README.md" role="doc" />
             <file name="LICENSE" role="doc" />
