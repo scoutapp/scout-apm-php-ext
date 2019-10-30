@@ -25,7 +25,7 @@ ZEND_NAMED_FUNCTION(scoutapm_curl_setopt_handler)
         record_arguments_for_call("curl_exec", 1, zvalue);
     }
 
-    original_handlers[handler_index_for_function(determine_function_name(execute_data))](INTERNAL_FUNCTION_PARAM_PASSTHRU);
+    SCOUT_INTERNAL_FUNCTION_PASSTHRU();
 }
 
 ZEND_NAMED_FUNCTION(scoutapm_curl_exec_handler)

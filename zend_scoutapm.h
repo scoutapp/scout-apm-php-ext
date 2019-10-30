@@ -120,6 +120,8 @@ typedef void (*zif_handler)(INTERNAL_FUNCTION_PARAMETERS);
 /* overload an instance class method by wrapping its handler with our own handler */
 #define SCOUT_OVERLOAD_METHOD(lowercase_class_name, method_name, handler_to_use) SCOUT_OVERLOAD_CLASS_ENTRY_FUNCTION(lowercase_class_name, "->", method_name, handler_to_use)
 
+#define SCOUT_INTERNAL_FUNCTION_PASSTHRU() original_handlers[handler_index_for_function(determine_function_name(execute_data))](INTERNAL_FUNCTION_PARAM_PASSTHRU)
+
 /* these are the string keys used in scoutapm_get_calls associative array return value */
 #define SCOUT_GET_CALLS_KEY_FUNCTION "function"
 #define SCOUT_GET_CALLS_KEY_ENTERED "entered"
