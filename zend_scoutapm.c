@@ -288,7 +288,7 @@ void record_arguments_for_call(const char *call_reference, int argc, zval *argv)
     SCOUTAPM_G(disconnected_call_argument_store)[SCOUTAPM_G(disconnected_call_argument_store_count)].argc = argc;
     SCOUTAPM_G(disconnected_call_argument_store)[SCOUTAPM_G(disconnected_call_argument_store_count)].argv = calloc(argc, sizeof(zval));
 
-    for(; i <= argc; i++) {
+    for(; i < argc; i++) {
         ZVAL_COPY(
             &SCOUTAPM_G(disconnected_call_argument_store)[SCOUTAPM_G(disconnected_call_argument_store_count)].argv[i],
             &argv[i]
