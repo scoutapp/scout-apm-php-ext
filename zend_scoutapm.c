@@ -167,11 +167,11 @@ static PHP_RINIT_FUNCTION(scoutapm)
         SCOUT_OVERLOAD_FUNCTION("curl_setopt", scoutapm_curl_setopt_handler)
         SCOUT_OVERLOAD_FUNCTION("curl_exec", scoutapm_curl_exec_handler)
         SCOUT_OVERLOAD_FUNCTION("fopen", scoutapm_fopen_handler)
-        SCOUT_OVERLOAD_FUNCTION("fwrite", scoutapm_default_handler) // <--------
+        SCOUT_OVERLOAD_FUNCTION("fwrite", scoutapm_default_handler) // @todo better argument handling
         SCOUT_OVERLOAD_FUNCTION("fread", scoutapm_fread_handler)
         SCOUT_OVERLOAD_METHOD("pdo", "exec", scoutapm_default_handler)
         SCOUT_OVERLOAD_METHOD("pdo", "query", scoutapm_default_handler)
-        SCOUT_OVERLOAD_METHOD("pdostatement", "execute", scoutapm_default_handler) // <--------
+        SCOUT_OVERLOAD_METHOD("pdostatement", "execute", scoutapm_default_handler) // @todo better argument handling
 
         SCOUTAPM_G(handlers_set) = 1;
     } else {
