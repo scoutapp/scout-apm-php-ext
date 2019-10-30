@@ -34,7 +34,7 @@ struct {
     {"pdostatement->execute", 8},
 };
 /* handlers count needs to be the number of handler lookups defined above. */
-zif_handler original_handlers[8];
+zif_handler original_handlers[9];
 
 ZEND_DECLARE_MODULE_GLOBALS(scoutapm)
 
@@ -181,6 +181,7 @@ ZEND_NAMED_FUNCTION(scoutapm_default_handler)
         return;
     }
 
+    // @todo segfault happens here if handler_index too high - https://github.com/scoutapp/scout-apm-php-ext/issues/41
     original_handlers[handler_index](INTERNAL_FUNCTION_PARAM_PASSTHRU);
 
     record_observed_stack_frame(called_function, entered, scoutapm_microtime(), argc, argv);
