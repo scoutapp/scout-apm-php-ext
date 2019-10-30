@@ -12,6 +12,7 @@ static PHP_RINIT_FUNCTION(scoutapm);
 static PHP_RSHUTDOWN_FUNCTION(scoutapm);
 static int zend_scoutapm_startup(zend_extension*);
 static double scoutapm_microtime();
+static void record_arguments_for_call(const char *call_reference, int argc, zval *argv);
 static void record_observed_stack_frame(const char *function_name, double microtime_entered, double microtime_exited, int argc, zval *argv);
 static int handler_index_for_function(const char *function_to_lookup);
 static const char* determine_function_name(zend_execute_data *execute_data);
@@ -115,20 +116,8 @@ ZEND_NAMED_FUNCTION(scoutapm_curl_setopt_handler)
     ZEND_PARSE_PARAMETERS_END();
 
     if (options == CURLOPT_URL) {
-        // @todo free all the allocated stuff here
-        SCOUTAPM_G(disconnected_call_argument_store) = realloc(
-            SCOUTAPM_G(disconnected_call_argument_store),
-            (SCOUTAPM_G(disconnected_call_argument_store_count)+1) * sizeof(scoutapm_disconnected_call_argument_store)
-        );
-
-        // @todo make unique
-        SCOUTAPM_G(disconnected_call_argument_store)[SCOUTAPM_G(disconnected_call_argument_store_count)].reference = "curl_exec";
-        SCOUTAPM_G(disconnected_call_argument_store)[SCOUTAPM_G(disconnected_call_argument_store_count)].argc = 1;
-        SCOUTAPM_G(disconnected_call_argument_store)[SCOUTAPM_G(disconnected_call_argument_store_count)].argv = calloc(1, sizeof(zval));
-        ZVAL_COPY(
-            SCOUTAPM_G(disconnected_call_argument_store)[SCOUTAPM_G(disconnected_call_argument_store_count)].argv,
-            zvalue
-        );
+        // @todo make call reference actually unique
+        record_arguments_for_call("curl_exec", 1, zvalue);
     }
 
     original_handlers[handler_index_for_function(determine_function_name(execute_data))](INTERNAL_FUNCTION_PARAM_PASSTHRU);
@@ -325,6 +314,23 @@ static double scoutapm_microtime()
         return 0;
     }
     return (double)(tp.tv_sec + tp.tv_usec / 1000000.00);
+}
+
+static void record_arguments_for_call(const char *call_reference, int argc, zval *argv)
+{
+    // @todo free all the allocated stuff here
+    SCOUTAPM_G(disconnected_call_argument_store) = realloc(
+        SCOUTAPM_G(disconnected_call_argument_store),
+        (SCOUTAPM_G(disconnected_call_argument_store_count)+1) * sizeof(scoutapm_disconnected_call_argument_store)
+    );
+
+    SCOUTAPM_G(disconnected_call_argument_store)[SCOUTAPM_G(disconnected_call_argument_store_count)].reference = call_reference;
+    SCOUTAPM_G(disconnected_call_argument_store)[SCOUTAPM_G(disconnected_call_argument_store_count)].argc = argc;
+    SCOUTAPM_G(disconnected_call_argument_store)[SCOUTAPM_G(disconnected_call_argument_store_count)].argv = calloc(argc, sizeof(zval));
+    ZVAL_COPY(
+        SCOUTAPM_G(disconnected_call_argument_store)[SCOUTAPM_G(disconnected_call_argument_store_count)].argv,
+        argv
+    );
 }
 
 /*
