@@ -52,7 +52,6 @@ ZEND_NAMED_FUNCTION(scoutapm_curl_exec_handler)
     recorded_arguments_index = find_index_for_recorded_arguments(unique_resource_id(SCOUT_WRAPPER_TYPE_CURL, resource_id));
 
     if (recorded_arguments_index < 0) {
-        // @todo maybe log a warning? happens if we call curl_exec without setting the URL...
         scoutapm_default_handler(INTERNAL_FUNCTION_PARAM_PASSTHRU);
         return;
     }

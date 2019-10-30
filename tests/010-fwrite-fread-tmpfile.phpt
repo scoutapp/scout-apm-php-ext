@@ -4,7 +4,7 @@ Calls to fwrite and fread are logged
 <?php if (!extension_loaded("scoutapm")) die("skip scoutapm extension required."); ?>
 --FILE--
 <?php
-$fh = fopen(tempnam(sys_get_temp_dir(), 'scoutapm-test'), 'w+');
+$fh = tmpfile();
 
 fwrite($fh, "fread/fwrite test\n");
 fseek($fh, 0);
@@ -20,6 +20,7 @@ var_dump($calls[1]['function']);
 var_dump($calls[1]['argv']);
 ?>
 --EXPECTF--
+Notice: fread(): ScoutAPM could not determine arguments for this call in %s
 fread/fwrite test
 string(6) "fwrite"
 array(2) {
@@ -32,7 +33,7 @@ array(2) {
 string(5) "fread"
 array(2) {
   [0]=>
-  string(24) "/tmp/scoutapm-test%s"
+  resource(%d) of type (Unknown)
   [1]=>
-  string(2) "w+"
+  int(18)
 }

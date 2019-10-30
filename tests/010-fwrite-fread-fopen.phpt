@@ -4,7 +4,7 @@ Calls to fwrite and fread are logged
 <?php if (!extension_loaded("scoutapm")) die("skip scoutapm extension required."); ?>
 --FILE--
 <?php
-$fh = tmpfile();
+$fh = fopen(tempnam(sys_get_temp_dir(), 'scoutapm-test'), 'w+');
 
 fwrite($fh, "fread/fwrite test\n");
 fseek($fh, 0);
@@ -32,7 +32,7 @@ array(2) {
 string(5) "fread"
 array(2) {
   [0]=>
-  resource(%d) of type (Unknown)
+  string(24) "/tmp/scoutapm-test%s"
   [1]=>
-  int(18)
+  string(2) "w+"
 }

@@ -54,7 +54,6 @@ ZEND_NAMED_FUNCTION(scoutapm_fread_handler)
     recorded_arguments_index = find_index_for_recorded_arguments(unique_resource_id(SCOUT_WRAPPER_TYPE_FILE, resource_id));
 
     if (recorded_arguments_index < 0) {
-        // @todo maybe log a warning? happens if we call fread without calling fopen...
         scoutapm_default_handler(INTERNAL_FUNCTION_PARAM_PASSTHRU);
         return;
     }
