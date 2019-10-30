@@ -21,8 +21,7 @@ ZEND_NAMED_FUNCTION(scoutapm_curl_setopt_handler)
     ZEND_PARSE_PARAMETERS_END();
 
     if (options == CURLOPT_URL) {
-        // @todo make call reference actually unique
-        record_arguments_for_call("curl_exec", 1, zvalue);
+        record_arguments_for_call(unique_resource_id(SCOUT_WRAPPER_TYPE_CURL, zid), 1, zvalue);
     }
 
     SCOUT_INTERNAL_FUNCTION_PASSTHRU();
@@ -50,8 +49,7 @@ ZEND_NAMED_FUNCTION(scoutapm_curl_exec_handler)
         return;
     }
 
-    // @todo make call reference actually unique
-    recorded_arguments_index = find_index_for_recorded_arguments("curl_exec");
+    recorded_arguments_index = find_index_for_recorded_arguments(unique_resource_id(SCOUT_WRAPPER_TYPE_CURL, resource_id));
 
     if (recorded_arguments_index < 0) {
         // @todo maybe log a warning? happens if we call curl_exec without setting the URL...

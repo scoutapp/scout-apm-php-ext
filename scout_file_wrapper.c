@@ -22,10 +22,10 @@ ZEND_NAMED_FUNCTION(scoutapm_fopen_handler)
     ZVAL_STR(&argv[0], filename);
     ZVAL_STR(&argv[1], mode);
 
-    // @todo make call reference actually unique
-    record_arguments_for_call("file", 2, argv);
 
     SCOUT_INTERNAL_FUNCTION_PASSTHRU();
+
+    record_arguments_for_call(unique_resource_id(SCOUT_WRAPPER_TYPE_FILE, return_value), 2, argv);
 }
 
 ZEND_NAMED_FUNCTION(scoutapm_fread_handler)
@@ -51,8 +51,7 @@ ZEND_NAMED_FUNCTION(scoutapm_fread_handler)
         return;
     }
 
-    // @todo make call reference actually unique
-    recorded_arguments_index = find_index_for_recorded_arguments("file");
+    recorded_arguments_index = find_index_for_recorded_arguments(unique_resource_id(SCOUT_WRAPPER_TYPE_FILE, resource_id));
 
     if (recorded_arguments_index < 0) {
         // @todo maybe log a warning? happens if we call fread without calling fopen...

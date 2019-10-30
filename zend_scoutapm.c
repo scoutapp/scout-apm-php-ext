@@ -313,6 +313,25 @@ zend_long find_index_for_recorded_arguments(const char *call_reference)
     return -1;
 }
 
+const char *unique_resource_id(const char *scout_wrapper_type, zval *resource_id)
+{
+    int len;
+    char *ret;
+
+    if (Z_TYPE_P(resource_id) != IS_RESOURCE) {
+        zend_throw_exception(NULL, "ScoutAPM extension was passed a zval that was not a resource", 0);
+        return "";
+    }
+
+    DYNAMIC_MALLOC_SPRINTF(ret, len,
+        "%s_handle(%d)_type(%d)",
+        scout_wrapper_type,
+        Z_RES_HANDLE_P(resource_id),
+        Z_RES_TYPE_P(resource_id)
+    );
+    return ret;
+}
+
 /*
  * Helper function to handle memory allocation for recorded stack frames. Called each time a function has completed
  * that we're interested in.

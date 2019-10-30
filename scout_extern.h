@@ -15,6 +15,7 @@ extern zend_long find_index_for_recorded_arguments(const char *call_reference);
 extern void record_observed_stack_frame(const char *function_name, double microtime_entered, double microtime_exited, int argc, zval *argv);
 extern int handler_index_for_function(const char *function_to_lookup);
 extern const char* determine_function_name(zend_execute_data *execute_data);
+extern const char *unique_resource_id(const char *scout_wrapper_type, zval *resource_id);
 
 ZEND_EXTERN_MODULE_GLOBALS(scoutapm);
 extern indexed_handler_lookup handler_lookup[];

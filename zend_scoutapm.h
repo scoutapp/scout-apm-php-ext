@@ -129,4 +129,8 @@ typedef void (*zif_handler)(INTERNAL_FUNCTION_PARAMETERS);
 #define SCOUT_GET_CALLS_KEY_TIME_TAKEN "time_taken"
 #define SCOUT_GET_CALLS_KEY_ARGV "argv"
 
+/* stored argument wrapper constants */
+#define SCOUT_WRAPPER_TYPE_CURL "curl_exec"
+#define SCOUT_WRAPPER_TYPE_FILE "file"
+
 #endif /* ZEND_SCOUTAPM_H */
