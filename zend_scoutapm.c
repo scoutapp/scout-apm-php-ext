@@ -17,6 +17,7 @@ const char* determine_function_name(zend_execute_data *execute_data);
 static PHP_RINIT_FUNCTION(scoutapm);
 static PHP_RSHUTDOWN_FUNCTION(scoutapm);
 static int zend_scoutapm_startup(zend_extension*);
+static void free_recorded_call_arguments();
 
 extern ZEND_NAMED_FUNCTION(scoutapm_curl_setopt_handler);
 extern ZEND_NAMED_FUNCTION(scoutapm_curl_exec_handler);
@@ -203,6 +204,9 @@ static PHP_RSHUTDOWN_FUNCTION(scoutapm)
         free(SCOUTAPM_G(observed_stack_frames));
     }
     SCOUTAPM_G(observed_stack_frames_count) = 0;
+
+    free_recorded_call_arguments();
+
     SCOUTAPM_DEBUG_MESSAGE("Stacks freed\n");
 
     return SUCCESS;
@@ -273,17 +277,33 @@ double scoutapm_microtime()
     return (double)(tp.tv_sec + tp.tv_usec / 1000000.00);
 }
 
+static void free_recorded_call_arguments()
+{
+    zend_long i, j;
+
+    for (i = 0; i < SCOUTAPM_G(disconnected_call_argument_store_count); i++) {
+        free((void*)SCOUTAPM_G(disconnected_call_argument_store)[i].reference);
+
+        for (j = 0; j < SCOUTAPM_G(disconnected_call_argument_store)[i].argc; j++) {
+            zval_ptr_dtor(&SCOUTAPM_G(disconnected_call_argument_store)[i].argv[j]);
+        }
+        free(SCOUTAPM_G(disconnected_call_argument_store)[i].argv);
+    }
+
+    free(SCOUTAPM_G(disconnected_call_argument_store));
+    SCOUTAPM_G(disconnected_call_argument_store_count) = 0;
+}
+
 void record_arguments_for_call(const char *call_reference, int argc, zval *argv)
 {
     zend_long i = 0;
 
-    // @todo free all the allocated stuff here
     SCOUTAPM_G(disconnected_call_argument_store) = realloc(
         SCOUTAPM_G(disconnected_call_argument_store),
         (SCOUTAPM_G(disconnected_call_argument_store_count)+1) * sizeof(scoutapm_disconnected_call_argument_store)
     );
 
-    SCOUTAPM_G(disconnected_call_argument_store)[SCOUTAPM_G(disconnected_call_argument_store_count)].reference = call_reference;
+    SCOUTAPM_G(disconnected_call_argument_store)[SCOUTAPM_G(disconnected_call_argument_store_count)].reference = strdup(call_reference);
     SCOUTAPM_G(disconnected_call_argument_store)[SCOUTAPM_G(disconnected_call_argument_store_count)].argc = argc;
     SCOUTAPM_G(disconnected_call_argument_store)[SCOUTAPM_G(disconnected_call_argument_store_count)].argv = calloc(argc, sizeof(zval));
 
@@ -293,6 +313,8 @@ void record_arguments_for_call(const char *call_reference, int argc, zval *argv)
             &argv[i]
         );
     }
+
+    SCOUTAPM_G(disconnected_call_argument_store_count)++;
 }
 
 zend_long find_index_for_recorded_arguments(const char *call_reference)
