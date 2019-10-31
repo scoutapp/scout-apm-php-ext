@@ -8,9 +8,11 @@ default_job: &default_job
     - run:
         name: "Install PHP"
         command: |
-          sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install software-properties-common build-essential autoconf libcurl4-openssl-dev libxml2-dev
+          sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install software-properties-common build-essential autoconf libcurl4-openssl-dev libxml2-dev libsqlite3-dev
           cd /tmp
-          wget https://www.php.net/distributions/php-$SCOUT_PHP_VERSION.tar.gz
+          [[ -z $SCOUT_PHP_URL ]] && FINAL_DOWNLOAD_URL="https://www.php.net/distributions/php-$SCOUT_PHP_VERSION.tar.gz" || FINAL_DOWNLOAD_URL=$SCOUT_PHP_URL
+          echo "Downloading release from $FINAL_DOWNLOAD_URL ..."
+          wget $FINAL_DOWNLOAD_URL
           tar zxf php-$SCOUT_PHP_VERSION.tar.gz
           cd php-$SCOUT_PHP_VERSION
           ./configure --with-curl $SCOUT_CONFIGURE_OPTS
@@ -98,6 +100,18 @@ jobs:
     environment:
       SCOUT_PHP_VERSION: 7.3.11
       SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.4.0RC5":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_URL: https://downloads.php.net/~derick/php-7.4.0RC5.tar.gz
+      SCOUT_PHP_VERSION: 7.4.0RC5
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.4.0RC5-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_URL: https://downloads.php.net/~derick/php-7.4.0RC5.tar.gz
+      SCOUT_PHP_VERSION: 7.4.0RC5
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
 
 workflows:
   version: 2
@@ -115,3 +129,5 @@ workflows:
       - "build-7.3.0-zts"
       - "build-7.3.11"
       - "build-7.3.11-zts"
+      - "build-7.4.0RC5"
+      - "build-7.4.0RC5-zts"
