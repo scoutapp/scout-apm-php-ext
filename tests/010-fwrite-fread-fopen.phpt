@@ -24,15 +24,14 @@ fread/fwrite test
 string(6) "fwrite"
 array(2) {
   [0]=>
-  resource(%d) of type (Unknown)
+  string(%d) "/tmp/scoutapm-test%s"
   [1]=>
-  string(18) "fread/fwrite test
-"
+  string(%d) "w+"
 }
 string(5) "fread"
 array(2) {
   [0]=>
-  string(24) "/tmp/scoutapm-test%s"
+  string(%d) "/tmp/scoutapm-test%s"
   [1]=>
-  string(2) "w+"
+  string(%d) "w+"
 }

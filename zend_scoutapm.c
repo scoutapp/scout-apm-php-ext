@@ -23,6 +23,7 @@ extern ZEND_NAMED_FUNCTION(scoutapm_curl_setopt_handler);
 extern ZEND_NAMED_FUNCTION(scoutapm_curl_exec_handler);
 extern ZEND_NAMED_FUNCTION(scoutapm_fopen_handler);
 extern ZEND_NAMED_FUNCTION(scoutapm_fread_handler);
+extern ZEND_NAMED_FUNCTION(scoutapm_fwrite_handler);
 
 /* This is simply a map of function names to an index in original_handlers */
 indexed_handler_lookup handler_lookup[] = {
@@ -168,7 +169,7 @@ static PHP_RINIT_FUNCTION(scoutapm)
         SCOUT_OVERLOAD_FUNCTION("curl_setopt", scoutapm_curl_setopt_handler)
         SCOUT_OVERLOAD_FUNCTION("curl_exec", scoutapm_curl_exec_handler)
         SCOUT_OVERLOAD_FUNCTION("fopen", scoutapm_fopen_handler)
-        SCOUT_OVERLOAD_FUNCTION("fwrite", scoutapm_default_handler) // @todo better argument handling
+        SCOUT_OVERLOAD_FUNCTION("fwrite", scoutapm_fwrite_handler)
         SCOUT_OVERLOAD_FUNCTION("fread", scoutapm_fread_handler)
         SCOUT_OVERLOAD_METHOD("pdo", "exec", scoutapm_default_handler)
         SCOUT_OVERLOAD_METHOD("pdo", "query", scoutapm_default_handler)

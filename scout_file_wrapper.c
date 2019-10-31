@@ -34,13 +34,53 @@ ZEND_NAMED_FUNCTION(scoutapm_fread_handler)
     double entered = scoutapm_microtime();
     zval *resource_id;
     const char *called_function;
-    zend_long recorded_arguments_index, bytes_to_read;
+    zend_long recorded_arguments_index;
 
     called_function = determine_function_name(execute_data);
 
-    ZEND_PARSE_PARAMETERS_START(2, 2)
+    ZEND_PARSE_PARAMETERS_START(1, 10)
             Z_PARAM_RESOURCE(resource_id)
-            Z_PARAM_LONG(bytes_to_read)
+    ZEND_PARSE_PARAMETERS_END();
+
+    handler_index = handler_index_for_function(called_function);
+
+    /* Practically speaking, this shouldn't happen as long as we defined the handlers properly */
+    if (handler_index < 0) {
+        zend_throw_exception(NULL, "ScoutAPM overwrote a handler for a function it didn't define a handler for", 0);
+        return;
+    }
+
+    recorded_arguments_index = find_index_for_recorded_arguments(unique_resource_id(SCOUT_WRAPPER_TYPE_FILE, resource_id));
+
+    if (recorded_arguments_index < 0) {
+        scoutapm_default_handler(INTERNAL_FUNCTION_PARAM_PASSTHRU);
+        return;
+    }
+
+    // @todo segfault happens here if handler_index too high - https://github.com/scoutapp/scout-apm-php-ext/issues/41
+    original_handlers[handler_index](INTERNAL_FUNCTION_PARAM_PASSTHRU);
+
+    record_observed_stack_frame(
+        called_function,
+        entered,
+        scoutapm_microtime(),
+        SCOUTAPM_G(disconnected_call_argument_store)[recorded_arguments_index].argc,
+        SCOUTAPM_G(disconnected_call_argument_store)[recorded_arguments_index].argv
+    );
+}
+
+ZEND_NAMED_FUNCTION(scoutapm_fwrite_handler)
+{
+    int handler_index;
+    double entered = scoutapm_microtime();
+    zval *resource_id;
+    const char *called_function;
+    zend_long recorded_arguments_index;
+
+    called_function = determine_function_name(execute_data);
+
+    ZEND_PARSE_PARAMETERS_START(1, 10)
+            Z_PARAM_RESOURCE(resource_id)
     ZEND_PARSE_PARAMETERS_END();
 
     handler_index = handler_index_for_function(called_function);
