@@ -24,23 +24,26 @@ extern ZEND_NAMED_FUNCTION(scoutapm_curl_exec_handler);
 extern ZEND_NAMED_FUNCTION(scoutapm_fopen_handler);
 extern ZEND_NAMED_FUNCTION(scoutapm_fread_handler);
 extern ZEND_NAMED_FUNCTION(scoutapm_fwrite_handler);
+extern ZEND_NAMED_FUNCTION(scoutapm_pdo_prepare_handler);
+extern ZEND_NAMED_FUNCTION(scoutapm_pdostatement_execute_handler);
 
 /* This is simply a map of function names to an index in original_handlers */
 indexed_handler_lookup handler_lookup[] = {
     /* define each function we want to overload, which maps to an index in the `original_handlers` array */
-    {0, "file_get_contents"},
-    {1, "file_put_contents"},
-    {2, "curl_setopt"},
-    {3, "curl_exec"},
-    {4, "fopen"},
-    {5, "fread"},
-    {6, "fwrite"},
-    {7, "pdo->exec"},
-    {8, "pdo->query"},
-    {9, "pdostatement->execute"},
+    { 0, "file_get_contents"},
+    { 1, "file_put_contents"},
+    { 2, "curl_setopt"},
+    { 3, "curl_exec"},
+    { 4, "fopen"},
+    { 5, "fread"},
+    { 6, "fwrite"},
+    { 7, "pdo->exec"},
+    { 8, "pdo->query"},
+    { 9, "pdo->prepare"},
+    {10, "pdostatement->execute"},
 };
 /* handlers count needs to be the number of handler lookups defined above. */
-zif_handler original_handlers[10];
+zif_handler original_handlers[11];
 
 ZEND_DECLARE_MODULE_GLOBALS(scoutapm)
 
@@ -173,7 +176,8 @@ static PHP_RINIT_FUNCTION(scoutapm)
         SCOUT_OVERLOAD_FUNCTION("fread", scoutapm_fread_handler)
         SCOUT_OVERLOAD_METHOD("pdo", "exec", scoutapm_default_handler)
         SCOUT_OVERLOAD_METHOD("pdo", "query", scoutapm_default_handler)
-        SCOUT_OVERLOAD_METHOD("pdostatement", "execute", scoutapm_default_handler) // @todo better argument handling
+        SCOUT_OVERLOAD_METHOD("pdo", "prepare", scoutapm_pdo_prepare_handler)
+        SCOUT_OVERLOAD_METHOD("pdostatement", "execute", scoutapm_pdostatement_execute_handler)
 
         SCOUTAPM_G(handlers_set) = 1;
     } else {

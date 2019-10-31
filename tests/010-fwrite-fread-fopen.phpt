@@ -1,5 +1,5 @@
 --TEST--
-Calls to fwrite and fread are logged
+Calls to fwrite and fread are logged with handle from fopen()
 --SKIPIF--
 <?php if (!extension_loaded("scoutapm")) die("skip scoutapm extension required."); ?>
 --FILE--

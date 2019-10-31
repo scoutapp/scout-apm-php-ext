@@ -1,5 +1,5 @@
 --TEST--
-Calls to PDOStatement::execute are logged
+Calls to PDOStatement::execute are logged when created from PDO->prepare()
 --SKIPIF--
 <?php if (!extension_loaded("scoutapm")) die("skip scoutapm extension required."); ?>
 <?php if (!extension_loaded("PDO")) die("skip PDO extension required."); ?>
@@ -13,6 +13,7 @@ var_dump($stmt->fetch(PDO::FETCH_ASSOC));
 
 $calls = scoutapm_get_calls();
 var_dump($calls[0]['function']);
+var_dump($calls[0]['argv']);
 ?>
 --EXPECTF--
 array(1) {
@@ -20,3 +21,7 @@ array(1) {
   string(1) "3"
 }
 string(21) "PDOStatement->execute"
+array(1) {
+  [0]=>
+  string(%d) "SELECT 1 + 2"
+}
