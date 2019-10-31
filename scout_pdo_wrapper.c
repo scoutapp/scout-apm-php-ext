@@ -10,8 +10,16 @@
 
 const char *unique_pdo_statement_id(zval *pdo_statement_instance)
 {
-    // @todo make unique...
-    return "pdo";
+    int len;
+    char *ret;
+
+    DYNAMIC_MALLOC_SPRINTF(ret, len,
+        "pdo_class(%s)_instance(%d)",
+        ZSTR_VAL(Z_OBJ_HT_P(pdo_statement_instance)->get_class_name(Z_OBJ_P(pdo_statement_instance))),
+        Z_OBJ_HANDLE_P(pdo_statement_instance)
+    );
+
+    return ret;
 }
 
 ZEND_NAMED_FUNCTION(scoutapm_pdo_prepare_handler)

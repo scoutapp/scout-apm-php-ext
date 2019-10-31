@@ -7,21 +7,25 @@ Calls to PDOStatement::execute are logged when created from PDO->prepare()
 --FILE--
 <?php
 $dbh = new PDO('sqlite::memory:');
-$stmt = $dbh->prepare("SELECT 1 + 2");
-$stmt->execute();
-var_dump($stmt->fetch(PDO::FETCH_ASSOC));
+$stmt1 = $dbh->prepare("SELECT 1 + 2");
+$stmt2 = $dbh->prepare("SELECT 3 + 4");
+$stmt1->execute();
+$stmt2->execute();
 
 $calls = scoutapm_get_calls();
 var_dump($calls[0]['function']);
 var_dump($calls[0]['argv']);
+var_dump($calls[1]['function']);
+var_dump($calls[1]['argv']);
 ?>
 --EXPECTF--
-array(1) {
-  ["1 + 2"]=>
-  string(1) "3"
-}
 string(21) "PDOStatement->execute"
 array(1) {
   [0]=>
   string(%d) "SELECT 1 + 2"
+}
+string(21) "PDOStatement->execute"
+array(1) {
+  [0]=>
+  string(%d) "SELECT 3 + 4"
 }
