@@ -1,150 +1,133 @@
 version: 2
 
+default_job: &default_job
+  docker:
+    - image: circleci/buildpack-deps:bionic-scm
+  working_directory: ~/repo
+  steps:
+    - run:
+        name: "Install PHP"
+        command: |
+          sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install software-properties-common build-essential autoconf libcurl4-openssl-dev libxml2-dev libsqlite3-dev
+          cd /tmp
+          [[ -z $SCOUT_PHP_URL ]] && FINAL_DOWNLOAD_URL="https://www.php.net/distributions/php-$SCOUT_PHP_VERSION.tar.gz" || FINAL_DOWNLOAD_URL=$SCOUT_PHP_URL
+          echo "Downloading release from $FINAL_DOWNLOAD_URL ..."
+          wget $FINAL_DOWNLOAD_URL
+          tar zxf php-$SCOUT_PHP_VERSION.tar.gz
+          cd php-$SCOUT_PHP_VERSION
+          ./configure --with-curl $SCOUT_CONFIGURE_OPTS
+          make -j$(nproc)
+          sudo make install
+          cd ~/repo
+    - checkout
+    - run:
+        name: "Build extension"
+        command: |
+          phpize
+          ./configure --enable-scoutapm --enable-scoutapm-dev
+          make
+    - run:
+        name: "Run tests"
+        command: |
+          php run-tests.php -p `which php` -d zend_extension=`pwd`/modules/scoutapm.so -g "FAIL,XFAIL,BORK,WARN,LEAK,SKIP" --offline --show-diff --set-timeout 120
+    - run:
+        name: "Benchmark"
+        command: |
+          sudo apt update && sudo apt install time
+          ./benchmark.sh
+          ./benchmark.sh -w
+    - store_artifacts:
+        path: ~/repo/tests
+
 jobs:
-  "build-7.1":
-    docker:
-      - image: circleci/php:7.1-cli
-    working_directory: ~/repo
-    steps:
-      - checkout
-      - run:
-          name: "Build"
-          command: |
-            phpize
-            ./configure --enable-scoutapm --enable-scoutapm-dev
-            make
-      - run:
-          name: "Run tests"
-          command: |
-            php run-tests.php -p `which php` -d zend_extension=`pwd`/modules/scoutapm.so -g "FAIL,XFAIL,BORK,WARN,LEAK,SKIP" --offline --show-diff --set-timeout 120
-      - run:
-          name: "Benchmark"
-          command: |
-            sudo apt update && sudo apt install time
-            ./benchmark.sh
-            ./benchmark.sh -w
-      - store_artifacts:
-          path: ~/repo/tests
-  "build-7.1-zts":
-    docker:
-      - image: circleci/php:7.1-zts
-    working_directory: ~/repo
-    steps:
-      - checkout
-      - run:
-          name: "Build"
-          command: |
-            phpize
-            ./configure --enable-scoutapm --enable-scoutapm-dev
-            make
-      - run:
-          name: "Run tests"
-          command: |
-            php run-tests.php -p `which php` -d zend_extension=`pwd`/modules/scoutapm.so -g "FAIL,XFAIL,BORK,WARN,LEAK,SKIP" --offline --show-diff --set-timeout 120
-      - run:
-          name: "Benchmark"
-          command: |
-            sudo apt update && sudo apt install time
-            ./benchmark.sh
-            ./benchmark.sh -w
-      - store_artifacts:
-          path: ~/repo/tests
-  "build-7.2":
-    docker:
-      - image: circleci/php:7.2-cli
-    working_directory: ~/repo
-    steps:
-      - checkout
-      - run:
-          name: "Build"
-          command: |
-            phpize
-            ./configure --enable-scoutapm --enable-scoutapm-dev
-            make
-      - run:
-          name: "Run tests"
-          command: |
-            php run-tests.php -p `which php` -d zend_extension=`pwd`/modules/scoutapm.so -g "FAIL,XFAIL,BORK,WARN,LEAK,SKIP" --offline --show-diff --show-slow 1000 --set-timeout 120
-      - run:
-          name: "Benchmark"
-          command: |
-            sudo apt update && sudo apt install time
-            ./benchmark.sh
-            ./benchmark.sh -w
-  "build-7.2-zts":
-    docker:
-      - image: circleci/php:7.2-zts
-    working_directory: ~/repo
-    steps:
-      - checkout
-      - run:
-          name: "Build"
-          command: |
-            phpize
-            ./configure --enable-scoutapm --enable-scoutapm-dev
-            make
-      - run:
-          name: "Run tests"
-          command: |
-            php run-tests.php -p `which php` -d zend_extension=`pwd`/modules/scoutapm.so -g "FAIL,XFAIL,BORK,WARN,LEAK,SKIP" --offline --show-diff --show-slow 1000 --set-timeout 120
-      - run:
-          name: "Benchmark"
-          command: |
-            sudo apt update && sudo apt install time
-            ./benchmark.sh
-            ./benchmark.sh -w
-  "build-7.3":
-    docker:
-      - image: circleci/php:7.3-cli
-    working_directory: ~/repo
-    steps:
-      - checkout
-      - run:
-          name: "Build"
-          command: |
-            phpize
-            ./configure --enable-scoutapm --enable-scoutapm-dev
-            make
-      - run:
-          name: "Run tests"
-          command: |
-            php run-tests.php -p `which php` -d zend_extension=`pwd`/modules/scoutapm.so -g "FAIL,XFAIL,BORK,WARN,LEAK,SKIP" --offline --show-diff --show-slow 1000 --set-timeout 120
-      - run:
-          name: "Benchmark"
-          command: |
-            sudo apt update && sudo apt install time
-            ./benchmark.sh
-            ./benchmark.sh -w
-  "build-7.3-zts":
-    docker:
-      - image: circleci/php:7.3-zts
-    working_directory: ~/repo
-    steps:
-      - checkout
-      - run:
-          name: "Build"
-          command: |
-            phpize
-            ./configure --enable-scoutapm --enable-scoutapm-dev
-            make
-      - run:
-          name: "Run tests"
-          command: |
-            php run-tests.php -p `which php` -d zend_extension=`pwd`/modules/scoutapm.so -g "FAIL,XFAIL,BORK,WARN,LEAK,SKIP" --offline --show-diff --show-slow 1000 --set-timeout 120
-      - run:
-          name: "Benchmark"
-          command: |
-            sudo apt update && sudo apt install time
-            ./benchmark.sh
-            ./benchmark.sh -w
+  "build-7.1.9":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.9
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.1.9-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.9
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.1.32":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.32
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.1.32-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.1.32
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.2.0":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.2.0
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.2.0-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.2.0
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.2.24":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.2.24
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.2.24-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.2.24
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.3.0":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.3.0
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.3.0-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.3.0
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.3.11":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.3.11
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.3.11-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_VERSION: 7.3.11
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
+  "build-7.4.0RC5":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_URL: https://downloads.php.net/~derick/php-7.4.0RC5.tar.gz
+      SCOUT_PHP_VERSION: 7.4.0RC5
+      SCOUT_CONFIGURE_OPTS: --enable-debug
+  "build-7.4.0RC5-zts":
+    <<: *default_job
+    environment:
+      SCOUT_PHP_URL: https://downloads.php.net/~derick/php-7.4.0RC5.tar.gz
+      SCOUT_PHP_VERSION: 7.4.0RC5
+      SCOUT_CONFIGURE_OPTS: --enable-debug --enable-maintainer-zts
 
 workflows:
   version: 2
   build:
     jobs:
-      - "build-7.1"
-      - "build-7.1-zts"
-      - "build-7.2"
-      - "build-7.2-zts"
-      - "build-7.3"
-      - "build-7.3-zts"
+      - "build-7.1.9"
+      - "build-7.1.9-zts"
+      - "build-7.1.32"
+      - "build-7.1.32-zts"
+      - "build-7.2.0"
+      - "build-7.2.0-zts"
+      - "build-7.2.24"
+      - "build-7.2.24-zts"
+      - "build-7.3.0"
+      - "build-7.3.0-zts"
+      - "build-7.3.11"
+      - "build-7.3.11-zts"
+      - "build-7.4.0RC5"
+      - "build-7.4.0RC5-zts"
