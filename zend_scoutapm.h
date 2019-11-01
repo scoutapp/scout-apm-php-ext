@@ -85,15 +85,12 @@ typedef void (*zif_handler)(INTERNAL_FUNCTION_PARAMETERS);
     destString = (char*)malloc(sizeNeeded); \
     snprintf(destString, sizeNeeded, fmt, ##__VA_ARGS__)
 
-/* overload a regular function by wrapping its handler with our own handler */
+/* overload a regular function by wrapping its handler witunchecked_handler_index_for_functionh our own handler */
 #define SCOUT_OVERLOAD_FUNCTION(function_name, handler_to_use) \
     original_function = zend_hash_str_find_ptr(EG(function_table), function_name, sizeof(function_name) - 1); \
     if (original_function != NULL) { \
-        handler_index = handler_index_for_function(function_name); \
-        if (handler_index < 0) { \
-            zend_throw_exception(NULL, "ScoutAPM did not define a handler index for "function_name, 0); \
-            return FAILURE;\
-        } \
+        handler_index = unchecked_handler_index_for_function(function_name); \
+        if (handler_index < 0) return FAILURE; \
         original_handlers[handler_index] = original_function->internal_function.handler; \
         original_function->internal_function.handler = handler_to_use; \
     }
@@ -104,11 +101,8 @@ typedef void (*zif_handler)(INTERNAL_FUNCTION_PARAMETERS);
     if (ce != NULL) { \
         original_function = zend_hash_str_find_ptr(&ce->function_table, method_name, sizeof(method_name)-1); \
         if (original_function != NULL) { \
-            handler_index = handler_index_for_function(lowercase_class_name instance_or_static method_name); \
-            if (handler_index < 0) { \
-                zend_throw_exception(NULL, "ScoutAPM did not define a handler index for "lowercase_class_name instance_or_static method_name, 0); \
-                return FAILURE; \
-            } \
+            handler_index = unchecked_handler_index_for_function(lowercase_class_name instance_or_static method_name); \
+            if (handler_index < 0) return FAILURE; \
             original_handlers[handler_index] = original_function->internal_function.handler; \
             original_function->internal_function.handler = handler_to_use; \
         } \

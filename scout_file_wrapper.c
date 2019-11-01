@@ -56,7 +56,6 @@ ZEND_NAMED_FUNCTION(scoutapm_fread_handler)
         return;
     }
 
-    // @todo segfault happens here if handler_index too high - https://github.com/scoutapp/scout-apm-php-ext/issues/41
     original_handlers[handler_index](INTERNAL_FUNCTION_PARAM_PASSTHRU);
 
     record_observed_stack_frame(
@@ -97,7 +96,6 @@ ZEND_NAMED_FUNCTION(scoutapm_fwrite_handler)
         return;
     }
 
-    // @todo segfault happens here if handler_index too high - https://github.com/scoutapp/scout-apm-php-ext/issues/41
     original_handlers[handler_index](INTERNAL_FUNCTION_PARAM_PASSTHRU);
 
     record_observed_stack_frame(
