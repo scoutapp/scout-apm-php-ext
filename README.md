@@ -86,9 +86,9 @@ print_cvs
  - Rebuild from scratch (`full-clean.sh`, then build as above)
  - `make test` to ensure everything passes locally
  - Push the branch (optionally, make a PR to GitHub) to trigger CI to build
- - Once passed, `git tag -s <tagversion>` and enter changelog notes in tag body
+ - Once passed, `pecl package` to generate the tgz
+ - Upload to `pecl.php.net`
+ - Make a GPG-signed tag with `git tag -s <tagversion>` and enter changelog notes in tag body
  - `git push origin <tagversion>` to push the tag up
  - [Create a release](https://github.com/scoutapp/scout-apm-php-ext/releases/new) from the tag (use same changelog notes)
- - `pecl package` to generate the tgz
- - Upload to `pecl.php.net`
  - Shift the milestones along on GitHub
