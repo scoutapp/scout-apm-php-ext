@@ -85,7 +85,7 @@ typedef void (*zif_handler)(INTERNAL_FUNCTION_PARAMETERS);
     destString = (char*)malloc(sizeNeeded); \
     snprintf(destString, sizeNeeded, fmt, ##__VA_ARGS__)
 
-/* overload a regular function by wrapping its handler witunchecked_handler_index_for_functionh our own handler */
+/* overload a regular function by wrapping its handler with our own handler */
 #define SCOUT_OVERLOAD_FUNCTION(function_name, handler_to_use) \
     original_function = zend_hash_str_find_ptr(EG(function_table), function_name, sizeof(function_name) - 1); \
     if (original_function != NULL) { \
