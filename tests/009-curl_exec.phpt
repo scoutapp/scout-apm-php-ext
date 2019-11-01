@@ -16,7 +16,7 @@ var_dump($call['function']);
 var_dump($call['entered']);
 var_dump($call['exited']);
 var_dump($call['time_taken']);
-var_dump($call['exited'] >= $call['entered']);
+var_dump($call['exited'] > $call['entered']);
 var_dump($call['argv']);
 ?>
 --EXPECTF--

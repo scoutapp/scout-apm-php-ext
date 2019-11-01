@@ -22,7 +22,6 @@ ZEND_NAMED_FUNCTION(scoutapm_fopen_handler)
     ZVAL_STR(&argv[0], filename);
     ZVAL_STR(&argv[1], mode);
 
-
     SCOUT_INTERNAL_FUNCTION_PASSTHRU();
 
     record_arguments_for_call(unique_resource_id(SCOUT_WRAPPER_TYPE_FILE, return_value), 2, argv);
