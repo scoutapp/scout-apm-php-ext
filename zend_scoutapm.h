@@ -27,7 +27,7 @@
 PHP_FUNCTION(scoutapm_get_calls);
 
 /* Describes information we store about a recorded stack frame */
-typedef struct scoutapm_stack_frame {
+typedef struct _scoutapm_stack_frame {
     const char *function_name;
     double entered;
     double exited;
@@ -35,11 +35,24 @@ typedef struct scoutapm_stack_frame {
     zval *argv;
 } scoutapm_stack_frame;
 
+typedef struct _scoutapm_disconnected_call_argument_store {
+    const char *reference;
+    int argc;
+    zval *argv;
+} scoutapm_disconnected_call_argument_store;
+
+typedef struct _handler_lookup {
+    int index;
+    const char *function_name;
+} indexed_handler_lookup;
+
 /* These are the "module globals". In non-ZTS mode, they're just regular variables, but means in ZTS mode they get handled properly */
 ZEND_BEGIN_MODULE_GLOBALS(scoutapm)
     zend_bool handlers_set;
     zend_long observed_stack_frames_count;
     scoutapm_stack_frame *observed_stack_frames;
+    zend_long disconnected_call_argument_store_count;
+    scoutapm_disconnected_call_argument_store *disconnected_call_argument_store;
 ZEND_END_MODULE_GLOBALS(scoutapm)
 
 /* Accessor for "module globals" for non-ZTS and ZTS modes. */
@@ -73,7 +86,7 @@ typedef void (*zif_handler)(INTERNAL_FUNCTION_PARAMETERS);
     snprintf(destString, sizeNeeded, fmt, ##__VA_ARGS__)
 
 /* overload a regular function by wrapping its handler with our own handler */
-#define SCOUT_OVERLOAD_FUNCTION(function_name) \
+#define SCOUT_OVERLOAD_FUNCTION(function_name, handler_to_use) \
     original_function = zend_hash_str_find_ptr(EG(function_table), function_name, sizeof(function_name) - 1); \
     if (original_function != NULL) { \
         handler_index = handler_index_for_function(function_name); \
@@ -82,11 +95,11 @@ typedef void (*zif_handler)(INTERNAL_FUNCTION_PARAMETERS);
             return FAILURE;\
         } \
         original_handlers[handler_index] = original_function->internal_function.handler; \
-        original_function->internal_function.handler = scoutapm_overloaded_handler; \
+        original_function->internal_function.handler = handler_to_use; \
     }
 
 /* Don't use this macro directly, use SCOUT_OVERLOAD_STATIC_METHOD or SCOUT_OVERLOAD_METHOD for consistency */
-#define SCOUT_OVERLOAD_CLASS_ENTRY_FUNCTION(lowercase_class_name, instance_or_static, method_name) \
+#define SCOUT_OVERLOAD_CLASS_ENTRY_FUNCTION(lowercase_class_name, instance_or_static, method_name, handler_to_use) \
     ce = zend_hash_str_find_ptr(CG(class_table), lowercase_class_name, sizeof(lowercase_class_name) - 1); \
     if (ce != NULL) { \
         original_function = zend_hash_str_find_ptr(&ce->function_table, method_name, sizeof(method_name)-1); \
@@ -97,15 +110,17 @@ typedef void (*zif_handler)(INTERNAL_FUNCTION_PARAMETERS);
                 return FAILURE; \
             } \
             original_handlers[handler_index] = original_function->internal_function.handler; \
-            original_function->internal_function.handler = scoutapm_overloaded_handler; \
+            original_function->internal_function.handler = handler_to_use; \
         } \
     }
 
 /* overload a static class method by wrapping its handler with our own handler */
-#define SCOUT_OVERLOAD_STATIC_METHOD(lowercase_class_name, method_name) SCOUT_OVERLOAD_CLASS_ENTRY_FUNCTION(lowercase_class_name, "::", method_name)
+#define SCOUT_OVERLOAD_STATIC_METHOD(lowercase_class_name, method_name, handler_to_use) SCOUT_OVERLOAD_CLASS_ENTRY_FUNCTION(lowercase_class_name, "::", method_name, handler_to_use)
 
 /* overload an instance class method by wrapping its handler with our own handler */
-#define SCOUT_OVERLOAD_METHOD(lowercase_class_name, method_name) SCOUT_OVERLOAD_CLASS_ENTRY_FUNCTION(lowercase_class_name, "->", method_name)
+#define SCOUT_OVERLOAD_METHOD(lowercase_class_name, method_name, handler_to_use) SCOUT_OVERLOAD_CLASS_ENTRY_FUNCTION(lowercase_class_name, "->", method_name, handler_to_use)
+
+#define SCOUT_INTERNAL_FUNCTION_PASSTHRU() original_handlers[handler_index_for_function(determine_function_name(execute_data))](INTERNAL_FUNCTION_PARAM_PASSTHRU)
 
 /* these are the string keys used in scoutapm_get_calls associative array return value */
 #define SCOUT_GET_CALLS_KEY_FUNCTION "function"
@@ -113,5 +128,9 @@ typedef void (*zif_handler)(INTERNAL_FUNCTION_PARAMETERS);
 #define SCOUT_GET_CALLS_KEY_EXITED "exited"
 #define SCOUT_GET_CALLS_KEY_TIME_TAKEN "time_taken"
 #define SCOUT_GET_CALLS_KEY_ARGV "argv"
+
+/* stored argument wrapper constants */
+#define SCOUT_WRAPPER_TYPE_CURL "curl_exec"
+#define SCOUT_WRAPPER_TYPE_FILE "file"
 
 #endif /* ZEND_SCOUTAPM_H */

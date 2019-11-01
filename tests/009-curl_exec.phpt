@@ -16,7 +16,7 @@ var_dump($call['function']);
 var_dump($call['entered']);
 var_dump($call['exited']);
 var_dump($call['time_taken']);
-var_dump($call['exited'] > $call['entered']);
+var_dump($call['exited'] >= $call['entered']);
 var_dump($call['argv']);
 ?>
 --EXPECTF--
@@ -27,5 +27,5 @@ float(%f)
 bool(true)
 array(1) {
   [0]=>
-  resource(4) of type (curl)
+  string(%d) "file://%s/tests/009-curl_exec.php"
 }

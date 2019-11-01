@@ -57,8 +57,7 @@ if test "$PHP_SCOUTAPM" != "no"; then
 
   PHP_SCOUTAPM_CFLAGS="$STD_CFLAGS $MAINTAINER_CFLAGS"
 
-  PHP_NEW_EXTENSION(scoutapm,
-        zend_scoutapm.c,
+  PHP_NEW_EXTENSION(scoutapm, zend_scoutapm.c scout_curl_wrapper.c scout_file_wrapper.c scout_pdo_wrapper.c,
         $ext_shared,,$PHP_SCOUTAPM_CFLAGS,,yes)
 fi
 

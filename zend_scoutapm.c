@@ -7,31 +7,43 @@
 
 #include "zend_scoutapm.h"
 
+double scoutapm_microtime();
+void record_arguments_for_call(const char *call_reference, int argc, zval *argv);
+zend_long find_index_for_recorded_arguments(const char *call_reference);
+void record_observed_stack_frame(const char *function_name, double microtime_entered, double microtime_exited, int argc, zval *argv);
+int handler_index_for_function(const char *function_to_lookup);
+const char* determine_function_name(zend_execute_data *execute_data);
+
 static PHP_RINIT_FUNCTION(scoutapm);
 static PHP_RSHUTDOWN_FUNCTION(scoutapm);
 static int zend_scoutapm_startup(zend_extension*);
-static double scoutapm_microtime();
-static void record_observed_stack_frame(const char *function_name, double microtime_entered, double microtime_exited, int argc, zval *argv);
-static int handler_index_for_function(const char *function_to_lookup);
-static const char* determine_function_name(zend_execute_data *execute_data);
+static void free_recorded_call_arguments();
+
+extern ZEND_NAMED_FUNCTION(scoutapm_curl_setopt_handler);
+extern ZEND_NAMED_FUNCTION(scoutapm_curl_exec_handler);
+extern ZEND_NAMED_FUNCTION(scoutapm_fopen_handler);
+extern ZEND_NAMED_FUNCTION(scoutapm_fread_handler);
+extern ZEND_NAMED_FUNCTION(scoutapm_fwrite_handler);
+extern ZEND_NAMED_FUNCTION(scoutapm_pdo_prepare_handler);
+extern ZEND_NAMED_FUNCTION(scoutapm_pdostatement_execute_handler);
 
 /* This is simply a map of function names to an index in original_handlers */
-struct {
-    const char *function_name;
-    int index;
-} handler_lookup[] = {
+indexed_handler_lookup handler_lookup[] = {
     /* define each function we want to overload, which maps to an index in the `original_handlers` array */
-    {"file_get_contents", 0},
-    {"file_put_contents", 1},
-    {"curl_exec", 2},
-    {"fread", 3},
-    {"fwrite", 4},
-    {"pdo->exec", 5},
-    {"pdo->query", 6},
-    {"pdostatement->execute", 7},
+    { 0, "file_get_contents"},
+    { 1, "file_put_contents"},
+    { 2, "curl_setopt"},
+    { 3, "curl_exec"},
+    { 4, "fopen"},
+    { 5, "fread"},
+    { 6, "fwrite"},
+    { 7, "pdo->exec"},
+    { 8, "pdo->query"},
+    { 9, "pdo->prepare"},
+    {10, "pdostatement->execute"},
 };
 /* handlers count needs to be the number of handler lookups defined above. */
-zif_handler original_handlers[8];
+zif_handler original_handlers[11];
 
 ZEND_DECLARE_MODULE_GLOBALS(scoutapm)
 
@@ -102,10 +114,11 @@ static int zend_scoutapm_startup(zend_extension *ze) {
 }
 
 /*
- * This handles ALL recorded calls by grabbing all arguments (we treat it as a variadic), finding the "original" handler
- * for the function and calling it. Once the function is called, record how long it took.
+ * This handles most recorded calls by grabbing all arguments (we treat it as a variadic), finding the "original" handler
+ * for the function and calling it. Once the function is called, record how long it took. Some "special" calls (e.g.
+ * curl_exec) have special handling because the arguments to curl_exec don't indicate the URL, for example.
  */
-ZEND_NAMED_FUNCTION(scoutapm_overloaded_handler)
+ZEND_NAMED_FUNCTION(scoutapm_default_handler)
 {
     int handler_index;
     double entered = scoutapm_microtime();
@@ -128,6 +141,7 @@ ZEND_NAMED_FUNCTION(scoutapm_overloaded_handler)
         return;
     }
 
+    // @todo segfault happens here if handler_index too high - https://github.com/scoutapp/scout-apm-php-ext/issues/41
     original_handlers[handler_index](INTERNAL_FUNCTION_PARAM_PASSTHRU);
 
     record_observed_stack_frame(called_function, entered, scoutapm_microtime(), argc, argv);
@@ -145,20 +159,25 @@ static PHP_RINIT_FUNCTION(scoutapm)
     SCOUTAPM_DEBUG_MESSAGE("Initialising stacks...");
     SCOUTAPM_G(observed_stack_frames_count) = 0;
     SCOUTAPM_G(observed_stack_frames) = calloc(0, sizeof(scoutapm_stack_frame));
+    SCOUTAPM_G(disconnected_call_argument_store_count) = 0;
+    SCOUTAPM_G(disconnected_call_argument_store) = calloc(0, sizeof(scoutapm_disconnected_call_argument_store));
     SCOUTAPM_DEBUG_MESSAGE("Stacks made\n");
 
     if (SCOUTAPM_G(handlers_set) != 1) {
         SCOUTAPM_DEBUG_MESSAGE("Overriding function handlers.\n");
 
         /* @todo make overloaded functions configurable? https://github.com/scoutapp/scout-apm-php-ext/issues/30 */
-        SCOUT_OVERLOAD_FUNCTION("file_get_contents")
-        SCOUT_OVERLOAD_FUNCTION("file_put_contents")
-        SCOUT_OVERLOAD_FUNCTION("curl_exec")
-        SCOUT_OVERLOAD_FUNCTION("fwrite")
-        SCOUT_OVERLOAD_FUNCTION("fread")
-        SCOUT_OVERLOAD_METHOD("pdo", "exec")
-        SCOUT_OVERLOAD_METHOD("pdo", "query")
-        SCOUT_OVERLOAD_METHOD("pdostatement", "execute")
+        SCOUT_OVERLOAD_FUNCTION("file_get_contents", scoutapm_default_handler)
+        SCOUT_OVERLOAD_FUNCTION("file_put_contents", scoutapm_default_handler)
+        SCOUT_OVERLOAD_FUNCTION("curl_setopt", scoutapm_curl_setopt_handler)
+        SCOUT_OVERLOAD_FUNCTION("curl_exec", scoutapm_curl_exec_handler)
+        SCOUT_OVERLOAD_FUNCTION("fopen", scoutapm_fopen_handler)
+        SCOUT_OVERLOAD_FUNCTION("fwrite", scoutapm_fwrite_handler)
+        SCOUT_OVERLOAD_FUNCTION("fread", scoutapm_fread_handler)
+        SCOUT_OVERLOAD_METHOD("pdo", "exec", scoutapm_default_handler)
+        SCOUT_OVERLOAD_METHOD("pdo", "query", scoutapm_default_handler)
+        SCOUT_OVERLOAD_METHOD("pdo", "prepare", scoutapm_pdo_prepare_handler)
+        SCOUT_OVERLOAD_METHOD("pdostatement", "execute", scoutapm_pdostatement_execute_handler)
 
         SCOUTAPM_G(handlers_set) = 1;
     } else {
@@ -190,6 +209,9 @@ static PHP_RSHUTDOWN_FUNCTION(scoutapm)
         free(SCOUTAPM_G(observed_stack_frames));
     }
     SCOUTAPM_G(observed_stack_frames_count) = 0;
+
+    free_recorded_call_arguments();
+
     SCOUTAPM_DEBUG_MESSAGE("Stacks freed\n");
 
     return SUCCESS;
@@ -200,7 +222,7 @@ static PHP_RSHUTDOWN_FUNCTION(scoutapm)
  * is `ClassName::methodName` for static methods, `ClassName->methodName` for instance methods, and `functionName` for
  * regular functions.
  */
-static const char* determine_function_name(zend_execute_data *execute_data)
+const char* determine_function_name(zend_execute_data *execute_data)
 {
     int len;
     char *ret;
@@ -231,7 +253,7 @@ static const char* determine_function_name(zend_execute_data *execute_data)
 /*
  * In our handler_lookup, find what the "index" in our overridden handlers is for a particular function name
  */
-static int handler_index_for_function(const char *function_to_lookup)
+int handler_index_for_function(const char *function_to_lookup)
 {
     int i = 0;
     const char *current = handler_lookup[i].function_name;
@@ -250,7 +272,7 @@ static int handler_index_for_function(const char *function_to_lookup)
  * Using gettimeofday, determine the time using microsecond precision, and return as a double.
  * @todo consider using HR monotonic time? https://github.com/scoutapp/scout-apm-php-ext/issues/23
  */
-static double scoutapm_microtime()
+double scoutapm_microtime()
 {
     struct timeval tp = {0};
     if (gettimeofday(&tp, NULL)) {
@@ -260,11 +282,88 @@ static double scoutapm_microtime()
     return (double)(tp.tv_sec + tp.tv_usec / 1000000.00);
 }
 
+static void free_recorded_call_arguments()
+{
+    zend_long i, j;
+
+    for (i = 0; i < SCOUTAPM_G(disconnected_call_argument_store_count); i++) {
+        free((void*)SCOUTAPM_G(disconnected_call_argument_store)[i].reference);
+
+        for (j = 0; j < SCOUTAPM_G(disconnected_call_argument_store)[i].argc; j++) {
+            zval_ptr_dtor(&SCOUTAPM_G(disconnected_call_argument_store)[i].argv[j]);
+        }
+        free(SCOUTAPM_G(disconnected_call_argument_store)[i].argv);
+    }
+
+    free(SCOUTAPM_G(disconnected_call_argument_store));
+    SCOUTAPM_G(disconnected_call_argument_store_count) = 0;
+}
+
+void record_arguments_for_call(const char *call_reference, int argc, zval *argv)
+{
+    zend_long i = 0;
+
+    SCOUTAPM_G(disconnected_call_argument_store) = realloc(
+        SCOUTAPM_G(disconnected_call_argument_store),
+        (SCOUTAPM_G(disconnected_call_argument_store_count)+1) * sizeof(scoutapm_disconnected_call_argument_store)
+    );
+
+    SCOUTAPM_G(disconnected_call_argument_store)[SCOUTAPM_G(disconnected_call_argument_store_count)].reference = strdup(call_reference);
+    SCOUTAPM_G(disconnected_call_argument_store)[SCOUTAPM_G(disconnected_call_argument_store_count)].argc = argc;
+    SCOUTAPM_G(disconnected_call_argument_store)[SCOUTAPM_G(disconnected_call_argument_store_count)].argv = calloc(argc, sizeof(zval));
+
+    for(; i < argc; i++) {
+        ZVAL_COPY(
+            &SCOUTAPM_G(disconnected_call_argument_store)[SCOUTAPM_G(disconnected_call_argument_store_count)].argv[i],
+            &argv[i]
+        );
+    }
+
+    SCOUTAPM_G(disconnected_call_argument_store_count)++;
+}
+
+zend_long find_index_for_recorded_arguments(const char *call_reference)
+{
+    zend_long i = 0;
+    for (; i <= SCOUTAPM_G(disconnected_call_argument_store_count); i++) {
+        if (SCOUTAPM_G(disconnected_call_argument_store)[i].reference
+            && strcasecmp(
+                SCOUTAPM_G(disconnected_call_argument_store)[i].reference,
+                call_reference
+            ) == 0
+        ) {
+            return i;
+        }
+    }
+
+    php_error_docref("", E_NOTICE, "ScoutAPM could not determine arguments for this call");
+    return -1;
+}
+
+const char *unique_resource_id(const char *scout_wrapper_type, zval *resource_id)
+{
+    int len;
+    char *ret;
+
+    if (Z_TYPE_P(resource_id) != IS_RESOURCE) {
+        zend_throw_exception(NULL, "ScoutAPM extension was passed a zval that was not a resource", 0);
+        return "";
+    }
+
+    DYNAMIC_MALLOC_SPRINTF(ret, len,
+        "%s_handle(%d)_type(%d)",
+        scout_wrapper_type,
+        Z_RES_HANDLE_P(resource_id),
+        Z_RES_TYPE_P(resource_id)
+    );
+    return ret;
+}
+
 /*
  * Helper function to handle memory allocation for recorded stack frames. Called each time a function has completed
  * that we're interested in.
  */
-static void record_observed_stack_frame(const char *function_name, double microtime_entered, double microtime_exited, int argc, zval *argv)
+void record_observed_stack_frame(const char *function_name, double microtime_entered, double microtime_exited, int argc, zval *argv)
 {
     int i;
 
