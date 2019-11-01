@@ -43,12 +43,6 @@ ZEND_NAMED_FUNCTION(scoutapm_fread_handler)
 
     handler_index = handler_index_for_function(called_function);
 
-    /* Practically speaking, this shouldn't happen as long as we defined the handlers properly */
-    if (handler_index < 0) {
-        zend_throw_exception(NULL, "ScoutAPM overwrote a handler for a function it didn't define a handler for", 0);
-        return;
-    }
-
     recorded_arguments_index = find_index_for_recorded_arguments(unique_resource_id(SCOUT_WRAPPER_TYPE_FILE, resource_id));
 
     if (recorded_arguments_index < 0) {
@@ -56,7 +50,6 @@ ZEND_NAMED_FUNCTION(scoutapm_fread_handler)
         return;
     }
 
-    // @todo segfault happens here if handler_index too high - https://github.com/scoutapp/scout-apm-php-ext/issues/41
     original_handlers[handler_index](INTERNAL_FUNCTION_PARAM_PASSTHRU);
 
     record_observed_stack_frame(
@@ -84,12 +77,6 @@ ZEND_NAMED_FUNCTION(scoutapm_fwrite_handler)
 
     handler_index = handler_index_for_function(called_function);
 
-    /* Practically speaking, this shouldn't happen as long as we defined the handlers properly */
-    if (handler_index < 0) {
-        zend_throw_exception(NULL, "ScoutAPM overwrote a handler for a function it didn't define a handler for", 0);
-        return;
-    }
-
     recorded_arguments_index = find_index_for_recorded_arguments(unique_resource_id(SCOUT_WRAPPER_TYPE_FILE, resource_id));
 
     if (recorded_arguments_index < 0) {
@@ -97,7 +84,6 @@ ZEND_NAMED_FUNCTION(scoutapm_fwrite_handler)
         return;
     }
 
-    // @todo segfault happens here if handler_index too high - https://github.com/scoutapp/scout-apm-php-ext/issues/41
     original_handlers[handler_index](INTERNAL_FUNCTION_PARAM_PASSTHRU);
 
     record_observed_stack_frame(

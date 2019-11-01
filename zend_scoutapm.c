@@ -18,6 +18,7 @@ static PHP_RINIT_FUNCTION(scoutapm);
 static PHP_RSHUTDOWN_FUNCTION(scoutapm);
 static int zend_scoutapm_startup(zend_extension*);
 static void free_recorded_call_arguments();
+static int unchecked_handler_index_for_function(const char *function_to_lookup);
 
 extern ZEND_NAMED_FUNCTION(scoutapm_curl_setopt_handler);
 extern ZEND_NAMED_FUNCTION(scoutapm_curl_exec_handler);
@@ -42,8 +43,10 @@ indexed_handler_lookup handler_lookup[] = {
     { 9, "pdo->prepare"},
     {10, "pdostatement->execute"},
 };
-/* handlers count needs to be the number of handler lookups defined above. */
-zif_handler original_handlers[11];
+
+/* handlers count needs to be bigger than the number of handler_lookup entries */
+#define ORIGINAL_HANDLERS_TO_ALLOCATE 20
+zif_handler original_handlers[ORIGINAL_HANDLERS_TO_ALLOCATE] = {NULL};
 
 ZEND_DECLARE_MODULE_GLOBALS(scoutapm)
 
@@ -135,13 +138,6 @@ ZEND_NAMED_FUNCTION(scoutapm_default_handler)
 
     handler_index = handler_index_for_function(called_function);
 
-    /* Practically speaking, this shouldn't happen as long as we defined the handlers properly */
-    if (handler_index < 0) {
-        zend_throw_exception(NULL, "ScoutAPM overwrote a handler for a function it didn't define a handler for", 0);
-        return;
-    }
-
-    // @todo segfault happens here if handler_index too high - https://github.com/scoutapp/scout-apm-php-ext/issues/41
     original_handlers[handler_index](INTERNAL_FUNCTION_PARAM_PASSTHRU);
 
     record_observed_stack_frame(called_function, entered, scoutapm_microtime(), argc, argv);
@@ -250,22 +246,47 @@ const char* determine_function_name(zend_execute_data *execute_data)
     return ZSTR_VAL(execute_data->func->common.function_name);
 }
 
-/*
- * In our handler_lookup, find what the "index" in our overridden handlers is for a particular function name
- */
-int handler_index_for_function(const char *function_to_lookup)
+static int unchecked_handler_index_for_function(const char *function_to_lookup)
 {
     int i = 0;
     const char *current = handler_lookup[i].function_name;
-    /* @todo fix https://github.com/scoutapp/scout-apm-php-ext/issues/29 */
+
     while (current) {
         if (strcasecmp(current, function_to_lookup) == 0) {
+            if (handler_lookup[i].index >= ORIGINAL_HANDLERS_TO_ALLOCATE) {
+                /*
+                 * Note: as this is done in startup, and a critical failure, php_error_docref or zend_throw_exception_ex
+                 * aren't suitable here, as they are "exceptions"; therefore the most informative thing we can do is
+                 * write a message directly, and return -1, capture this in the PHP_RINIT_FUNCTION and return FAILURE.
+                 * The -1 should be checked in SCOUT_OVERLOAD_CLASS_ENTRY_FUNCTION and SCOUT_OVERLOAD_FUNCTION
+                 */
+                php_printf("ScoutAPM overwrote a handler for '%s' but but we did not allocate enough original_handlers", function_to_lookup);
+                return -1;
+            }
+
             return handler_lookup[i].index;
         }
         current = handler_lookup[++i].function_name;
     }
 
+    /* Practically speaking, this shouldn't happen as long as we defined the handlers properly */
+    zend_throw_exception_ex(NULL, 0, "ScoutAPM overwrote a handler for '%s' but did not have a handler lookup for it", function_to_lookup);
     return -1;
+}
+
+/*
+ * In our handler_lookup, find what the "index" in our overridden handlers is for a particular function name
+ */
+int handler_index_for_function(const char *function_to_lookup)
+{
+    int handler_index = unchecked_handler_index_for_function(function_to_lookup);
+
+    if (original_handlers[handler_index] == NULL) {
+        zend_throw_exception_ex(NULL, 0, "ScoutAPM overwrote a handler for '%s' but the handler for index '%d' was not defined", function_to_lookup, handler_lookup[handler_index].index);
+        return -1;
+    }
+
+    return handler_index;
 }
 
 /*
