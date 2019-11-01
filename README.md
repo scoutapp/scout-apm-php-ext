@@ -26,11 +26,8 @@ If you would like another function instrumented, please let us know on
 The Scout APM extension is available to install using
 [PECL](https://pecl.php.net/package/scoutapm).
 
-**Note:** since the stability is in "alpha" stage, you must append the
-`-alpha` flag, for example:
-
 ```bash
-$ sudo pecl install scoutapm-alpha
+$ sudo pecl install scoutapm
 ```
 
 You may need to add `zend_extension=scoutapm.so` into your `php.ini` to

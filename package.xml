@@ -25,20 +25,22 @@
     </lead>
 
     <!-- Current Release -->
-    <date>2019-09-27</date>
-    <time>10:18:00</time>
+    <date>2019-11-04</date>
+    <time>11:50:00</time>
     <version>
-        <release>0.0.4</release>
-        <api>0.0.4</api>
+        <release>1.0.0</release>
+        <api>1.0.0</api>
     </version>
     <stability>
-        <release>alpha</release>
-        <api>alpha</api>
+        <release>stable</release>
+        <api>stable</api>
     </stability>
     <license uri="https://opensource.org/licenses/MIT">MIT</license>
     <notes>
-        - Fixed test failing because differing behaviour of sqlite in some versions
-        - Define i/j etc to follow c89 rules (thanks @remicollet)
+        - More documentation into README.md (#38)
+        - Better text matrix introduced, including PHP 7.4 tests (#40)
+        - Improved argument handling for functions like `curl_exec`, `fwrite`, `fread`, `PDOStatement->execute` (#42, #43)
+        - Bug fixes for #41 and #29 to help prevent bad configuration of overwritten functions (#44)
     </notes>
     <!-- End Current Release -->
 
@@ -91,6 +93,23 @@
     <zendextsrcrelease />
 
     <changelog>
+        <release>
+            <date>2019-09-27</date>
+            <time>10:18:00</time>
+            <version>
+                <release>0.0.4</release>
+                <api>0.0.4</api>
+            </version>
+            <stability>
+                <release>alpha</release>
+                <api>alpha</api>
+            </stability>
+            <license uri="https://opensource.org/licenses/MIT">MIT</license>
+            <notes>
+                - Fixed test failing because differing behaviour of sqlite in some versions
+                - Define i/j etc to follow c89 rules (thanks @remicollet)
+            </notes>
+        </release>
         <release>
             <date>2019-09-17</date>
             <time>11:15:00</time>
