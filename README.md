@@ -26,11 +26,8 @@ If you would like another function instrumented, please let us know on
 The Scout APM extension is available to install using
 [PECL](https://pecl.php.net/package/scoutapm).
 
-**Note:** since the stability is in "alpha" stage, you must append the
-`-alpha` flag, for example:
-
 ```bash
-$ sudo pecl install scoutapm-alpha
+$ sudo pecl install scoutapm
 ```
 
 You may need to add `zend_extension=scoutapm.so` into your `php.ini` to
@@ -89,9 +86,9 @@ print_cvs
  - Rebuild from scratch (`full-clean.sh`, then build as above)
  - `make test` to ensure everything passes locally
  - Push the branch (optionally, make a PR to GitHub) to trigger CI to build
- - Once passed, `git tag -s <tagversion>` and enter changelog notes in tag body
+ - Once passed, `pecl package` to generate the tgz
+ - Upload to `pecl.php.net`
+ - Make a GPG-signed tag with `git tag -s <tagversion>` and enter changelog notes in tag body
  - `git push origin <tagversion>` to push the tag up
  - [Create a release](https://github.com/scoutapp/scout-apm-php-ext/releases/new) from the tag (use same changelog notes)
- - `pecl package` to generate the tgz
- - Upload to `pecl.php.net`
  - Shift the milestones along on GitHub
