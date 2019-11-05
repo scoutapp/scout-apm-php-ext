@@ -25,11 +25,11 @@
     </lead>
 
     <!-- Current Release -->
-    <date>2019-11-04</date>
-    <time>11:50:00</time>
+    <date></date>
+    <time></time>
     <version>
-        <release>1.0.0</release>
-        <api>1.0.0</api>
+        <release>1.0.1</release>
+        <api>1.0.1</api>
     </version>
     <stability>
         <release>stable</release>
@@ -37,10 +37,7 @@
     </stability>
     <license uri="https://opensource.org/licenses/MIT">MIT</license>
     <notes>
-        - More documentation into README.md (#38)
-        - Better text matrix introduced, including PHP 7.4 tests (#40)
-        - Improved argument handling for functions like `curl_exec`, `fwrite`, `fread`, `PDOStatement->execute` (#42, #43)
-        - Bug fixes for #41 and #29 to help prevent bad configuration of overwritten functions (#44)
+        - Fix segfault when trying to access args out of bounds (#48)
     </notes>
     <!-- End Current Release -->
 
@@ -75,6 +72,7 @@
                 <file name="011-pdostatement-execute-pdo-prepare.phpt" role="test" />
                 <file name="012-file_put_contents.phpt" role="test" />
                 <file name="013-fix-memory-leak-when-scoutapm_get_calls-not-called.phpt" role="test" />
+                <file name="bug-47.phpt" role="test" />
             </dir>
         </dir>
     </contents>
@@ -93,6 +91,25 @@
     <zendextsrcrelease />
 
     <changelog>
+        <release>
+            <date>2019-11-04</date>
+            <time>11:50:00</time>
+            <version>
+                <release>1.0.0</release>
+                <api>1.0.0</api>
+            </version>
+            <stability>
+                <release>stable</release>
+                <api>stable</api>
+            </stability>
+            <license uri="https://opensource.org/licenses/MIT">MIT</license>
+            <notes>
+                - More documentation into README.md (#38)
+                - Better text matrix introduced, including PHP 7.4 tests (#40)
+                - Improved argument handling for functions like `curl_exec`, `fwrite`, `fread`, `PDOStatement->execute` (#42, #43)
+                - Bug fixes for #41 and #29 to help prevent bad configuration of overwritten functions (#44)
+            </notes>
+        </release>
         <release>
             <date>2019-09-27</date>
             <time>10:18:00</time>
