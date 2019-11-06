@@ -20,9 +20,6 @@ var_dump($calls[1]['function']);
 var_dump($calls[1]['argv']);
 ?>
 --EXPECTF--
-Notice: fwrite(): ScoutAPM could not determine arguments for this call in %s
-
-Notice: fread(): ScoutAPM could not determine arguments for this call in %s
 fread/fwrite test
 string(6) "fwrite"
 array(2) {

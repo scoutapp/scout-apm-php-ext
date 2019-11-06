@@ -11,7 +11,6 @@ fwrite($f2, "fread/fwrite test");
 var_dump(scoutapm_get_calls()[0]['argv']);
 ?>
 --EXPECTF--
-Notice: fwrite(): ScoutAPM could not determine arguments for this call in %s
 array(2) {
   [0]=>
   resource(%d) of type (%s)
