@@ -39,6 +39,7 @@
     <notes>
         - Fix segfault when trying to access args out of bounds (#48)
         - Fix exception raised when trying to fopen a file that does not exist (#50)
+        - Removed notice emitted calling some functions (#51)
     </notes>
     <!-- End Current Release -->
 

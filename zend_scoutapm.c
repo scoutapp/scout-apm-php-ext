@@ -357,7 +357,10 @@ zend_long find_index_for_recorded_arguments(const char *call_reference)
         }
     }
 
+#if SCOUT_APM_EXT_DEBUGGING == 1
     php_error_docref("", E_NOTICE, "ScoutAPM could not determine arguments for this call");
+#endif
+
     return -1;
 }
 
