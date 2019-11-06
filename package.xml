@@ -38,6 +38,7 @@
     <license uri="https://opensource.org/licenses/MIT">MIT</license>
     <notes>
         - Fix segfault when trying to access args out of bounds (#48)
+        - Fix exception raised when trying to fopen a file that does not exist (#50)
     </notes>
     <!-- End Current Release -->
 

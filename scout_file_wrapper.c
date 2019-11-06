@@ -24,7 +24,9 @@ ZEND_NAMED_FUNCTION(scoutapm_fopen_handler)
 
     SCOUT_INTERNAL_FUNCTION_PASSTHRU();
 
-    record_arguments_for_call(unique_resource_id(SCOUT_WRAPPER_TYPE_FILE, return_value), 2, argv);
+    if (Z_TYPE_P(return_value) == IS_RESOURCE) {
+        record_arguments_for_call(unique_resource_id(SCOUT_WRAPPER_TYPE_FILE, return_value), 2, argv);
+    }
 }
 
 ZEND_NAMED_FUNCTION(scoutapm_fread_handler)
