@@ -346,7 +346,7 @@ void record_arguments_for_call(const char *call_reference, int argc, zval *argv)
 zend_long find_index_for_recorded_arguments(const char *call_reference)
 {
     zend_long i = 0;
-    for (; i <= SCOUTAPM_G(disconnected_call_argument_store_count); i++) {
+    for (; i < SCOUTAPM_G(disconnected_call_argument_store_count); i++) {
         if (SCOUTAPM_G(disconnected_call_argument_store)[i].reference
             && strcasecmp(
                 SCOUTAPM_G(disconnected_call_argument_store)[i].reference,
