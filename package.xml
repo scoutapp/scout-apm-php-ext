@@ -25,11 +25,11 @@
     </lead>
 
     <!-- Current Release -->
-    <date>2019-11-06</date>
-    <time>08:26:00</time>
+    <date></date>
+    <time></time>
     <version>
-        <release>1.0.1</release>
-        <api>1.0.1</api>
+        <release></release>
+        <api></api>
     </version>
     <stability>
         <release>stable</release>
@@ -37,9 +37,7 @@
     </stability>
     <license uri="https://opensource.org/licenses/MIT">MIT</license>
     <notes>
-        - Fix segfault when trying to access args out of bounds (#48)
-        - Fix exception raised when trying to fopen a file that does not exist (#50)
-        - Removed notice emitted calling some functions (#51)
+        - Check if curl header is available and compile support with/without curl accordingly (#54)
     </notes>
     <!-- End Current Release -->
 
@@ -94,6 +92,24 @@
     <zendextsrcrelease />
 
     <changelog>
+        <release>
+            <date>2019-11-06</date>
+            <time>08:26:00</time>
+            <version>
+                <release>1.0.1</release>
+                <api>1.0.1</api>
+            </version>
+            <stability>
+                <release>stable</release>
+                <api>stable</api>
+            </stability>
+            <license uri="https://opensource.org/licenses/MIT">MIT</license>
+            <notes>
+                - Fix segfault when trying to access args out of bounds (#48)
+                - Fix exception raised when trying to fopen a file that does not exist (#50)
+                - Removed notice emitted calling some functions (#51)
+            </notes>
+        </release>
         <release>
             <date>2019-11-04</date>
             <time>11:50:00</time>
