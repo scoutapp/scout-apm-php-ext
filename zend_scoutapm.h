@@ -23,6 +23,7 @@
 #define SCOUT_APM_EXT_DEBUGGING 0
 
 PHP_FUNCTION(scoutapm_get_calls);
+PHP_FUNCTION(scoutapm_list_instrumented_functions);
 
 /* Describes information we store about a recorded stack frame */
 typedef struct _scoutapm_stack_frame {
