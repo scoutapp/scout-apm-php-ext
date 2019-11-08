@@ -8,7 +8,7 @@ default_job: &default_job
     - run:
         name: "Install PHP"
         command: |
-          sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install software-properties-common build-essential autoconf libxml2-dev libsqlite3-dev $ADDITIONAL_SYS_PACKAGES
+          sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install software-properties-common build-essential autoconf $ADDITIONAL_SYS_PACKAGES
           cd /tmp
           [[ -z $SCOUT_PHP_URL ]] && FINAL_DOWNLOAD_URL="https://www.php.net/distributions/php-$SCOUT_PHP_VERSION.tar.gz" || FINAL_DOWNLOAD_URL=$SCOUT_PHP_URL
           echo "Downloading release from $FINAL_DOWNLOAD_URL ..."
@@ -43,104 +43,104 @@ jobs:
   "build-7.1.9":
     <<: *default_job
     environment:
-      ADDITIONAL_SYS_PACKAGES: libcurl4-openssl-dev
+      ADDITIONAL_SYS_PACKAGES: libxml2-dev libsqlite3-dev libcurl4-openssl-dev
       SCOUT_PHP_VERSION: 7.1.9
       SCOUT_PHP_CONFIGURE_OPTS: --with-curl --enable-debug
   "build-7.1.9-zts":
     <<: *default_job
     environment:
-      ADDITIONAL_SYS_PACKAGES: libcurl4-openssl-dev
+      ADDITIONAL_SYS_PACKAGES: libxml2-dev libsqlite3-dev libcurl4-openssl-dev
       SCOUT_PHP_VERSION: 7.1.9
       SCOUT_PHP_CONFIGURE_OPTS: --with-curl --enable-debug --enable-maintainer-zts
   "build-7.1.32":
     <<: *default_job
     environment:
-      ADDITIONAL_SYS_PACKAGES: libcurl4-openssl-dev
+      ADDITIONAL_SYS_PACKAGES: libxml2-dev libsqlite3-dev libcurl4-openssl-dev
       SCOUT_PHP_VERSION: 7.1.32
       SCOUT_PHP_CONFIGURE_OPTS: --with-curl --enable-debug
   "build-7.1.32-zts":
     <<: *default_job
     environment:
-      ADDITIONAL_SYS_PACKAGES: libcurl4-openssl-dev
+      ADDITIONAL_SYS_PACKAGES: libxml2-dev libsqlite3-dev libcurl4-openssl-dev
       SCOUT_PHP_VERSION: 7.1.32
       SCOUT_PHP_CONFIGURE_OPTS: --with-curl --enable-debug --enable-maintainer-zts
   "build-7.1.32-no-curl":
     <<: *default_job
     environment:
-      ADDITIONAL_SYS_PACKAGES:
+      ADDITIONAL_SYS_PACKAGES: libxml2-dev libsqlite3-dev
       SCOUT_PHP_VERSION: 7.1.32
       SCOUT_PHP_CONFIGURE_OPTS: --enable-debug
   "build-7.2.0":
     <<: *default_job
     environment:
-      ADDITIONAL_SYS_PACKAGES: libcurl4-openssl-dev
+      ADDITIONAL_SYS_PACKAGES: libxml2-dev libsqlite3-dev libcurl4-openssl-dev
       SCOUT_PHP_VERSION: 7.2.0
       SCOUT_PHP_CONFIGURE_OPTS: --with-curl --enable-debug
   "build-7.2.0-zts":
     <<: *default_job
     environment:
-      ADDITIONAL_SYS_PACKAGES: libcurl4-openssl-dev
+      ADDITIONAL_SYS_PACKAGES: libxml2-dev libsqlite3-dev libcurl4-openssl-dev
       SCOUT_PHP_VERSION: 7.2.0
       SCOUT_PHP_CONFIGURE_OPTS: --with-curl --enable-debug --enable-maintainer-zts
   "build-7.2.24":
     <<: *default_job
     environment:
-      ADDITIONAL_SYS_PACKAGES: libcurl4-openssl-dev
+      ADDITIONAL_SYS_PACKAGES: libxml2-dev libsqlite3-dev libcurl4-openssl-dev
       SCOUT_PHP_VERSION: 7.2.24
       SCOUT_PHP_CONFIGURE_OPTS: --with-curl --enable-debug
   "build-7.2.24-zts":
     <<: *default_job
     environment:
-      ADDITIONAL_SYS_PACKAGES: libcurl4-openssl-dev
+      ADDITIONAL_SYS_PACKAGES: libxml2-dev libsqlite3-dev libcurl4-openssl-dev
       SCOUT_PHP_VERSION: 7.2.24
       SCOUT_PHP_CONFIGURE_OPTS: --with-curl --enable-debug --enable-maintainer-zts
   "build-7.2.24-no-curl":
     <<: *default_job
     environment:
-      ADDITIONAL_SYS_PACKAGES:
+      ADDITIONAL_SYS_PACKAGES: libxml2-dev libsqlite3-dev
       SCOUT_PHP_VERSION: 7.2.24
       SCOUT_PHP_CONFIGURE_OPTS: --enable-debug
   "build-7.3.0":
     <<: *default_job
     environment:
-      ADDITIONAL_SYS_PACKAGES: libcurl4-openssl-dev
+      ADDITIONAL_SYS_PACKAGES: libxml2-dev libsqlite3-dev libcurl4-openssl-dev
       SCOUT_PHP_VERSION: 7.3.0
       SCOUT_PHP_CONFIGURE_OPTS: --with-curl --enable-debug
   "build-7.3.0-zts":
     <<: *default_job
     environment:
-      ADDITIONAL_SYS_PACKAGES: libcurl4-openssl-dev
+      ADDITIONAL_SYS_PACKAGES: libxml2-dev libsqlite3-dev libcurl4-openssl-dev
       SCOUT_PHP_VERSION: 7.3.0
       SCOUT_PHP_CONFIGURE_OPTS: --with-curl --enable-debug --enable-maintainer-zts
   "build-7.3.11":
     <<: *default_job
     environment:
-      ADDITIONAL_SYS_PACKAGES: libcurl4-openssl-dev
+      ADDITIONAL_SYS_PACKAGES: libxml2-dev libsqlite3-dev libcurl4-openssl-dev
       SCOUT_PHP_VERSION: 7.3.11
       SCOUT_PHP_CONFIGURE_OPTS: --with-curl --enable-debug
   "build-7.3.11-zts":
     <<: *default_job
     environment:
-      ADDITIONAL_SYS_PACKAGES: libcurl4-openssl-dev
+      ADDITIONAL_SYS_PACKAGES: libxml2-dev libsqlite3-dev libcurl4-openssl-dev
       SCOUT_PHP_VERSION: 7.3.11
       SCOUT_PHP_CONFIGURE_OPTS: --with-curl --enable-debug --enable-maintainer-zts
   "build-7.3.11-no-curl":
     <<: *default_job
     environment:
-      ADDITIONAL_SYS_PACKAGES:
+      ADDITIONAL_SYS_PACKAGES: libxml2-dev libsqlite3-dev
       SCOUT_PHP_VERSION: 7.3.11
       SCOUT_PHP_CONFIGURE_OPTS: --enable-debug
   "build-7.4.0RC5":
     <<: *default_job
     environment:
-      ADDITIONAL_SYS_PACKAGES: libcurl4-openssl-dev
+      ADDITIONAL_SYS_PACKAGES: libxml2-dev libsqlite3-dev libcurl4-openssl-dev
       SCOUT_PHP_URL: https://downloads.php.net/~derick/php-7.4.0RC5.tar.gz
       SCOUT_PHP_VERSION: 7.4.0RC5
       SCOUT_PHP_CONFIGURE_OPTS: --with-curl --enable-debug
   "build-7.4.0RC5-zts":
     <<: *default_job
     environment:
-      ADDITIONAL_SYS_PACKAGES: libcurl4-openssl-dev
+      ADDITIONAL_SYS_PACKAGES: libxml2-dev libsqlite3-dev libcurl4-openssl-dev
       SCOUT_PHP_URL: https://downloads.php.net/~derick/php-7.4.0RC5.tar.gz
       SCOUT_PHP_VERSION: 7.4.0RC5
       SCOUT_PHP_CONFIGURE_OPTS: --with-curl --enable-debug --enable-maintainer-zts
