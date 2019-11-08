@@ -20,8 +20,10 @@ static int zend_scoutapm_startup(zend_extension*);
 static void free_recorded_call_arguments();
 static int unchecked_handler_index_for_function(const char *function_to_lookup);
 
+#if HAVE_SCOUT_CURL
 extern ZEND_NAMED_FUNCTION(scoutapm_curl_setopt_handler);
 extern ZEND_NAMED_FUNCTION(scoutapm_curl_exec_handler);
+#endif
 extern ZEND_NAMED_FUNCTION(scoutapm_fopen_handler);
 extern ZEND_NAMED_FUNCTION(scoutapm_fread_handler);
 extern ZEND_NAMED_FUNCTION(scoutapm_fwrite_handler);
@@ -53,6 +55,7 @@ ZEND_DECLARE_MODULE_GLOBALS(scoutapm)
 /* a PHP module defines what functions it exports */
 static const zend_function_entry scoutapm_functions[] = {
     PHP_FE(scoutapm_get_calls, NULL)
+    PHP_FE(scoutapm_list_instrumented_functions, NULL)
     PHP_FE_END
 };
 
@@ -165,8 +168,10 @@ static PHP_RINIT_FUNCTION(scoutapm)
         /* @todo make overloaded functions configurable? https://github.com/scoutapp/scout-apm-php-ext/issues/30 */
         SCOUT_OVERLOAD_FUNCTION("file_get_contents", scoutapm_default_handler)
         SCOUT_OVERLOAD_FUNCTION("file_put_contents", scoutapm_default_handler)
+#if HAVE_SCOUT_CURL
         SCOUT_OVERLOAD_FUNCTION("curl_setopt", scoutapm_curl_setopt_handler)
         SCOUT_OVERLOAD_FUNCTION("curl_exec", scoutapm_curl_exec_handler)
+#endif
         SCOUT_OVERLOAD_FUNCTION("fopen", scoutapm_fopen_handler)
         SCOUT_OVERLOAD_FUNCTION("fwrite", scoutapm_fwrite_handler)
         SCOUT_OVERLOAD_FUNCTION("fread", scoutapm_fread_handler)
@@ -483,4 +488,27 @@ PHP_FUNCTION(scoutapm_get_calls)
 
     SCOUTAPM_DEBUG_MESSAGE("done.\n");
 }
+
+
+/* {{{ proto array scoutapm_list_instrumented_functions()
+   Fetch a list of functions that will be instrumented or monitored by the ScoutAPM extension. */
+PHP_FUNCTION(scoutapm_list_instrumented_functions)
+{
+    int i, lookup_count = sizeof(handler_lookup) / sizeof(indexed_handler_lookup);
+
+    array_init(return_value);
+
+    for(i = 0; i < lookup_count; i++) {
+        if (original_handlers[handler_lookup[i].index] == NULL) {
+            continue;
+        }
+
+        add_next_index_stringl(
+            return_value,
+            handler_lookup[i].function_name,
+            strlen(handler_lookup[i].function_name)
+        );
+    }
+}
+
 /* }}} */

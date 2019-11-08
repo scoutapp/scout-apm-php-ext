@@ -3,6 +3,7 @@ Calls to curl_exec are logged
 --SKIPIF--
 <?php if (!extension_loaded("scoutapm")) die("skip scoutapm extension required."); ?>
 <?php if (!extension_loaded("curl")) die("skip curl extension required."); ?>
+<?php if (!in_array("curl_exec", scoutapm_list_instrumented_functions())) die("skip scout was not compiled with curl");
 --FILE--
 <?php
 $ch = curl_init();

@@ -14,6 +14,17 @@ PHP_ARG_ENABLE([scoutapm-dev],
 
 if test "$PHP_SCOUTAPM" != "no"; then
 
+  dnl Check if curl is present
+  PHP_CHECK_LIBRARY(curl,curl_easy_perform,
+  [
+    AC_DEFINE(HAVE_SCOUT_CURL,1,[Curl is present on the system])
+  ],[
+    AC_DEFINE(HAVE_SCOUT_CURL,0,[Curl is present on the system])
+    AC_MSG_WARN([curl library headers were not found on the system, scoutapm will not instrument curl functions])
+  ],[
+    $CURL_LIBS
+  ])
+
   if test "$PHP_SCOUTAPM_DEV" = "yes"; then
     PHP_CHECK_GCC_ARG(-Wbool-conversion,                _MAINTAINER_CFLAGS="$_MAINTAINER_CFLAGS -Wbool-conversion")
     PHP_CHECK_GCC_ARG(-Wdeclaration-after-statement,    _MAINTAINER_CFLAGS="$_MAINTAINER_CFLAGS -Wdeclaration-after-statement")

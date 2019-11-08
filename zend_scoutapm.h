@@ -8,9 +8,7 @@
 #ifndef ZEND_SCOUTAPM_H
 #define ZEND_SCOUTAPM_H
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif
 
 #include "php.h"
 #include <zend_extensions.h>
@@ -25,6 +23,7 @@
 #define SCOUT_APM_EXT_DEBUGGING 0
 
 PHP_FUNCTION(scoutapm_get_calls);
+PHP_FUNCTION(scoutapm_list_instrumented_functions);
 
 /* Describes information we store about a recorded stack frame */
 typedef struct _scoutapm_stack_frame {
