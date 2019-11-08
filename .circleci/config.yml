@@ -15,7 +15,7 @@ default_job: &default_job
           wget $FINAL_DOWNLOAD_URL
           tar zxf php-$SCOUT_PHP_VERSION.tar.gz
           cd php-$SCOUT_PHP_VERSION
-          ./configure $SCOUT_CONFIGURE_OPTS
+          ./configure $SCOUT_PHP_CONFIGURE_OPTS
           make -j$(nproc)
           sudo make install
           cd ~/repo
@@ -45,105 +45,105 @@ jobs:
     environment:
       ADDITIONAL_SYS_PACKAGES: libcurl4-openssl-dev
       SCOUT_PHP_VERSION: 7.1.9
-      SCOUT_CONFIGURE_OPTS: --with-curl --enable-debug
+      SCOUT_PHP_CONFIGURE_OPTS: --with-curl --enable-debug
   "build-7.1.9-zts":
     <<: *default_job
     environment:
       ADDITIONAL_SYS_PACKAGES: libcurl4-openssl-dev
       SCOUT_PHP_VERSION: 7.1.9
-      SCOUT_CONFIGURE_OPTS: --with-curl --enable-debug --enable-maintainer-zts
+      SCOUT_PHP_CONFIGURE_OPTS: --with-curl --enable-debug --enable-maintainer-zts
   "build-7.1.32":
     <<: *default_job
     environment:
       ADDITIONAL_SYS_PACKAGES: libcurl4-openssl-dev
       SCOUT_PHP_VERSION: 7.1.32
-      SCOUT_CONFIGURE_OPTS: --with-curl --enable-debug
+      SCOUT_PHP_CONFIGURE_OPTS: --with-curl --enable-debug
   "build-7.1.32-zts":
     <<: *default_job
     environment:
       ADDITIONAL_SYS_PACKAGES: libcurl4-openssl-dev
       SCOUT_PHP_VERSION: 7.1.32
-      SCOUT_CONFIGURE_OPTS: --with-curl --enable-debug --enable-maintainer-zts
+      SCOUT_PHP_CONFIGURE_OPTS: --with-curl --enable-debug --enable-maintainer-zts
   "build-7.1.32-no-curl":
     <<: *default_job
     environment:
       ADDITIONAL_SYS_PACKAGES:
       SCOUT_PHP_VERSION: 7.1.32
-      SCOUT_CONFIGURE_OPTS: --enable-debug
+      SCOUT_PHP_CONFIGURE_OPTS: --enable-debug
   "build-7.2.0":
     <<: *default_job
     environment:
       ADDITIONAL_SYS_PACKAGES: libcurl4-openssl-dev
       SCOUT_PHP_VERSION: 7.2.0
-      SCOUT_CONFIGURE_OPTS: --with-curl --enable-debug
+      SCOUT_PHP_CONFIGURE_OPTS: --with-curl --enable-debug
   "build-7.2.0-zts":
     <<: *default_job
     environment:
       ADDITIONAL_SYS_PACKAGES: libcurl4-openssl-dev
       SCOUT_PHP_VERSION: 7.2.0
-      SCOUT_CONFIGURE_OPTS: --with-curl --enable-debug --enable-maintainer-zts
+      SCOUT_PHP_CONFIGURE_OPTS: --with-curl --enable-debug --enable-maintainer-zts
   "build-7.2.24":
     <<: *default_job
     environment:
       ADDITIONAL_SYS_PACKAGES: libcurl4-openssl-dev
       SCOUT_PHP_VERSION: 7.2.24
-      SCOUT_CONFIGURE_OPTS: --with-curl --enable-debug
+      SCOUT_PHP_CONFIGURE_OPTS: --with-curl --enable-debug
   "build-7.2.24-zts":
     <<: *default_job
     environment:
       ADDITIONAL_SYS_PACKAGES: libcurl4-openssl-dev
       SCOUT_PHP_VERSION: 7.2.24
-      SCOUT_CONFIGURE_OPTS: --with-curl --enable-debug --enable-maintainer-zts
+      SCOUT_PHP_CONFIGURE_OPTS: --with-curl --enable-debug --enable-maintainer-zts
   "build-7.2.24-no-curl":
     <<: *default_job
     environment:
       ADDITIONAL_SYS_PACKAGES:
       SCOUT_PHP_VERSION: 7.2.24
-      SCOUT_CONFIGURE_OPTS: --enable-debug
+      SCOUT_PHP_CONFIGURE_OPTS: --enable-debug
   "build-7.3.0":
     <<: *default_job
     environment:
       ADDITIONAL_SYS_PACKAGES: libcurl4-openssl-dev
       SCOUT_PHP_VERSION: 7.3.0
-      SCOUT_CONFIGURE_OPTS: --with-curl --enable-debug
+      SCOUT_PHP_CONFIGURE_OPTS: --with-curl --enable-debug
   "build-7.3.0-zts":
     <<: *default_job
     environment:
       ADDITIONAL_SYS_PACKAGES: libcurl4-openssl-dev
       SCOUT_PHP_VERSION: 7.3.0
-      SCOUT_CONFIGURE_OPTS: --with-curl --enable-debug --enable-maintainer-zts
+      SCOUT_PHP_CONFIGURE_OPTS: --with-curl --enable-debug --enable-maintainer-zts
   "build-7.3.11":
     <<: *default_job
     environment:
       ADDITIONAL_SYS_PACKAGES: libcurl4-openssl-dev
       SCOUT_PHP_VERSION: 7.3.11
-      SCOUT_CONFIGURE_OPTS: --with-curl --enable-debug
+      SCOUT_PHP_CONFIGURE_OPTS: --with-curl --enable-debug
   "build-7.3.11-zts":
     <<: *default_job
     environment:
       ADDITIONAL_SYS_PACKAGES: libcurl4-openssl-dev
       SCOUT_PHP_VERSION: 7.3.11
-      SCOUT_CONFIGURE_OPTS: --with-curl --enable-debug --enable-maintainer-zts
+      SCOUT_PHP_CONFIGURE_OPTS: --with-curl --enable-debug --enable-maintainer-zts
   "build-7.3.11-no-curl":
     <<: *default_job
     environment:
       ADDITIONAL_SYS_PACKAGES:
       SCOUT_PHP_VERSION: 7.3.11
-      SCOUT_CONFIGURE_OPTS: --enable-debug
+      SCOUT_PHP_CONFIGURE_OPTS: --enable-debug
   "build-7.4.0RC5":
     <<: *default_job
     environment:
       ADDITIONAL_SYS_PACKAGES: libcurl4-openssl-dev
       SCOUT_PHP_URL: https://downloads.php.net/~derick/php-7.4.0RC5.tar.gz
       SCOUT_PHP_VERSION: 7.4.0RC5
-      SCOUT_CONFIGURE_OPTS: --with-curl --enable-debug
+      SCOUT_PHP_CONFIGURE_OPTS: --with-curl --enable-debug
   "build-7.4.0RC5-zts":
     <<: *default_job
     environment:
       ADDITIONAL_SYS_PACKAGES: libcurl4-openssl-dev
       SCOUT_PHP_URL: https://downloads.php.net/~derick/php-7.4.0RC5.tar.gz
       SCOUT_PHP_VERSION: 7.4.0RC5
-      SCOUT_CONFIGURE_OPTS: --with-curl --enable-debug --enable-maintainer-zts
+      SCOUT_PHP_CONFIGURE_OPTS: --with-curl --enable-debug --enable-maintainer-zts
 
 workflows:
   version: 2
