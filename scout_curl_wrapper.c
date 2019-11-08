@@ -5,8 +5,10 @@
  * For license information, please see the LICENSE file.
  */
 
-#include <curl/curl.h>
 #include "zend_scoutapm.h"
+
+#if HAVE_SCOUT_CURL
+#include <curl/curl.h>
 #include "scout_extern.h"
 
 ZEND_NAMED_FUNCTION(scoutapm_curl_setopt_handler)
@@ -60,3 +62,4 @@ ZEND_NAMED_FUNCTION(scoutapm_curl_exec_handler)
         SCOUTAPM_G(disconnected_call_argument_store)[recorded_arguments_index].argv
     );
 }
+#endif

@@ -8,9 +8,7 @@
 #ifndef ZEND_SCOUTAPM_H
 #define ZEND_SCOUTAPM_H
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif
 
 #include "php.h"
 #include <zend_extensions.h>

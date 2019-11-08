@@ -20,8 +20,10 @@ static int zend_scoutapm_startup(zend_extension*);
 static void free_recorded_call_arguments();
 static int unchecked_handler_index_for_function(const char *function_to_lookup);
 
+#if HAVE_SCOUT_CURL
 extern ZEND_NAMED_FUNCTION(scoutapm_curl_setopt_handler);
 extern ZEND_NAMED_FUNCTION(scoutapm_curl_exec_handler);
+#endif
 extern ZEND_NAMED_FUNCTION(scoutapm_fopen_handler);
 extern ZEND_NAMED_FUNCTION(scoutapm_fread_handler);
 extern ZEND_NAMED_FUNCTION(scoutapm_fwrite_handler);
@@ -165,8 +167,10 @@ static PHP_RINIT_FUNCTION(scoutapm)
         /* @todo make overloaded functions configurable? https://github.com/scoutapp/scout-apm-php-ext/issues/30 */
         SCOUT_OVERLOAD_FUNCTION("file_get_contents", scoutapm_default_handler)
         SCOUT_OVERLOAD_FUNCTION("file_put_contents", scoutapm_default_handler)
+#if HAVE_SCOUT_CURL
         SCOUT_OVERLOAD_FUNCTION("curl_setopt", scoutapm_curl_setopt_handler)
         SCOUT_OVERLOAD_FUNCTION("curl_exec", scoutapm_curl_exec_handler)
+#endif
         SCOUT_OVERLOAD_FUNCTION("fopen", scoutapm_fopen_handler)
         SCOUT_OVERLOAD_FUNCTION("fwrite", scoutapm_fwrite_handler)
         SCOUT_OVERLOAD_FUNCTION("fread", scoutapm_fread_handler)
