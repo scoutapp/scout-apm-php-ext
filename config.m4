@@ -20,6 +20,7 @@ if test "$PHP_SCOUTAPM" != "no"; then
     AC_DEFINE(HAVE_SCOUT_CURL,1,[Curl is present on the system])
   ],[
     AC_DEFINE(HAVE_SCOUT_CURL,0,[Curl is present on the system])
+    AC_MSG_WARN([curl library headers were not found on the system, scoutapm will not instrument curl functions])
   ],[
     $CURL_LIBS
   ])
