@@ -242,7 +242,7 @@ const char* determine_function_name(zend_execute_data *execute_data)
 
     if (Z_TYPE(execute_data->This) == IS_OBJECT) {
         DYNAMIC_MALLOC_SPRINTF(ret, len, "%s->%s",
-            ZSTR_VAL(Z_OBJCE(execute_data->This)->name),
+            ZSTR_VAL(execute_data->func->common.scope->name),
             ZSTR_VAL(execute_data->func->common.function_name)
         );
         return ret;
