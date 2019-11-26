@@ -34,6 +34,7 @@ mkdep.awk
 scan_makefile_in.awk
 shtool
 /ltmain.sh
+/ltmain.sh.backup
 /mkinstalldirs
 
 # configure
