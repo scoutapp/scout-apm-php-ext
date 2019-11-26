@@ -14,16 +14,30 @@ PHP_ARG_ENABLE([scoutapm-dev],
 
 if test "$PHP_SCOUTAPM" != "no"; then
 
-  dnl Check if curl is present
-  PHP_CHECK_LIBRARY(curl,curl_easy_perform,
-  [
-    AC_DEFINE(HAVE_SCOUT_CURL,1,[Curl is present on the system])
-  ],[
+  dnl modern version provides libcurl.pc
+  AC_PATH_PROG(PKG_CONFIG, wpkg-config, no)
+  dnl old version only providfes curl-config
+  AC_PATH_PROG(CURL_CONFIG, wcurl-config, no)
+
+  AC_MSG_CHECKING(for libcurl headers)
+  if test -x "$PKG_CONFIG" && $PKG_CONFIG --exists libcurl; then
+    AC_MSG_RESULT(found with pkg-config)
+    CURL_INCL=`$PKG_CONFIG libcurl --cflags`
+  elif test -x "$CURL_CONFIG"; then
+    AC_MSG_RESULT(found with curl-config)
+    CURL_INCL=`$CURL_CONFIG --cflags`
+  else
+    AC_MSG_WARN(neither pkg-config nor curl-config found)
+    CURL_INCL=no
+  fi
+
+  if test "$CURL_INCL" = "no"; then
     AC_DEFINE(HAVE_SCOUT_CURL,0,[Curl is present on the system])
     AC_MSG_WARN([curl library headers were not found on the system, scoutapm will not instrument curl functions])
-  ],[
-    $CURL_LIBS
-  ])
+  else
+    PHP_EVAL_INCLINE($CURL_INCL)
+    AC_DEFINE(HAVE_SCOUT_CURL,1,[Curl is present on the system])
+  fi
 
   if test "$PHP_SCOUTAPM_DEV" = "yes"; then
     PHP_CHECK_GCC_ARG(-Wbool-conversion,                _MAINTAINER_CFLAGS="$_MAINTAINER_CFLAGS -Wbool-conversion")
