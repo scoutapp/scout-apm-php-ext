@@ -16,7 +16,7 @@ if test "$PHP_SCOUTAPM" != "no"; then
 
   dnl modern version provides libcurl.pc
   AC_PATH_PROG(PKG_CONFIG, wpkg-config, no)
-  dnl old version only providfes curl-config
+  dnl old version only provides curl-config
   AC_PATH_PROG(CURL_CONFIG, wcurl-config, no)
 
   AC_MSG_CHECKING(for libcurl headers)
