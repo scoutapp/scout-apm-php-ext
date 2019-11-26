@@ -130,19 +130,19 @@ jobs:
       ADDITIONAL_SYS_PACKAGES: libxml2-dev libsqlite3-dev
       SCOUT_PHP_VERSION: 7.3.11
       SCOUT_PHP_CONFIGURE_OPTS: --enable-debug
-  "build-7.4.0RC5":
+  "build-7.4.0RC6":
     <<: *default_job
     environment:
       ADDITIONAL_SYS_PACKAGES: libxml2-dev libsqlite3-dev libcurl4-openssl-dev
-      SCOUT_PHP_URL: https://downloads.php.net/~derick/php-7.4.0RC5.tar.gz
-      SCOUT_PHP_VERSION: 7.4.0RC5
+      SCOUT_PHP_URL: https://downloads.php.net/~derick/php-7.4.0RC6.tar.gz
+      SCOUT_PHP_VERSION: 7.4.0RC6
       SCOUT_PHP_CONFIGURE_OPTS: --with-curl --enable-debug
-  "build-7.4.0RC5-zts":
+  "build-7.4.0RC6-zts":
     <<: *default_job
     environment:
       ADDITIONAL_SYS_PACKAGES: libxml2-dev libsqlite3-dev libcurl4-openssl-dev
-      SCOUT_PHP_URL: https://downloads.php.net/~derick/php-7.4.0RC5.tar.gz
-      SCOUT_PHP_VERSION: 7.4.0RC5
+      SCOUT_PHP_URL: https://downloads.php.net/~derick/php-7.4.0RC6.tar.gz
+      SCOUT_PHP_VERSION: 7.4.0RC6
       SCOUT_PHP_CONFIGURE_OPTS: --with-curl --enable-debug --enable-maintainer-zts
 
 workflows:
@@ -164,5 +164,5 @@ workflows:
       - "build-7.3.11"
       - "build-7.3.11-zts"
       - "build-7.3.11-no-curl"
-      - "build-7.4.0RC5"
-      - "build-7.4.0RC5-zts"
+      - "build-7.4.0RC6"
+      - "build-7.4.0RC6-zts"

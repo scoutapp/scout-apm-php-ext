@@ -25,11 +25,11 @@
     </lead>
 
     <!-- Current Release -->
-    <date></date>
-    <time></time>
+    <date>2019-11-26</date>
+    <time>09:00:00</time>
     <version>
-        <release></release>
-        <api></api>
+        <release>1.0.2</release>
+        <api>1.0.2</api>
     </version>
     <stability>
         <release>stable</release>
@@ -38,6 +38,7 @@
     <license uri="https://opensource.org/licenses/MIT">MIT</license>
     <notes>
         - Check if curl header is available and compile support with/without curl accordingly (#54)
+        - Fixed bug when overriding methods in extended classes (e.g. doctrine/dbal) (#56)
     </notes>
     <!-- End Current Release -->
 
