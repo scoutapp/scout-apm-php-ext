@@ -6,6 +6,7 @@
  */
 
 #include "zend_scoutapm.h"
+#include "ext/standard/info.h"
 
 double scoutapm_microtime();
 void record_arguments_for_call(const char *call_reference, int argc, zval *argv);
@@ -59,6 +60,25 @@ static const zend_function_entry scoutapm_functions[] = {
     PHP_FE_END
 };
 
+PHP_MINFO_FUNCTION(scoutapm)
+{
+	php_info_print_table_start();
+	php_info_print_table_header(2, "scoutapm support", "enabled");
+	php_info_print_table_row(2, "Version", PHP_SCOUTAPM_VERSION);
+#if HAVE_CURL
+  #if HAVE_SCOUT_CURL
+	php_info_print_table_row(2, "curl functions", "Yes");
+  #else
+	php_info_print_table_row(2, "curl functions", "Not instrumented");
+  #endif
+#else
+	php_info_print_table_row(2, "curl functions", "No");
+#endif
+	php_info_print_table_row(2, "file functions", "Yes");
+	php_info_print_table_row(2, "pdo functions", "Yes");
+	php_info_print_table_end();
+}
+
 /* scoutapm_module_entry provides the metadata/information for PHP about this PHP module */
 static zend_module_entry scoutapm_module_entry = {
     STANDARD_MODULE_HEADER,
@@ -68,7 +88,7 @@ static zend_module_entry scoutapm_module_entry = {
     NULL,                           /* module shutdown */
     PHP_RINIT(scoutapm),            /* request init */
     PHP_RSHUTDOWN(scoutapm),        /* request shutdown */
-    NULL,                           /* module information */
+    PHP_MINFO(scoutapm),            /* module information */
     PHP_SCOUTAPM_VERSION,           /* module version */
     PHP_MODULE_GLOBALS(scoutapm),   /* module global variables */
     NULL,
