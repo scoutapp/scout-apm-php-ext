@@ -25,11 +25,11 @@
     </lead>
 
     <!-- Current Release -->
-    <date>2019-11-26</date>
-    <time>09:00:00</time>
+    <date></date>
+    <time></time>
     <version>
-        <release>1.0.2</release>
-        <api>1.0.2</api>
+        <release>1.0.3</release>
+        <api>1.0.3</api>
     </version>
     <stability>
         <release>stable</release>
@@ -37,8 +37,8 @@
     </stability>
     <license uri="https://opensource.org/licenses/MIT">MIT</license>
     <notes>
-        - Check if curl header is available and compile support with/without curl accordingly (#54)
-        - Fixed bug when overriding methods in extended classes (e.g. doctrine/dbal) (#56)
+        - Added support for PHP 7.4 (#60)
+        - Improved cURL detection (thanks @remicollet, #58)
     </notes>
     <!-- End Current Release -->
 
@@ -83,6 +83,7 @@
         <required>
             <php>
                 <min>7.1.0</min>
+                <max>7.4.99</max>
             </php>
             <pearinstaller>
                 <min>1.9.1</min>
