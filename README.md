@@ -25,7 +25,7 @@ The following functions are exposed when the extension is enabled:
 
  * `scoutapm_get_calls() : array`
    - Returns a list of any instrumented function calls since
-     `scout_apm_get_calls()` was last called. The list is cleared each time the
+     `scoutapm_get_calls()` was last called. The list is cleared each time the
      function is called.
  * `scoutapm_list_instrumented_functions()`
    - Returns a list of the functions the extension will instrument if called.
