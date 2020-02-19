@@ -15,9 +15,9 @@ PHP_ARG_ENABLE([scoutapm-dev],
 if test "$PHP_SCOUTAPM" != "no"; then
 
   dnl modern version provides libcurl.pc
-  AC_PATH_PROG(PKG_CONFIG, wpkg-config, no)
+  AC_PATH_PROG(PKG_CONFIG, pkg-config, no)
   dnl old version only provides curl-config
-  AC_PATH_PROG(CURL_CONFIG, wcurl-config, no)
+  AC_PATH_PROG(CURL_CONFIG, curl-config, no)
 
   AC_MSG_CHECKING(for libcurl headers)
   if test -x "$PKG_CONFIG" && $PKG_CONFIG --exists libcurl; then
