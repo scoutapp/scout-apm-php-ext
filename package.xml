@@ -26,10 +26,10 @@
 
     <!-- Current Release -->
     <date>2020-02-19</date>
-    <time>11:25:00</time>
+    <time>14:53:00</time>
     <version>
-        <release>1.1.0</release>
-        <api>1.1.0</api>
+        <release>1.1.1</release>
+        <api>1.1.1</api>
     </version>
     <stability>
         <release>stable</release>
@@ -37,8 +37,7 @@
     </stability>
     <license uri="https://opensource.org/licenses/MIT">MIT</license>
     <notes>
-        - Added support for PHP 7.4 (#60)
-        - Improved cURL detection (thanks @remicollet, #58)
+        - Fixed typo in config.m4 for libcurl detection
     </notes>
     <!-- End Current Release -->
 
@@ -94,6 +93,23 @@
     <zendextsrcrelease />
 
     <changelog>
+        <release>
+            <date>2020-02-19</date>
+            <time>11:25:00</time>
+            <version>
+                <release>1.1.0</release>
+                <api>1.1.0</api>
+            </version>
+            <stability>
+                <release>stable</release>
+                <api>stable</api>
+            </stability>
+            <license uri="https://opensource.org/licenses/MIT">MIT</license>
+            <notes>
+                - Added support for PHP 7.4 (#60)
+                - Improved cURL detection (thanks @remicollet, #58)
+            </notes>
+        </release>
         <release>
             <date>2019-11-06</date>
             <time>08:26:00</time>
