@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file, in reverse chronological order by release.
 
+## 1.1.1 - 2020-02-19
+
+### Added
+
+- Nothing.
+
+### Changed
+
+- Nothing.
+
+### Deprecated
+
+- Nothing.
+
+### Removed
+
+- Nothing.
+
+### Fixed
+
+- [#62](https://github.com/scoutapp/scout-apm-php-ext/pull/62) Fixed typo in config.m4 for libcurl detection (thanks @remicollet)
+
 ## 1.1.0 - 2020-02-19
 
 ### Added
