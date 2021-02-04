@@ -185,7 +185,9 @@ static PHP_RINIT_FUNCTION(scoutapm)
     SCOUTAPM_G(disconnected_call_argument_store) = calloc(0, sizeof(scoutapm_disconnected_call_argument_store));
     SCOUTAPM_DEBUG_MESSAGE("Stacks made\n");
 
+#ifndef ZTS
     if (SCOUTAPM_G(handlers_set) != 1) {
+#endif /* ZTS */
         SCOUTAPM_DEBUG_MESSAGE("Overriding function handlers.\n");
 
         /* @todo make overloaded functions configurable? https://github.com/scoutapp/scout-apm-php-ext/issues/30 */
@@ -204,9 +206,11 @@ static PHP_RINIT_FUNCTION(scoutapm)
         SCOUT_OVERLOAD_METHOD("pdostatement", "execute", scoutapm_pdostatement_execute_handler)
 
         SCOUTAPM_G(handlers_set) = 1;
+#ifndef ZTS
     } else {
         SCOUTAPM_DEBUG_MESSAGE("Handlers have already been set, skipping.\n");
     }
+#endif /* ZTS */
 
     return SUCCESS;
 }
