@@ -411,6 +411,25 @@ const char *unique_resource_id(const char *scout_wrapper_type, zval *resource_id
     return ret;
 }
 
+const char *unique_class_instance_id(zval *class_instance)
+{
+    int len;
+    char *ret;
+
+    if (Z_TYPE_P(class_instance) != IS_OBJECT) {
+        zend_throw_exception(NULL, "ScoutAPM extension was passed a zval that was not a resource", 0);
+        return "";
+    }
+
+    DYNAMIC_MALLOC_SPRINTF(ret, len,
+        "class(%s)_instance(%d)",
+        ZSTR_VAL(Z_OBJ_HT_P(class_instance)->get_class_name(Z_OBJ_P(class_instance))),
+        Z_OBJ_HANDLE_P(class_instance)
+    );
+
+    return ret;
+}
+
 /*
  * Helper function to handle memory allocation for recorded stack frames. Called each time a function has completed
  * that we're interested in.
