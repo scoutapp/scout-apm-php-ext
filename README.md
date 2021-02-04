@@ -50,6 +50,12 @@ $ ./configure --enable-scoutapm
 $ make test
 ```
 
+Run tests with installed PHP (avoids skipped tests):
+
+```bash
+make && php run-tests.php -d zend_extension=$(pwd)/modules/scoutapm.so --show-diff -q
+```
+
 Note: whilst a CMakeLists.txt exists, this project does NOT use CMake.
 The CMakeLists.txt exists so this project can be worked on in CLion.
 See <https://dev.to/jasny/developing-a-php-extension-in-clion-3oo1>.
