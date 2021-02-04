@@ -8,20 +8,6 @@
 #include "zend_scoutapm.h"
 #include "scout_extern.h"
 
-const char *unique_pdo_statement_id(zval *pdo_statement_instance)
-{
-    int len;
-    char *ret;
-
-    DYNAMIC_MALLOC_SPRINTF(ret, len,
-        "pdo_class(%s)_instance(%d)",
-        ZSTR_VAL(Z_OBJ_HT_P(pdo_statement_instance)->get_class_name(Z_OBJ_P(pdo_statement_instance))),
-        Z_OBJ_HANDLE_P(pdo_statement_instance)
-    );
-
-    return ret;
-}
-
 ZEND_NAMED_FUNCTION(scoutapm_pdo_prepare_handler)
 {
     zval *statement;
@@ -32,7 +18,7 @@ ZEND_NAMED_FUNCTION(scoutapm_pdo_prepare_handler)
 
     SCOUT_INTERNAL_FUNCTION_PASSTHRU();
 
-    record_arguments_for_call(unique_pdo_statement_id(return_value), 1, statement);
+    record_arguments_for_call(unique_class_instance_id(return_value), 1, statement);
 }
 
 ZEND_NAMED_FUNCTION(scoutapm_pdostatement_execute_handler)
@@ -46,7 +32,7 @@ ZEND_NAMED_FUNCTION(scoutapm_pdostatement_execute_handler)
 
     handler_index = handler_index_for_function(called_function);
 
-    recorded_arguments_index = find_index_for_recorded_arguments(unique_pdo_statement_id(getThis()));
+    recorded_arguments_index = find_index_for_recorded_arguments(unique_class_instance_id(getThis()));
 
     if (recorded_arguments_index < 0) {
         scoutapm_default_handler(INTERNAL_FUNCTION_PARAM_PASSTHRU);

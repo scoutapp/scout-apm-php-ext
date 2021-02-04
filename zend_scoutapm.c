@@ -53,10 +53,13 @@ zif_handler original_handlers[ORIGINAL_HANDLERS_TO_ALLOCATE] = {NULL};
 
 ZEND_DECLARE_MODULE_GLOBALS(scoutapm)
 
+ZEND_BEGIN_ARG_INFO_EX(no_arguments, 0, 0, 0)
+ZEND_END_ARG_INFO()
+
 /* a PHP module defines what functions it exports */
 static const zend_function_entry scoutapm_functions[] = {
-    PHP_FE(scoutapm_get_calls, NULL)
-    PHP_FE(scoutapm_list_instrumented_functions, NULL)
+    PHP_FE(scoutapm_get_calls, no_arguments)
+    PHP_FE(scoutapm_list_instrumented_functions, no_arguments)
     PHP_FE_END
 };
 
@@ -405,6 +408,25 @@ const char *unique_resource_id(const char *scout_wrapper_type, zval *resource_id
         Z_RES_HANDLE_P(resource_id),
         Z_RES_TYPE_P(resource_id)
     );
+    return ret;
+}
+
+const char *unique_class_instance_id(zval *class_instance)
+{
+    int len;
+    char *ret;
+
+    if (Z_TYPE_P(class_instance) != IS_OBJECT) {
+        zend_throw_exception(NULL, "ScoutAPM extension was passed a zval that was not a resource", 0);
+        return "";
+    }
+
+    DYNAMIC_MALLOC_SPRINTF(ret, len,
+        "class(%s)_instance(%d)",
+        ZSTR_VAL(Z_OBJ_HT_P(class_instance)->get_class_name(Z_OBJ_P(class_instance))),
+        Z_OBJ_HANDLE_P(class_instance)
+    );
+
     return ret;
 }
 

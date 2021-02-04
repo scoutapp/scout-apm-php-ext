@@ -40,127 +40,151 @@ default_job: &default_job
         path: ~/repo/tests
 
 jobs:
+  # 7.1
   "build-7.1.9":
     <<: *default_job
     environment:
       ADDITIONAL_SYS_PACKAGES: libxml2-dev libsqlite3-dev libcurl4-openssl-dev
       SCOUT_PHP_VERSION: 7.1.9
       SCOUT_PHP_CONFIGURE_OPTS: --with-curl --enable-debug
-  "build-7.1.9-zts":
+  "build-7.1.33":
     <<: *default_job
     environment:
       ADDITIONAL_SYS_PACKAGES: libxml2-dev libsqlite3-dev libcurl4-openssl-dev
-      SCOUT_PHP_VERSION: 7.1.9
-      SCOUT_PHP_CONFIGURE_OPTS: --with-curl --enable-debug --enable-maintainer-zts
-  "build-7.1.32":
-    <<: *default_job
-    environment:
-      ADDITIONAL_SYS_PACKAGES: libxml2-dev libsqlite3-dev libcurl4-openssl-dev
-      SCOUT_PHP_VERSION: 7.1.32
+      SCOUT_PHP_VERSION: 7.1.33
       SCOUT_PHP_CONFIGURE_OPTS: --with-curl --enable-debug
-  "build-7.1.32-zts":
+  "build-7.1.33-zts":
     <<: *default_job
     environment:
       ADDITIONAL_SYS_PACKAGES: libxml2-dev libsqlite3-dev libcurl4-openssl-dev
-      SCOUT_PHP_VERSION: 7.1.32
+      SCOUT_PHP_VERSION: 7.1.33
       SCOUT_PHP_CONFIGURE_OPTS: --with-curl --enable-debug --enable-maintainer-zts
-  "build-7.1.32-no-curl":
+  "build-7.1.33-no-curl":
     <<: *default_job
     environment:
       ADDITIONAL_SYS_PACKAGES: libxml2-dev libsqlite3-dev
-      SCOUT_PHP_VERSION: 7.1.32
+      SCOUT_PHP_VERSION: 7.1.33
       SCOUT_PHP_CONFIGURE_OPTS: --enable-debug
+  # 7.2
   "build-7.2.0":
     <<: *default_job
     environment:
       ADDITIONAL_SYS_PACKAGES: libxml2-dev libsqlite3-dev libcurl4-openssl-dev
       SCOUT_PHP_VERSION: 7.2.0
       SCOUT_PHP_CONFIGURE_OPTS: --with-curl --enable-debug
-  "build-7.2.0-zts":
+  "build-7.2.34":
     <<: *default_job
     environment:
       ADDITIONAL_SYS_PACKAGES: libxml2-dev libsqlite3-dev libcurl4-openssl-dev
-      SCOUT_PHP_VERSION: 7.2.0
-      SCOUT_PHP_CONFIGURE_OPTS: --with-curl --enable-debug --enable-maintainer-zts
-  "build-7.2.24":
-    <<: *default_job
-    environment:
-      ADDITIONAL_SYS_PACKAGES: libxml2-dev libsqlite3-dev libcurl4-openssl-dev
-      SCOUT_PHP_VERSION: 7.2.24
+      SCOUT_PHP_VERSION: 7.2.34
       SCOUT_PHP_CONFIGURE_OPTS: --with-curl --enable-debug
-  "build-7.2.24-zts":
+  "build-7.2.34-zts":
     <<: *default_job
     environment:
       ADDITIONAL_SYS_PACKAGES: libxml2-dev libsqlite3-dev libcurl4-openssl-dev
-      SCOUT_PHP_VERSION: 7.2.24
+      SCOUT_PHP_VERSION: 7.2.34
       SCOUT_PHP_CONFIGURE_OPTS: --with-curl --enable-debug --enable-maintainer-zts
-  "build-7.2.24-no-curl":
+  "build-7.2.34-no-curl":
     <<: *default_job
     environment:
       ADDITIONAL_SYS_PACKAGES: libxml2-dev libsqlite3-dev
-      SCOUT_PHP_VERSION: 7.2.24
+      SCOUT_PHP_VERSION: 7.2.34
       SCOUT_PHP_CONFIGURE_OPTS: --enable-debug
+  # 7.3
   "build-7.3.0":
     <<: *default_job
     environment:
       ADDITIONAL_SYS_PACKAGES: libxml2-dev libsqlite3-dev libcurl4-openssl-dev
       SCOUT_PHP_VERSION: 7.3.0
       SCOUT_PHP_CONFIGURE_OPTS: --with-curl --enable-debug
-  "build-7.3.0-zts":
+  "build-7.3.25":
     <<: *default_job
     environment:
       ADDITIONAL_SYS_PACKAGES: libxml2-dev libsqlite3-dev libcurl4-openssl-dev
-      SCOUT_PHP_VERSION: 7.3.0
-      SCOUT_PHP_CONFIGURE_OPTS: --with-curl --enable-debug --enable-maintainer-zts
-  "build-7.3.11":
-    <<: *default_job
-    environment:
-      ADDITIONAL_SYS_PACKAGES: libxml2-dev libsqlite3-dev libcurl4-openssl-dev
-      SCOUT_PHP_VERSION: 7.3.11
+      SCOUT_PHP_VERSION: 7.3.25
       SCOUT_PHP_CONFIGURE_OPTS: --with-curl --enable-debug
-  "build-7.3.11-zts":
+  "build-7.3.25-zts":
     <<: *default_job
     environment:
       ADDITIONAL_SYS_PACKAGES: libxml2-dev libsqlite3-dev libcurl4-openssl-dev
-      SCOUT_PHP_VERSION: 7.3.11
+      SCOUT_PHP_VERSION: 7.3.25
       SCOUT_PHP_CONFIGURE_OPTS: --with-curl --enable-debug --enable-maintainer-zts
-  "build-7.3.11-no-curl":
+  "build-7.3.25-no-curl":
     <<: *default_job
     environment:
       ADDITIONAL_SYS_PACKAGES: libxml2-dev libsqlite3-dev
-      SCOUT_PHP_VERSION: 7.3.11
+      SCOUT_PHP_VERSION: 7.3.25
       SCOUT_PHP_CONFIGURE_OPTS: --enable-debug
+  # 7.4
   "build-7.4.0":
     <<: *default_job
     environment:
       ADDITIONAL_SYS_PACKAGES: libxml2-dev libsqlite3-dev libcurl4-openssl-dev
       SCOUT_PHP_VERSION: 7.4.0
       SCOUT_PHP_CONFIGURE_OPTS: --with-curl --enable-debug
-  "build-7.4.0-zts":
+  "build-7.4.13":
     <<: *default_job
     environment:
       ADDITIONAL_SYS_PACKAGES: libxml2-dev libsqlite3-dev libcurl4-openssl-dev
-      SCOUT_PHP_VERSION: 7.4.0
+      SCOUT_PHP_VERSION: 7.4.13
+      SCOUT_PHP_CONFIGURE_OPTS: --with-curl --enable-debug
+  "build-7.4.13-zts":
+    <<: *default_job
+    environment:
+      ADDITIONAL_SYS_PACKAGES: libxml2-dev libsqlite3-dev libcurl4-openssl-dev
+      SCOUT_PHP_VERSION: 7.4.13
       SCOUT_PHP_CONFIGURE_OPTS: --with-curl --enable-debug --enable-maintainer-zts
+  "build-7.4.13-no-curl":
+    <<: *default_job
+    environment:
+      ADDITIONAL_SYS_PACKAGES: libxml2-dev libsqlite3-dev
+      SCOUT_PHP_VERSION: 7.4.13
+      SCOUT_PHP_CONFIGURE_OPTS: --enable-debug
+  # 8.0
+  "build-8.0.0":
+    <<: *default_job
+    environment:
+      ADDITIONAL_SYS_PACKAGES: libxml2-dev libsqlite3-dev libcurl4-openssl-dev
+      SCOUT_PHP_VERSION: 8.0.0
+      SCOUT_PHP_CONFIGURE_OPTS: --with-curl --enable-debug
+  "build-8.0.0-zts":
+    <<: *default_job
+    environment:
+      ADDITIONAL_SYS_PACKAGES: libxml2-dev libsqlite3-dev libcurl4-openssl-dev
+      SCOUT_PHP_VERSION: 8.0.0
+      SCOUT_PHP_CONFIGURE_OPTS: --with-curl --enable-debug --enable-maintainer-zts
+  "build-8.0.0-no-curl":
+    <<: *default_job
+    environment:
+      ADDITIONAL_SYS_PACKAGES: libxml2-dev libsqlite3-dev
+      SCOUT_PHP_VERSION: 8.0.0
+      SCOUT_PHP_CONFIGURE_OPTS: --enable-debug
 
 workflows:
   version: 2
   build:
     jobs:
+      # 7.1
       - "build-7.1.9"
-      - "build-7.1.9-zts"
-      - "build-7.1.32"
-      - "build-7.1.32-zts"
-      - "build-7.1.32-no-curl"
+      - "build-7.1.33"
+      - "build-7.1.33-zts" # only test with zts for the latest of each minors
+      - "build-7.1.33-no-curl" # only test without curl for the latest of each minors
+      # 7.2
       - "build-7.2.0"
-      - "build-7.2.0-zts"
-      - "build-7.2.24"
-      - "build-7.2.24-zts"
-      - "build-7.2.24-no-curl"
+      - "build-7.2.34"
+      - "build-7.2.34-zts" # only test with zts for the latest of each minors
+      - "build-7.2.34-no-curl" # only test without curl for the latest of each minors
+      # 7.3
       - "build-7.3.0"
-      - "build-7.3.0-zts"
-      - "build-7.3.11"
-      - "build-7.3.11-zts"
-      - "build-7.3.11-no-curl"
+      - "build-7.3.25"
+      - "build-7.3.25-zts" # only test with zts for the latest of each minors
+      - "build-7.3.25-no-curl" # only test without curl for the latest of each minors
+      # 7.4
       - "build-7.4.0"
-      - "build-7.4.0-zts"
+      - "build-7.4.13"
+      - "build-7.4.13-zts" # only test with zts for the latest of each minors
+      - "build-7.4.13-no-curl" # only test without curl for the latest of each minors
+      # 8.0
+      - "build-8.0.0"
+      - "build-8.0.0-zts"
+      - "build-8.0.0-no-curl"
