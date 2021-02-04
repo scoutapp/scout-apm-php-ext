@@ -53,10 +53,13 @@ zif_handler original_handlers[ORIGINAL_HANDLERS_TO_ALLOCATE] = {NULL};
 
 ZEND_DECLARE_MODULE_GLOBALS(scoutapm)
 
+ZEND_BEGIN_ARG_INFO_EX(no_arguments, 0, 0, 0)
+ZEND_END_ARG_INFO()
+
 /* a PHP module defines what functions it exports */
 static const zend_function_entry scoutapm_functions[] = {
-    PHP_FE(scoutapm_get_calls, NULL)
-    PHP_FE(scoutapm_list_instrumented_functions, NULL)
+    PHP_FE(scoutapm_get_calls, no_arguments)
+    PHP_FE(scoutapm_list_instrumented_functions, no_arguments)
     PHP_FE_END
 };
 
