@@ -152,7 +152,7 @@ jobs:
     environment:
       ADDITIONAL_SYS_PACKAGES: libxml2-dev libsqlite3-dev libcurl4-openssl-dev
       SCOUT_PHP_VERSION: 8.0.0
-      SCOUT_PHP_CONFIGURE_OPTS: --with-curl --enable-debug --enable-maintainer-zts
+      SCOUT_PHP_CONFIGURE_OPTS: --with-curl --enable-debug --enable-zts
   "build-8.0.0-no-curl":
     <<: *default_job
     environment:
