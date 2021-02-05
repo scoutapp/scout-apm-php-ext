@@ -25,11 +25,11 @@
     </lead>
 
     <!-- Current Release -->
-    <date>2021-02-04</date>
-    <time>12:18:00</time>
+    <date>2021-02-05</date>
+    <time>16:37:00</time>
     <version>
-        <release>1.2.0</release>
-        <api>1.2.0</api>
+        <release>1.2.1</release>
+        <api>1.2.1</api>
     </version>
     <stability>
         <release>stable</release>
@@ -37,7 +37,7 @@
     </stability>
     <license uri="https://opensource.org/licenses/MIT">MIT</license>
     <notes>
-        - Added support for PHP 8.0 (#66)
+        - Fixing builds on ZTS mode (thanks @remicollet, #69)
     </notes>
     <!-- End Current Release -->
 
@@ -93,6 +93,22 @@
     <zendextsrcrelease />
 
     <changelog>
+        <release>
+            <date>2021-02-04</date>
+            <time>12:18:00</time>
+            <version>
+                <release>1.2.0</release>
+                <api>1.2.0</api>
+            </version>
+            <stability>
+                <release>stable</release>
+                <api>stable</api>
+            </stability>
+            <license uri="https://opensource.org/licenses/MIT">MIT</license>
+            <notes>
+                - Added support for PHP 8.0 (#66)
+            </notes>
+        </release>
         <release>
             <date>2020-02-19</date>
             <time>14:53:00</time>

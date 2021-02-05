@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file, in reverse chronological order by release.
 
+## 1.2.1 - 2021-02-04
+
+### Added
+
+- Nothing.
+
+### Changed
+
+- Nothing.
+
+### Deprecated
+
+- Nothing.
+
+### Removed
+
+- Nothing.
+
+### Fixed
+
+- [#69](https://github.com/scoutapp/scout-apm-php-ext/pull/69) Fixing builds on ZTS mode (thanks @remicollet)
+
 ## 1.2.0 - 2021-02-04
 
 ### Added
