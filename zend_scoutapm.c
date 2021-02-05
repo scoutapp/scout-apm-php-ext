@@ -15,6 +15,7 @@ void record_observed_stack_frame(const char *function_name, double microtime_ent
 int handler_index_for_function(const char *function_to_lookup);
 const char* determine_function_name(zend_execute_data *execute_data);
 
+static PHP_GINIT_FUNCTION(scoutapm);
 static PHP_RINIT_FUNCTION(scoutapm);
 static PHP_RSHUTDOWN_FUNCTION(scoutapm);
 static int zend_scoutapm_startup(zend_extension*);
@@ -94,7 +95,7 @@ static zend_module_entry scoutapm_module_entry = {
     PHP_MINFO(scoutapm),            /* module information */
     PHP_SCOUTAPM_VERSION,           /* module version */
     PHP_MODULE_GLOBALS(scoutapm),   /* module global variables */
-    NULL,
+    PHP_GINIT(scoutapm),            /* init global */
     NULL,
     NULL,
     STANDARD_MODULE_PROPERTIES_EX
@@ -105,6 +106,9 @@ static zend_module_entry scoutapm_module_entry = {
  * Instead, see `zend_scoutapm_startup` - we load the module there.
 ZEND_GET_MODULE(scoutapm);
  */
+#if defined(COMPILE_DL_SCOUTAPM) && defined(ZTS)
+ZEND_TSRMLS_CACHE_DEFINE()
+#endif
 
 /* extension_version_info is used by PHP */
 zend_extension_version_info extension_version_info = {
@@ -169,6 +173,14 @@ ZEND_NAMED_FUNCTION(scoutapm_default_handler)
     record_observed_stack_frame(called_function, entered, scoutapm_microtime(), argc, argv);
 }
 
+static PHP_GINIT_FUNCTION(scoutapm)
+{
+#if defined(COMPILE_DL_SCOUTAPM) && defined(ZTS)
+    ZEND_TSRMLS_CACHE_UPDATE();
+#endif
+    memset(scoutapm_globals, 0, sizeof(zend_scoutapm_globals));
+}
+
 /*
  * Set up the handlers and stack. This is called at the start of each request to PHP.
  */
@@ -177,6 +189,10 @@ static PHP_RINIT_FUNCTION(scoutapm)
     zend_function *original_function;
     int handler_index;
     zend_class_entry *ce;
+
+#if defined(COMPILE_DL_SCOUTAPM) && defined(ZTS)
+    ZEND_TSRMLS_CACHE_UPDATE();
+#endif
 
     SCOUTAPM_DEBUG_MESSAGE("Initialising stacks...");
     SCOUTAPM_G(observed_stack_frames_count) = 0;
