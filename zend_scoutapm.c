@@ -85,7 +85,7 @@ PHP_MINFO_FUNCTION(scoutapm)
 static
 PHP_GINIT_FUNCTION(scoutapm)
 {
-    scoutapm_globals->handlers_set = 0;
+    memset(scoutapm_globals, 0, sizeof(zend_scoutapm_globals));
 }
 
 /* scoutapm_module_entry provides the metadata/information for PHP about this PHP module */
