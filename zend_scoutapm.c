@@ -82,6 +82,12 @@ PHP_MINFO_FUNCTION(scoutapm)
 	php_info_print_table_end();
 }
 
+static
+PHP_GINIT_FUNCTION(scoutapm)
+{
+    scoutapm_globals->handlers_set = 0;
+}
+
 /* scoutapm_module_entry provides the metadata/information for PHP about this PHP module */
 static zend_module_entry scoutapm_module_entry = {
     STANDARD_MODULE_HEADER,
@@ -94,7 +100,7 @@ static zend_module_entry scoutapm_module_entry = {
     PHP_MINFO(scoutapm),            /* module information */
     PHP_SCOUTAPM_VERSION,           /* module version */
     PHP_MODULE_GLOBALS(scoutapm),   /* module global variables */
-    NULL,
+    PHP_GINIT(scoutapm),            /* init global */
     NULL,
     NULL,
     STANDARD_MODULE_PROPERTIES_EX
@@ -105,6 +111,9 @@ static zend_module_entry scoutapm_module_entry = {
  * Instead, see `zend_scoutapm_startup` - we load the module there.
 ZEND_GET_MODULE(scoutapm);
  */
+#if defined(COMPILE_DL_SCOUTAPM) && defined(ZTS)
+ZEND_TSRMLS_CACHE_DEFINE()
+#endif
 
 /* extension_version_info is used by PHP */
 zend_extension_version_info extension_version_info = {
@@ -177,6 +186,10 @@ static PHP_RINIT_FUNCTION(scoutapm)
     zend_function *original_function;
     int handler_index;
     zend_class_entry *ce;
+
+#if defined(COMPILE_DL_SCOUTAPM) && defined(ZTS)
+	ZEND_TSRMLS_CACHE_UPDATE();
+#endif
 
     SCOUTAPM_DEBUG_MESSAGE("Initialising stacks...");
     SCOUTAPM_G(observed_stack_frames_count) = 0;
