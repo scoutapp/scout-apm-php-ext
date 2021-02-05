@@ -15,6 +15,7 @@ void record_observed_stack_frame(const char *function_name, double microtime_ent
 int handler_index_for_function(const char *function_to_lookup);
 const char* determine_function_name(zend_execute_data *execute_data);
 
+static PHP_GINIT_FUNCTION(scoutapm);
 static PHP_RINIT_FUNCTION(scoutapm);
 static PHP_RSHUTDOWN_FUNCTION(scoutapm);
 static int zend_scoutapm_startup(zend_extension*);
@@ -80,15 +81,6 @@ PHP_MINFO_FUNCTION(scoutapm)
 	php_info_print_table_row(2, "file functions", "Yes");
 	php_info_print_table_row(2, "pdo functions", "Yes");
 	php_info_print_table_end();
-}
-
-static
-PHP_GINIT_FUNCTION(scoutapm)
-{
-#if defined(COMPILE_DL_SCOUTAPM) && defined(ZTS)
-	ZEND_TSRMLS_CACHE_UPDATE();
-#endif
-    memset(scoutapm_globals, 0, sizeof(zend_scoutapm_globals));
 }
 
 /* scoutapm_module_entry provides the metadata/information for PHP about this PHP module */
@@ -181,6 +173,14 @@ ZEND_NAMED_FUNCTION(scoutapm_default_handler)
     record_observed_stack_frame(called_function, entered, scoutapm_microtime(), argc, argv);
 }
 
+static PHP_GINIT_FUNCTION(scoutapm)
+{
+#if defined(COMPILE_DL_SCOUTAPM) && defined(ZTS)
+    ZEND_TSRMLS_CACHE_UPDATE();
+#endif
+    memset(scoutapm_globals, 0, sizeof(zend_scoutapm_globals));
+}
+
 /*
  * Set up the handlers and stack. This is called at the start of each request to PHP.
  */
@@ -191,7 +191,7 @@ static PHP_RINIT_FUNCTION(scoutapm)
     zend_class_entry *ce;
 
 #if defined(COMPILE_DL_SCOUTAPM) && defined(ZTS)
-	ZEND_TSRMLS_CACHE_UPDATE();
+    ZEND_TSRMLS_CACHE_UPDATE();
 #endif
 
     SCOUTAPM_DEBUG_MESSAGE("Initialising stacks...");
