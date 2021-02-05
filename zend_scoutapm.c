@@ -85,6 +85,9 @@ PHP_MINFO_FUNCTION(scoutapm)
 static
 PHP_GINIT_FUNCTION(scoutapm)
 {
+#if defined(COMPILE_DL_SCOUTAPM) && defined(ZTS)
+	ZEND_TSRMLS_CACHE_UPDATE();
+#endif
     memset(scoutapm_globals, 0, sizeof(zend_scoutapm_globals));
 }
 
