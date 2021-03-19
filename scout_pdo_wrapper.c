@@ -18,6 +18,10 @@ ZEND_NAMED_FUNCTION(scoutapm_pdo_prepare_handler)
 
     SCOUT_INTERNAL_FUNCTION_PASSTHRU();
 
+    if (Z_TYPE_P(return_value) != IS_OBJECT) {
+        return;
+    }
+
     record_arguments_for_call(unique_class_instance_id(return_value), 1, statement);
 }
 
