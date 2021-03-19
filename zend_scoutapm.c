@@ -408,13 +408,67 @@ zend_long find_index_for_recorded_arguments(const char *call_reference)
     return -1;
 }
 
+const char *zval_type_and_value_if_possible(zval *val)
+{
+    int len;
+    char *ret;
+
+reference_retry_point:
+    switch (Z_TYPE_P(val)) {
+        case IS_NULL:
+            return "null";
+        case IS_TRUE:
+            return "bool(true)";
+        case IS_FALSE:
+            return "bool(false)";
+        case IS_LONG:
+            DYNAMIC_MALLOC_SPRINTF(ret, len,
+                "int(%ld)",
+                Z_LVAL_P(val)
+            );
+            return ret;
+        case IS_DOUBLE:
+            DYNAMIC_MALLOC_SPRINTF(ret, len,
+                "float(%g)",
+                Z_DVAL_P(val)
+            );
+            return ret;
+        case IS_STRING:
+            DYNAMIC_MALLOC_SPRINTF(ret, len,
+                "string(%zd, \"%s\")",
+                Z_STRLEN_P(val),
+                Z_STRVAL_P(val)
+            );
+            return ret;
+        case IS_RESOURCE:
+            DYNAMIC_MALLOC_SPRINTF(ret, len,
+                "resource(%d)",
+                Z_RES_HANDLE_P(val)
+            );
+            return ret;
+        case IS_ARRAY:
+            return "array";
+        case IS_OBJECT:
+            DYNAMIC_MALLOC_SPRINTF(ret, len,
+                "object(%s)",
+                ZSTR_VAL(Z_OBJ_HT_P(val)->get_class_name(Z_OBJ_P(val)))
+            );
+            return ret;
+        case IS_REFERENCE:
+            val = Z_REFVAL_P(val);
+            goto reference_retry_point;
+        default:
+            return "(unknown)";
+    }
+}
+
 const char *unique_resource_id(const char *scout_wrapper_type, zval *resource_id)
 {
     int len;
     char *ret;
 
     if (Z_TYPE_P(resource_id) != IS_RESOURCE) {
-        zend_throw_exception(NULL, "ScoutAPM extension was passed a zval that was not a resource", 0);
+        zend_throw_exception_ex(NULL, 0, "ScoutAPM ext expected a resource, received: %s", zval_type_and_value_if_possible(resource_id));
         return "";
     }
 
@@ -433,7 +487,7 @@ const char *unique_class_instance_id(zval *class_instance)
     char *ret;
 
     if (Z_TYPE_P(class_instance) != IS_OBJECT) {
-        zend_throw_exception(NULL, "ScoutAPM extension was passed a zval that was not a resource", 0);
+        zend_throw_exception_ex(NULL, 0, "ScoutAPM ext expected an object, received: %s", zval_type_and_value_if_possible(class_instance));
         return "";
     }
 
