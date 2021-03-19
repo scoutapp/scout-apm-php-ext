@@ -25,11 +25,11 @@
     </lead>
 
     <!-- Current Release -->
-    <date>2021-02-05</date>
-    <time>16:37:00</time>
+    <date>2021-03-19</date>
+    <time>12:15:00</time>
     <version>
-        <release>1.2.1</release>
-        <api>1.2.1</api>
+        <release>1.2.2</release>
+        <api>1.2.2</api>
     </version>
     <stability>
         <release>stable</release>
@@ -37,7 +37,7 @@
     </stability>
     <license uri="https://opensource.org/licenses/MIT">MIT</license>
     <notes>
-        - Fixing builds on ZTS mode (thanks @remicollet, #69)
+        - Do not try to record arguments if PDO::prepare returns a non-object (#72)
     </notes>
     <!-- End Current Release -->
 
@@ -93,6 +93,22 @@
     <zendextsrcrelease />
 
     <changelog>
+        <release>
+            <date>2021-02-05</date>
+            <time>16:37:00</time>
+            <version>
+                <release>1.2.1</release>
+                <api>1.2.1</api>
+            </version>
+            <stability>
+                <release>stable</release>
+                <api>stable</api>
+            </stability>
+            <license uri="https://opensource.org/licenses/MIT">MIT</license>
+            <notes>
+                - Fixing builds on ZTS mode (thanks @remicollet, #69)
+            </notes>
+        </release>
         <release>
             <date>2021-02-04</date>
             <time>12:18:00</time>
