@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file, in reverse chronological order by release.
 
+## 1.2.2 - 2021-03-19
+
+### Added
+
+- Nothing.
+
+### Changed
+
+- Nothing.
+
+### Deprecated
+
+- Nothing.
+
+### Removed
+
+- Nothing.
+
+### Fixed
+
+- [#72](https://github.com/scoutapp/scout-apm-php-ext/pull/72) Do not try to record arguments if PDO::prepare returns a non-object
+
 ## 1.2.1 - 2021-02-04
 
 ### Added
