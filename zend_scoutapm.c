@@ -18,9 +18,18 @@ const char* determine_function_name(zend_execute_data *execute_data);
 static PHP_GINIT_FUNCTION(scoutapm);
 static PHP_RINIT_FUNCTION(scoutapm);
 static PHP_RSHUTDOWN_FUNCTION(scoutapm);
+static PHP_MINIT_FUNCTION(scoutapm);
+static PHP_MSHUTDOWN_FUNCTION(scoutapm);
 static int zend_scoutapm_startup(zend_extension*);
 static void free_recorded_call_arguments();
 static int unchecked_handler_index_for_function(const char *function_to_lookup);
+
+#if SCOUTAPM_INSTRUMENT_USING_OBSERVER_API == 0
+static void (*original_zend_execute_ex) (zend_execute_data *execute_data);
+static void (*original_zend_execute_internal) (zend_execute_data *execute_data, zval *return_value);
+void scoutapm_execute_internal(zend_execute_data *execute_data, zval *return_value);
+void scoutapm_execute_ex(zend_execute_data *execute_data);
+#endif
 
 #if HAVE_SCOUT_CURL
 extern ZEND_NAMED_FUNCTION(scoutapm_curl_setopt_handler);
@@ -35,17 +44,16 @@ extern ZEND_NAMED_FUNCTION(scoutapm_pdostatement_execute_handler);
 /* This is simply a map of function names to an index in original_handlers */
 indexed_handler_lookup handler_lookup[] = {
     /* define each function we want to overload, which maps to an index in the `original_handlers` array */
-    { 0, "file_get_contents"},
-    { 1, "file_put_contents"},
-    { 2, "curl_setopt"},
-    { 3, "curl_exec"},
-    { 4, "fopen"},
-    { 5, "fread"},
-    { 6, "fwrite"},
-    { 7, "pdo->exec"},
-    { 8, "pdo->query"},
-    { 9, "pdo->prepare"},
-    {10, "pdostatement->execute"},
+    { 0, "file_put_contents"},
+    { 1, "curl_setopt"},
+    { 2, "curl_exec"},
+    { 3, "fopen"},
+    { 4, "fread"},
+    { 5, "fwrite"},
+    { 6, "pdo->exec"},
+    { 7, "pdo->query"},
+    { 8, "pdo->prepare"},
+    { 9, "pdostatement->execute"},
 };
 
 /* handlers count needs to be bigger than the number of handler_lookup entries */
@@ -88,8 +96,8 @@ static zend_module_entry scoutapm_module_entry = {
     STANDARD_MODULE_HEADER,
     PHP_SCOUTAPM_NAME,
     scoutapm_functions,             /* function entries */
-    NULL,                           /* module init */
-    NULL,                           /* module shutdown */
+    PHP_MINIT(scoutapm),            /* module init */
+    PHP_MSHUTDOWN(scoutapm),        /* module shutdown */
     PHP_RINIT(scoutapm),            /* request init */
     PHP_RSHUTDOWN(scoutapm),        /* request shutdown */
     PHP_MINFO(scoutapm),            /* module information */
@@ -205,7 +213,6 @@ static PHP_RINIT_FUNCTION(scoutapm)
         SCOUTAPM_DEBUG_MESSAGE("Overriding function handlers.\n");
 
         /* @todo make overloaded functions configurable? https://github.com/scoutapp/scout-apm-php-ext/issues/30 */
-        SCOUT_OVERLOAD_FUNCTION("file_get_contents", scoutapm_default_handler)
         SCOUT_OVERLOAD_FUNCTION("file_put_contents", scoutapm_default_handler)
 #if HAVE_SCOUT_CURL
         SCOUT_OVERLOAD_FUNCTION("curl_setopt", scoutapm_curl_setopt_handler)
@@ -256,6 +263,114 @@ static PHP_RSHUTDOWN_FUNCTION(scoutapm)
 
     return SUCCESS;
 }
+
+static PHP_MINIT_FUNCTION(scoutapm)
+{
+#if SCOUTAPM_INSTRUMENT_USING_OBSERVER_API == 0
+    original_zend_execute_internal = zend_execute_internal;
+    zend_execute_internal = scoutapm_execute_internal;
+
+    original_zend_execute_ex = zend_execute_ex;
+    zend_execute_ex = scoutapm_execute_ex;
+#endif
+
+    return SUCCESS;
+}
+
+static PHP_MSHUTDOWN_FUNCTION(scoutapm)
+{
+#if SCOUTAPM_INSTRUMENT_USING_OBSERVER_API == 0
+    zend_execute_internal = original_zend_execute_internal;
+    zend_execute_ex = original_zend_execute_ex;
+#endif
+
+    return SUCCESS;
+}
+
+int should_be_instrumented(const char *function_name)
+{
+    // @todo make list dynamic and add-able-to
+    const char *functions_to_be_instrumented[] = {
+        "file_get_contents",
+    };
+    int size = 1, i = 0;
+    for (; i < size; i++) {
+        if (strcasecmp(function_name, functions_to_be_instrumented[i]) == 0) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+#if SCOUTAPM_INSTRUMENT_USING_OBSERVER_API == 0
+void scoutapm_execute_internal(zend_execute_data *execute_data, zval *return_value)
+{
+    const char *function_name;
+    double entered = scoutapm_microtime();
+    int argc;
+    zval *argv = NULL;
+
+    if (execute_data->func->common.function_name == NULL) {
+        if (original_zend_execute_internal) {
+            original_zend_execute_internal(execute_data, return_value);
+        } else {
+            execute_internal(execute_data, return_value);
+        }
+        return;
+    }
+
+    function_name = determine_function_name(execute_data);
+
+    if (should_be_instrumented(function_name) == 0) {
+        if (original_zend_execute_internal) {
+            original_zend_execute_internal(execute_data, return_value);
+        } else {
+            execute_internal(execute_data, return_value);
+        }
+        return;
+    }
+
+    ZEND_PARSE_PARAMETERS_START(0, -1)
+            Z_PARAM_VARIADIC(' ', argv, argc)
+    ZEND_PARSE_PARAMETERS_END();
+
+    if (original_zend_execute_internal) {
+        original_zend_execute_internal(execute_data, return_value);
+    } else {
+        execute_internal(execute_data, return_value);
+    }
+
+    record_observed_stack_frame(function_name, entered, scoutapm_microtime(), argc, argv);
+}
+
+void scoutapm_execute_ex(zend_execute_data *execute_data)
+{
+    const char *function_name;
+    double entered = scoutapm_microtime();
+    int argc;
+    zval *argv = NULL;
+
+    if (execute_data->func->common.function_name == NULL) {
+        original_zend_execute_ex(execute_data);
+        return;
+    }
+
+    function_name = determine_function_name(execute_data);
+
+    if (should_be_instrumented(function_name) == 0) {
+        original_zend_execute_ex(execute_data);
+        return;
+    }
+
+    ZEND_PARSE_PARAMETERS_START(0, -1)
+            Z_PARAM_VARIADIC(' ', argv, argc)
+    ZEND_PARSE_PARAMETERS_END();
+
+    original_zend_execute_ex(execute_data);
+
+    record_observed_stack_frame(function_name, entered, scoutapm_microtime(), argc, argv);
+}
+#endif /* SCOUTAPM_INSTRUMENT_USING_OBSERVER_API == 0 */
 
 /*
  * Given some zend_execute_data, figure out what the function/method/static method is being called. The convention used
@@ -608,6 +723,7 @@ PHP_FUNCTION(scoutapm_list_instrumented_functions)
 {
     int i, lookup_count = sizeof(handler_lookup) / sizeof(indexed_handler_lookup);
 
+    // @todo also add zend_execute_ex list
     array_init(return_value);
 
     for(i = 0; i < lookup_count; i++) {

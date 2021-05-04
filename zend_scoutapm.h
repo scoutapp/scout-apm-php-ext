@@ -22,6 +22,9 @@
 /* Extreme amounts of debugging, set to 1 to enable it and `make clean && make` (tests will fail...) */
 #define SCOUT_APM_EXT_DEBUGGING 0
 
+// @todo set this based on PHP version once we introduce observer API for PHP 8
+#define SCOUTAPM_INSTRUMENT_USING_OBSERVER_API 0
+
 PHP_FUNCTION(scoutapm_get_calls);
 PHP_FUNCTION(scoutapm_list_instrumented_functions);
 
