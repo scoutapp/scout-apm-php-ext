@@ -45,16 +45,13 @@ extern ZEND_NAMED_FUNCTION(scoutapm_pdostatement_execute_handler);
 /* This is simply a map of function names to an index in original_handlers */
 indexed_handler_lookup handler_lookup[] = {
     /* define each function we want to overload, which maps to an index in the `original_handlers` array */
-    { 0, "file_put_contents"},
     { 1, "curl_setopt"},
     { 2, "curl_exec"},
     { 3, "fopen"},
     { 4, "fread"},
     { 5, "fwrite"},
-    { 6, "pdo->exec"},
-    { 7, "pdo->query"},
-    { 8, "pdo->prepare"},
-    { 9, "pdostatement->execute"},
+    { 6, "pdo->prepare"},
+    { 7, "pdostatement->execute"},
 };
 
 /* handlers count needs to be bigger than the number of handler_lookup entries */
@@ -216,9 +213,10 @@ static PHP_RINIT_FUNCTION(scoutapm)
         SCOUTAPM_DEBUG_MESSAGE("Overriding function handlers.\n");
 
         add_function_to_instrumentation("file_get_contents");
+        add_function_to_instrumentation("file_put_contents");
+        add_function_to_instrumentation("pdo->exec");
+        add_function_to_instrumentation("pdo->query");
 
-        /* @todo make overloaded functions configurable? https://github.com/scoutapp/scout-apm-php-ext/issues/30 */
-        SCOUT_OVERLOAD_FUNCTION("file_put_contents", scoutapm_default_handler)
 #if HAVE_SCOUT_CURL
         SCOUT_OVERLOAD_FUNCTION("curl_setopt", scoutapm_curl_setopt_handler)
         SCOUT_OVERLOAD_FUNCTION("curl_exec", scoutapm_curl_exec_handler)
@@ -226,8 +224,6 @@ static PHP_RINIT_FUNCTION(scoutapm)
         SCOUT_OVERLOAD_FUNCTION("fopen", scoutapm_fopen_handler)
         SCOUT_OVERLOAD_FUNCTION("fwrite", scoutapm_fwrite_handler)
         SCOUT_OVERLOAD_FUNCTION("fread", scoutapm_fread_handler)
-        SCOUT_OVERLOAD_METHOD("pdo", "exec", scoutapm_default_handler)
-        SCOUT_OVERLOAD_METHOD("pdo", "query", scoutapm_default_handler)
         SCOUT_OVERLOAD_METHOD("pdo", "prepare", scoutapm_pdo_prepare_handler)
         SCOUT_OVERLOAD_METHOD("pdostatement", "execute", scoutapm_pdostatement_execute_handler)
 
