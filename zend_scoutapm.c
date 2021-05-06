@@ -14,6 +14,7 @@ zend_long find_index_for_recorded_arguments(const char *call_reference);
 void record_observed_stack_frame(const char *function_name, double microtime_entered, double microtime_exited, int argc, zval *argv);
 int handler_index_for_function(const char *function_to_lookup);
 const char* determine_function_name(zend_execute_data *execute_data);
+void add_function_to_instrumentation(const char *function_name);
 
 static PHP_GINIT_FUNCTION(scoutapm);
 static PHP_RINIT_FUNCTION(scoutapm);
@@ -209,8 +210,12 @@ static PHP_RINIT_FUNCTION(scoutapm)
     SCOUTAPM_G(disconnected_call_argument_store) = calloc(0, sizeof(scoutapm_disconnected_call_argument_store));
     SCOUTAPM_DEBUG_MESSAGE("Stacks made\n");
 
+    SCOUTAPM_G(num_instrumented_functions) = 0;
+
     if (SCOUTAPM_G(handlers_set) != 1) {
         SCOUTAPM_DEBUG_MESSAGE("Overriding function handlers.\n");
+
+        add_function_to_instrumentation("file_get_contents");
 
         /* @todo make overloaded functions configurable? https://github.com/scoutapp/scout-apm-php-ext/issues/30 */
         SCOUT_OVERLOAD_FUNCTION("file_put_contents", scoutapm_default_handler)
@@ -287,15 +292,22 @@ static PHP_MSHUTDOWN_FUNCTION(scoutapm)
     return SUCCESS;
 }
 
+void add_function_to_instrumentation(const char *function_name)
+{
+    if (SCOUTAPM_G(num_instrumented_functions) > MAX_INSTRUMENTED_FUNCTIONS) {
+        zend_throw_exception_ex(NULL, 0, "Unable to add instrumentation for function '%s' - MAX_INSTRUMENTED_FUNCTIONS of %d reached", function_name, MAX_INSTRUMENTED_FUNCTIONS);
+        return;
+    }
+
+    SCOUTAPM_G(instrumented_function_names)[SCOUTAPM_G(num_instrumented_functions)] = strdup(function_name);
+    SCOUTAPM_G(num_instrumented_functions)++;
+}
+
 int should_be_instrumented(const char *function_name)
 {
-    // @todo make list dynamic and add-able-to
-    const char *functions_to_be_instrumented[] = {
-        "file_get_contents",
-    };
-    int size = 1, i = 0;
-    for (; i < size; i++) {
-        if (strcasecmp(function_name, functions_to_be_instrumented[i]) == 0) {
+    int i = 0;
+    for (; i < SCOUTAPM_G(num_instrumented_functions); i++) {
+        if (strcasecmp(function_name, SCOUTAPM_G(instrumented_function_names)[i]) == 0) {
             return 1;
         }
     }

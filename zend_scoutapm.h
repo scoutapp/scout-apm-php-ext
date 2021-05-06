@@ -48,6 +48,8 @@ typedef struct _handler_lookup {
     const char *function_name;
 } indexed_handler_lookup;
 
+#define MAX_INSTRUMENTED_FUNCTIONS 10
+
 /* These are the "module globals". In non-ZTS mode, they're just regular variables, but means in ZTS mode they get handled properly */
 ZEND_BEGIN_MODULE_GLOBALS(scoutapm)
     zend_bool handlers_set;
@@ -55,6 +57,8 @@ ZEND_BEGIN_MODULE_GLOBALS(scoutapm)
     scoutapm_stack_frame *observed_stack_frames;
     zend_long disconnected_call_argument_store_count;
     scoutapm_disconnected_call_argument_store *disconnected_call_argument_store;
+    char *instrumented_function_names[MAX_INSTRUMENTED_FUNCTIONS];
+    int num_instrumented_functions;
 ZEND_END_MODULE_GLOBALS(scoutapm)
 
 /* Accessor for "module globals" for non-ZTS and ZTS modes. */
