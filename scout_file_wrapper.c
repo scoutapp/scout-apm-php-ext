@@ -13,6 +13,8 @@ ZEND_NAMED_FUNCTION(scoutapm_fopen_handler)
     zend_string *filename, *mode;
     zval *argv;
 
+    SCOUT_PASSTHRU_IF_ALREADY_INSTRUMENTING()
+
     ZEND_PARSE_PARAMETERS_START(2, 4)
             Z_PARAM_STR(filename)
             Z_PARAM_STR(mode)
@@ -36,6 +38,8 @@ ZEND_NAMED_FUNCTION(scoutapm_fread_handler)
     zval *resource_id;
     const char *called_function;
     zend_long recorded_arguments_index;
+
+    SCOUT_PASSTHRU_IF_ALREADY_INSTRUMENTING()
 
     called_function = determine_function_name(execute_data);
 
@@ -70,6 +74,8 @@ ZEND_NAMED_FUNCTION(scoutapm_fwrite_handler)
     zval *resource_id;
     const char *called_function;
     zend_long recorded_arguments_index;
+
+    SCOUT_PASSTHRU_IF_ALREADY_INSTRUMENTING()
 
     called_function = determine_function_name(execute_data);
 

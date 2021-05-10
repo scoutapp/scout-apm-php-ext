@@ -59,6 +59,7 @@ ZEND_BEGIN_MODULE_GLOBALS(scoutapm)
     scoutapm_disconnected_call_argument_store *disconnected_call_argument_store;
     char *instrumented_function_names[MAX_INSTRUMENTED_FUNCTIONS];
     int num_instrumented_functions;
+    int currently_instrumenting;
 ZEND_END_MODULE_GLOBALS(scoutapm)
 
 /* Accessor for "module globals" for non-ZTS and ZTS modes. */
@@ -121,6 +122,12 @@ typedef void (*zif_handler)(INTERNAL_FUNCTION_PARAMETERS);
 #define SCOUT_OVERLOAD_METHOD(lowercase_class_name, method_name, handler_to_use) SCOUT_OVERLOAD_CLASS_ENTRY_FUNCTION(lowercase_class_name, "->", method_name, handler_to_use)
 
 #define SCOUT_INTERNAL_FUNCTION_PASSTHRU() original_handlers[handler_index_for_function(determine_function_name(execute_data))](INTERNAL_FUNCTION_PARAM_PASSTHRU)
+
+#define SCOUT_PASSTHRU_IF_ALREADY_INSTRUMENTING()   \
+    if (SCOUTAPM_G(currently_instrumenting) == 1) { \
+        SCOUT_INTERNAL_FUNCTION_PASSTHRU();         \
+        return;                                     \
+    }
 
 /* these are the string keys used in scoutapm_get_calls associative array return value */
 #define SCOUT_GET_CALLS_KEY_FUNCTION "function"

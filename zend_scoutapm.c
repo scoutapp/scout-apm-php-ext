@@ -166,6 +166,8 @@ ZEND_NAMED_FUNCTION(scoutapm_default_handler)
     zval *argv = NULL;
     const char *called_function;
 
+    SCOUT_PASSTHRU_IF_ALREADY_INSTRUMENTING()
+
     /* note - no strdup needed as we copy it in record_observed_stack_frame */
     called_function = determine_function_name(execute_data);
 
@@ -208,6 +210,7 @@ static PHP_RINIT_FUNCTION(scoutapm)
     SCOUTAPM_G(disconnected_call_argument_store) = calloc(0, sizeof(scoutapm_disconnected_call_argument_store));
     SCOUTAPM_DEBUG_MESSAGE("Stacks made\n");
 
+    SCOUTAPM_G(currently_instrumenting) = 0;
     SCOUTAPM_G(num_instrumented_functions) = 0;
 
     if (SCOUTAPM_G(handlers_set) != 1) {
@@ -333,7 +336,7 @@ void scoutapm_execute_internal(zend_execute_data *execute_data, zval *return_val
 
     function_name = determine_function_name(execute_data);
 
-    if (should_be_instrumented(function_name) == 0) {
+    if (should_be_instrumented(function_name) == 0 || SCOUTAPM_G(currently_instrumenting) == 1) {
         if (original_zend_execute_internal) {
             original_zend_execute_internal(execute_data, return_value);
         } else {
@@ -341,6 +344,8 @@ void scoutapm_execute_internal(zend_execute_data *execute_data, zval *return_val
         }
         return;
     }
+
+    SCOUTAPM_G(currently_instrumenting) = 1;
 
     ZEND_PARSE_PARAMETERS_START(0, -1)
             Z_PARAM_VARIADIC(' ', argv, argc)
@@ -353,6 +358,7 @@ void scoutapm_execute_internal(zend_execute_data *execute_data, zval *return_val
     }
 
     record_observed_stack_frame(function_name, entered, scoutapm_microtime(), argc, argv);
+    SCOUTAPM_G(currently_instrumenting) = 0;
 }
 
 void scoutapm_execute_ex(zend_execute_data *execute_data)
@@ -369,10 +375,12 @@ void scoutapm_execute_ex(zend_execute_data *execute_data)
 
     function_name = determine_function_name(execute_data);
 
-    if (should_be_instrumented(function_name) == 0) {
+    if (should_be_instrumented(function_name) == 0 || SCOUTAPM_G(currently_instrumenting) == 1) {
         original_zend_execute_ex(execute_data);
         return;
     }
+
+    SCOUTAPM_G(currently_instrumenting) = 1;
 
     ZEND_PARSE_PARAMETERS_START(0, -1)
             Z_PARAM_VARIADIC(' ', argv, argc)
@@ -381,6 +389,7 @@ void scoutapm_execute_ex(zend_execute_data *execute_data)
     original_zend_execute_ex(execute_data);
 
     record_observed_stack_frame(function_name, entered, scoutapm_microtime(), argc, argv);
+    SCOUTAPM_G(currently_instrumenting) = 0;
 }
 #endif /* SCOUTAPM_INSTRUMENT_USING_OBSERVER_API == 0 */
 

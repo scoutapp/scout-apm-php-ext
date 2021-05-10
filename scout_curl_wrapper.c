@@ -24,6 +24,8 @@ ZEND_NAMED_FUNCTION(scoutapm_curl_setopt_handler)
     ASSIGN_CURL_HANDLE_CLASS_ENTRY
 #endif
 
+    SCOUT_PASSTHRU_IF_ALREADY_INSTRUMENTING()
+
     ZEND_PARSE_PARAMETERS_START(3, 3)
 #if PHP_MAJOR_VERSION >= 8
             Z_PARAM_OBJECT_OF_CLASS(zid, curl_ce)
@@ -56,6 +58,8 @@ ZEND_NAMED_FUNCTION(scoutapm_curl_exec_handler)
 #if PHP_MAJOR_VERSION >= 8
     ASSIGN_CURL_HANDLE_CLASS_ENTRY
 #endif
+
+    SCOUT_PASSTHRU_IF_ALREADY_INSTRUMENTING()
 
     called_function = determine_function_name(execute_data);
 
