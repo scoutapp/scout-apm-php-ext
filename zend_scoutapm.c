@@ -217,6 +217,9 @@ static PHP_RINIT_FUNCTION(scoutapm)
         add_function_to_instrumentation("file_put_contents");
         add_function_to_instrumentation("pdo->exec");
         add_function_to_instrumentation("pdo->query");
+        add_function_to_instrumentation("Predis\\Client->get");
+        add_function_to_instrumentation("Predis\\Client->set");
+        add_function_to_instrumentation("Predis\\Client->del");
 
 #if HAVE_SCOUT_CURL
         SCOUT_OVERLOAD_FUNCTION("curl_setopt", scoutapm_curl_setopt_handler)

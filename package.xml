@@ -72,6 +72,7 @@
                 <file name="011-pdostatement-execute-pdo-prepare.phpt" role="test" />
                 <file name="012-file_put_contents.phpt" role="test" />
                 <file name="013-fix-memory-leak-when-scoutapm_get_calls-not-called.phpt" role="test" />
+                <file name="014-predis-support.phpt" role="test" />
                 <file name="bug-47.phpt" role="test" />
                 <file name="bug-49.phpt" role="test" />
             </dir>
