@@ -24,7 +24,7 @@ fread/fwrite test
 string(6) "fwrite"
 array(2) {
   [0]=>
-  resource(%d) of type (Unknown)
+  string(%d) "resource(%d)"
   [1]=>
   string(18) "fread/fwrite test
 "
@@ -32,7 +32,7 @@ array(2) {
 string(5) "fread"
 array(2) {
   [0]=>
-  resource(%d) of type (Unknown)
+  string(%d) "resource(%d)"
   [1]=>
   int(18)
 }

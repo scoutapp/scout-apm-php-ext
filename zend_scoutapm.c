@@ -15,6 +15,7 @@ void record_observed_stack_frame(const char *function_name, double microtime_ent
 int handler_index_for_function(const char *function_to_lookup);
 const char* determine_function_name(zend_execute_data *execute_data);
 void add_function_to_instrumentation(const char *function_name);
+void safely_copy_argument_zval_as_scalar(zval *original_to_copy, zval *destination);
 
 static PHP_GINIT_FUNCTION(scoutapm);
 static PHP_RINIT_FUNCTION(scoutapm);
@@ -501,9 +502,9 @@ void record_arguments_for_call(const char *call_reference, int argc, zval *argv)
     SCOUTAPM_G(disconnected_call_argument_store)[SCOUTAPM_G(disconnected_call_argument_store_count)].argv = calloc(argc, sizeof(zval));
 
     for(; i < argc; i++) {
-        ZVAL_COPY(
-            &SCOUTAPM_G(disconnected_call_argument_store)[SCOUTAPM_G(disconnected_call_argument_store_count)].argv[i],
-            &argv[i]
+        safely_copy_argument_zval_as_scalar(
+            &argv[i],
+            &SCOUTAPM_G(disconnected_call_argument_store)[SCOUTAPM_G(disconnected_call_argument_store_count)].argv[i]
         );
     }
 
@@ -529,6 +530,50 @@ zend_long find_index_for_recorded_arguments(const char *call_reference)
 #endif
 
     return -1;
+}
+
+void safely_copy_argument_zval_as_scalar(zval *original_to_copy, zval *destination)
+{
+    int len;
+    char *ret;
+
+reference_retry_point:
+    switch (Z_TYPE_P(original_to_copy)) {
+        case IS_NULL:
+        case IS_TRUE:
+        case IS_FALSE:
+        case IS_LONG:
+        case IS_DOUBLE:
+        case IS_STRING:
+            ZVAL_COPY(destination, original_to_copy);
+            return;
+        case IS_REFERENCE:
+            original_to_copy = Z_REFVAL_P(original_to_copy);
+            goto reference_retry_point;
+        case IS_ARRAY:
+            /**
+             * @todo improvement for future; copy array but only if it contains scalar
+             * @link https://github.com/scoutapp/scout-apm-php-ext/issues/76
+             */
+            ret = (char*)"(array)";
+            break;
+        case IS_RESOURCE:
+            DYNAMIC_MALLOC_SPRINTF(ret, len,
+                "resource(%d)",
+                Z_RES_HANDLE_P(original_to_copy)
+            );
+            break;
+        case IS_OBJECT:
+            DYNAMIC_MALLOC_SPRINTF(ret, len,
+                "object(%s)",
+                ZSTR_VAL(Z_OBJ_HT_P(original_to_copy)->get_class_name(Z_OBJ_P(original_to_copy)))
+            );
+            break;
+        default:
+            ret = (char*)"(unknown)";
+    }
+
+    ZVAL_STRING(destination, ret);
 }
 
 const char *zval_type_and_value_if_possible(zval *val)
@@ -648,9 +693,9 @@ void record_observed_stack_frame(const char *function_name, double microtime_ent
     SCOUTAPM_G(observed_stack_frames)[SCOUTAPM_G(observed_stack_frames_count)].argv = calloc(argc, sizeof(zval));
 
     for (i = 0; i < argc; i++) {
-        ZVAL_COPY(
-            &(SCOUTAPM_G(observed_stack_frames)[SCOUTAPM_G(observed_stack_frames_count)].argv[i]),
-            &(argv[i])
+        safely_copy_argument_zval_as_scalar(
+            &(argv[i]),
+            &(SCOUTAPM_G(observed_stack_frames)[SCOUTAPM_G(observed_stack_frames_count)].argv[i])
         );
     }
 
