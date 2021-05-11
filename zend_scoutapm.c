@@ -183,6 +183,10 @@ static PHP_RINIT_FUNCTION(scoutapm)
         add_function_to_instrumentation("Predis\\Client->get");
         add_function_to_instrumentation("Predis\\Client->set");
         add_function_to_instrumentation("Predis\\Client->del");
+        add_function_to_instrumentation("Predis\\Client->append");
+        add_function_to_instrumentation("Predis\\Client->incr");
+        add_function_to_instrumentation("Predis\\Client->decr");
+
 
 #if HAVE_SCOUT_CURL
         SCOUT_OVERLOAD_FUNCTION("curl_setopt", scoutapm_curl_setopt_handler)

@@ -1,65 +1,89 @@
 --TEST--
 Predis userland functions are supported
 --SKIPIF--
-<?php if (!extension_loaded("scoutapm")) die("skip scoutapm extension required."); ?>
+<?php
+
+if (!extension_loaded("scoutapm")) die("skip scoutapm extension required.");
+if (shell_exec("which composer") === null) die("skip composer not found in path.");
+
+$out = null;
+$result = null;
+exec("mkdir -p /tmp/scout_predis_test && cd /tmp/scout_predis_test && composer require -n predis/predis", $out, $result);
+
+if ($result !== 0) {
+  die("skip composer failed: " . implode(", ", $out));
+}
+
+require "/tmp/scout_predis_test/vendor/autoload.php";
+
+// Check Redis is running & can connect to it
+$client = new \Predis\Client();
+try {
+  $client->connect();
+} catch (\Predis\Connection\ConnectionException $e) {
+  die("skip " . $e->getMessage());
+}
+?>
 --FILE--
 <?php
 
-// Mimicks the implementation of Predis\Client (uses magic methods for set/get)
-namespace Predis {
-  class Client {
-    private $fh;
-    public function __construct() {
-      $this->fh = fopen("php://memory", "w+");
-    }
-    public function __call($method, $argv) {
-      if ($method === 'get') {
-        rewind($this->fh);
-        return fread($this->fh, 3);
-      }
-      if ($method === 'del') {
-        ftruncate($this->fh, 0);
-        return;
-      }
-      fwrite($this->fh, $argv[1]);
-    }
-  }
-}
+require "/tmp/scout_predis_test/vendor/autoload.php";
 
-namespace {
-  $client = new \Predis\Client();
-  $client->set('foo', 'bar');
-  var_dump($client->get('foo'));
-  $client->del('foo');
-  var_dump($client->get('foo'));
+$client = new \Predis\Client();
 
-  $calls = scoutapm_get_calls();
+$client->set('foo', 'bar');
+var_dump($client->get('foo'));
+$client->append('foo', 'baz');
+var_dump($client->get('foo'));
+$client->del('foo');
+var_dump($client->get('foo'));
 
-  var_dump(array_column($calls, 'function'));
-  var_dump(array_column(array_column($calls, 'argv'), 0));
-}
+$client->set('count', 0);
+var_dump($client->get('count'));
+$client->incr('count');
+var_dump($client->get('count'));
+$client->decr('count');
+var_dump($client->get('count'));
 
+$calls = scoutapm_get_calls();
+
+var_dump(array_column($calls, 'function'));
+
+?>
+--CLEAN--
+<?php
+shell_exec("rm -Rf /tmp/scout_predis_test");
 ?>
 --EXPECTF--
 string(%s) "bar"
-string(0) ""
-array(4) {
-  [0]=>
-  string(18) "Predis\Client->set"
-  [1]=>
-  string(18) "Predis\Client->get"
-  [2]=>
-  string(18) "Predis\Client->del"
-  [3]=>
-  string(18) "Predis\Client->get"
-}
-array(4) {
-  [0]=>
-  string(3) "set"
-  [1]=>
-  string(3) "get"
-  [2]=>
-  string(3) "del"
-  [3]=>
-  string(3) "get"
+string(%s) "barbaz"
+NULL
+string(%s) "0"
+string(%s) "1"
+string(%s) "0"
+array(%d) {
+  [%d]=>
+  string(%d) "Predis\Client->set"
+  [%d]=>
+  string(%d) "Predis\Client->get"
+  [%d]=>
+  string(%d) "Predis\Client->append"
+  [%d]=>
+  string(%d) "Predis\Client->get"
+  [%d]=>
+  string(%d) "Predis\Client->del"
+  [%d]=>
+  string(%d) "Predis\Client->get"
+  [%d]=>
+  string(%d) "Predis\Client->set"
+  [%d]=>
+  string(%d) "Predis\Client->get"
+  [%d]=>
+  string(%d) "Predis\Client->incr"
+  [%d]=>
+  string(%d) "Predis\Client->get"
+  [%d]=>
+  string(%d) "Predis\Client->decr"
+  [%d]=>
+  string(%d) "Predis\Client->get"
 }
