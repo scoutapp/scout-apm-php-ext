@@ -9,16 +9,42 @@ on:
 jobs:
   phpt-test:
     name: "PHPT Tests"
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
+        os:
+          - ubuntu-latest
         php-version:
+#          - 7.1.9
           - 7.1.33
+#          - 7.2.0
+#          - 7.2.34
+#          - 7.3.0
+#          - 7.3.27
+#          - 7.4.0
+#          - 7.4.18
+#          - 8.0.0
+          - 8.0.5
+        zts-mode:
+          - zts
+          - nts
         php-options:
-          - "--enable-debug"
+          - "--with-curl"
+          - ""
     steps:
       - uses: actions/checkout@v2
-      - name: "Install PHP"
+
+      - name: "Set ZTS mode, PHP 8+"
+        if: ${{ matrix.zts-mode == 'zts' && startsWith(matrix.php-version, '8.') }}
+        run: echo "zts_flag=--enable-zts" >> $GITHUB_ENV
+      - name: "Set ZTS mode, PHP 7"
+        if: ${{ matrix.zts-mode == 'zts' && startsWith(matrix.php-version, '7.') }}
+        run: echo "zts_flag=--enable-maintainer-zts" >> $GITHUB_ENV
+      - name: "Set NTS mode"
+        if: ${{ matrix.zts-mode == 'nts' }}
+        run: echo "zts_flag=" >> $GITHUB_ENV
+
+      - name: "Install PHP ${{ matrix.php-version }} (${{ env.zts_flag}} ${{ matrix.php-options }})"
         run: |
           sudo DEBIAN_FRONTEND=noninteractive apt-get update
           sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install software-properties-common build-essential autoconf libxml2-dev libsqlite3-dev libcurl4-openssl-dev
@@ -28,7 +54,7 @@ jobs:
           wget $FINAL_DOWNLOAD_URL
           tar zxf php-${{ matrix.php-version }}.tar.gz
           cd php-${{ matrix.php-version }}
-          ./configure ${{ matrix.php-options }}
+          ./configure --enable-debug ${{ env.zts_flag}} ${{ matrix.php-options }}
           make -j$(nproc)
           sudo make install
           cd $GITHUB_WORKSPACE
@@ -40,3 +66,8 @@ jobs:
       - name: "Run the tests"
         run: |
           php run-tests.php -p `which php` -d zend_extension=`pwd`/modules/scoutapm.so -g "FAIL,XFAIL,BORK,WARN,LEAK,SKIP" --offline --show-diff --set-timeout 120
+      - name: "Run the benchmark"
+        run: |
+          sudo apt update && sudo apt install time
+          ./benchmark.sh
+          ./benchmark.sh -w
