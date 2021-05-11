@@ -36,7 +36,7 @@ namespace {
   $calls = scoutapm_get_calls();
 
   var_dump(array_column($calls, 'function'));
-  var_dump(array_column($calls, 'argv'));
+  var_dump(array_column(array_column($calls, 'argv'), 0));
 }
 
 ?>
@@ -55,25 +55,11 @@ array(4) {
 }
 array(4) {
   [0]=>
-  array(2) {
-    [0]=>
-    string(3) "set"
-    [1]=>
-    string(7) "(array)"
-  }
+  string(3) "set"
   [1]=>
-  array(1) {
-    [0]=>
-    string(3) "get"
-  }
+  string(3) "get"
   [2]=>
-  array(1) {
-    [0]=>
-    string(3) "del"
-  }
+  string(3) "del"
   [3]=>
-  array(1) {
-    [0]=>
-    string(3) "get"
-  }
+  string(3) "get"
 }
