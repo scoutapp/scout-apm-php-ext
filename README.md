@@ -1,6 +1,6 @@
 # Scout APM PHP Extension
 
-[![CircleCI](https://circleci.com/gh/scoutapp/scout-apm-php-ext/tree/master.svg?style=svg)](https://circleci.com/gh/scoutapp/scout-apm-php-ext/tree/master)
+[![PHPT Tests](https://github.com/scoutapp/scout-apm-php-ext/actions/workflows/phpt-tests.yaml/badge.svg)](https://github.com/scoutapp/scout-apm-php-ext/actions/workflows/phpt-tests.yaml)
 
 The Scout APM PHP extension allows instrumentation of internal PHP
 functions that can't be done in regular PHP. The `scout-apm-php`
