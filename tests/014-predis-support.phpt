@@ -2,7 +2,6 @@
 Predis userland functions are supported
 --SKIPIF--
 <?php
-
 if (!extension_loaded("scoutapm")) die("skip scoutapm extension required.");
 if (shell_exec("which composer") === null) die("skip composer not found in path.");
 
@@ -17,6 +16,7 @@ if ($result !== 0) {
 require "/tmp/scout_predis_test/vendor/autoload.php";
 
 // Check Redis is running & can connect to it
+// Run with: docker run --rm --name redis -p 6379:6379 -d redis
 $client = new \Predis\Client();
 try {
   $client->connect();
@@ -34,16 +34,13 @@ $client = new \Predis\Client();
 $client->set('foo', 'bar');
 var_dump($client->get('foo'));
 $client->append('foo', 'baz');
-var_dump($client->get('foo'));
 $client->del('foo');
-var_dump($client->get('foo'));
 
 $client->set('count', 0);
-var_dump($client->get('count'));
 $client->incr('count');
-var_dump($client->get('count'));
 $client->decr('count');
-var_dump($client->get('count'));
+$client->incrBy('count', 2);
+$client->decrBy('count', 2);
 
 $calls = scoutapm_get_calls();
 
@@ -56,11 +53,6 @@ shell_exec("rm -Rf /tmp/scout_predis_test");
 ?>
 --EXPECTF--
 string(%s) "bar"
-string(%s) "barbaz"
-NULL
-string(%s) "0"
-string(%s) "1"
-string(%s) "0"
 array(%d) {
   [%d]=>
   string(%d) "Predis\Client->set"
@@ -69,21 +61,15 @@ array(%d) {
   [%d]=>
   string(%d) "Predis\Client->append"
   [%d]=>
-  string(%d) "Predis\Client->get"
-  [%d]=>
   string(%d) "Predis\Client->del"
-  [%d]=>
-  string(%d) "Predis\Client->get"
   [%d]=>
   string(%d) "Predis\Client->set"
   [%d]=>
-  string(%d) "Predis\Client->get"
-  [%d]=>
   string(%d) "Predis\Client->incr"
-  [%d]=>
-  string(%d) "Predis\Client->get"
   [%d]=>
   string(%d) "Predis\Client->decr"
   [%d]=>
-  string(%d) "Predis\Client->get"
+  string(%d) "Predis\Client->incrBy"
+  [%d]=>
+  string(%d) "Predis\Client->decrBy"
 }

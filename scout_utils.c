@@ -15,7 +15,7 @@ const char *zval_type_and_value_if_possible(zval *val);
 
 void add_function_to_instrumentation(const char *function_name)
 {
-    if (SCOUTAPM_G(num_instrumented_functions) > MAX_INSTRUMENTED_FUNCTIONS) {
+    if (SCOUTAPM_G(num_instrumented_functions) >= MAX_INSTRUMENTED_FUNCTIONS) {
         zend_throw_exception_ex(NULL, 0, "Unable to add instrumentation for function '%s' - MAX_INSTRUMENTED_FUNCTIONS of %d reached", function_name, MAX_INSTRUMENTED_FUNCTIONS);
         return;
     }

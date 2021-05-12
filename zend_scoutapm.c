@@ -27,22 +27,12 @@ void scoutapm_execute_internal(zend_execute_data *execute_data, zval *return_val
 void scoutapm_execute_ex(zend_execute_data *execute_data);
 #endif
 
-#if HAVE_SCOUT_CURL
-extern ZEND_NAMED_FUNCTION(scoutapm_curl_setopt_handler);
-extern ZEND_NAMED_FUNCTION(scoutapm_curl_exec_handler);
-#endif
-extern ZEND_NAMED_FUNCTION(scoutapm_fopen_handler);
-extern ZEND_NAMED_FUNCTION(scoutapm_fread_handler);
-extern ZEND_NAMED_FUNCTION(scoutapm_fwrite_handler);
-extern ZEND_NAMED_FUNCTION(scoutapm_pdo_prepare_handler);
-extern ZEND_NAMED_FUNCTION(scoutapm_pdostatement_execute_handler);
-
-extern void add_function_to_instrumentation(const char *function_name);
 extern int should_be_instrumented(const char *function_name);
 extern const char* determine_function_name(zend_execute_data *execute_data);
 extern double scoutapm_microtime();
 extern void free_recorded_call_arguments();
 extern int unchecked_handler_index_for_function(const char *function_to_lookup);
+extern int setup_recording_for_functions();
 
 extern indexed_handler_lookup handler_lookup[];
 extern const int handler_lookup_size;
@@ -155,10 +145,6 @@ static PHP_GINIT_FUNCTION(scoutapm)
  */
 static PHP_RINIT_FUNCTION(scoutapm)
 {
-    zend_function *original_function;
-    int handler_index;
-    zend_class_entry *ce;
-
 #if defined(COMPILE_DL_SCOUTAPM) && defined(ZTS)
     ZEND_TSRMLS_CACHE_UPDATE();
 #endif
@@ -176,27 +162,9 @@ static PHP_RINIT_FUNCTION(scoutapm)
     if (SCOUTAPM_G(handlers_set) != 1) {
         SCOUTAPM_DEBUG_MESSAGE("Overriding function handlers.\n");
 
-        add_function_to_instrumentation("file_get_contents");
-        add_function_to_instrumentation("file_put_contents");
-        add_function_to_instrumentation("pdo->exec");
-        add_function_to_instrumentation("pdo->query");
-        add_function_to_instrumentation("Predis\\Client->get");
-        add_function_to_instrumentation("Predis\\Client->set");
-        add_function_to_instrumentation("Predis\\Client->del");
-        add_function_to_instrumentation("Predis\\Client->append");
-        add_function_to_instrumentation("Predis\\Client->incr");
-        add_function_to_instrumentation("Predis\\Client->decr");
-
-
-#if HAVE_SCOUT_CURL
-        SCOUT_OVERLOAD_FUNCTION("curl_setopt", scoutapm_curl_setopt_handler)
-        SCOUT_OVERLOAD_FUNCTION("curl_exec", scoutapm_curl_exec_handler)
-#endif
-        SCOUT_OVERLOAD_FUNCTION("fopen", scoutapm_fopen_handler)
-        SCOUT_OVERLOAD_FUNCTION("fwrite", scoutapm_fwrite_handler)
-        SCOUT_OVERLOAD_FUNCTION("fread", scoutapm_fread_handler)
-        SCOUT_OVERLOAD_METHOD("pdo", "prepare", scoutapm_pdo_prepare_handler)
-        SCOUT_OVERLOAD_METHOD("pdostatement", "execute", scoutapm_pdostatement_execute_handler)
+        if (setup_recording_for_functions() == FAILURE) {
+            return FAILURE;
+        }
 
         SCOUTAPM_G(handlers_set) = 1;
     } else {

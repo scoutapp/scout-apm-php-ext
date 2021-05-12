@@ -8,6 +8,17 @@
 #include "zend_scoutapm.h"
 #include "scout_extern.h"
 
+extern void add_function_to_instrumentation(const char *function_name);
+#if HAVE_SCOUT_CURL
+extern ZEND_NAMED_FUNCTION(scoutapm_curl_setopt_handler);
+extern ZEND_NAMED_FUNCTION(scoutapm_curl_exec_handler);
+#endif
+extern ZEND_NAMED_FUNCTION(scoutapm_fopen_handler);
+extern ZEND_NAMED_FUNCTION(scoutapm_fread_handler);
+extern ZEND_NAMED_FUNCTION(scoutapm_fwrite_handler);
+extern ZEND_NAMED_FUNCTION(scoutapm_pdo_prepare_handler);
+extern ZEND_NAMED_FUNCTION(scoutapm_pdostatement_execute_handler);
+
 /* This is simply a map of function names to an index in original_handlers */
 indexed_handler_lookup handler_lookup[] = {
     /* define each function we want to overload, which maps to an index in the `original_handlers` array */
@@ -24,6 +35,46 @@ const int handler_lookup_size = sizeof(handler_lookup);
 /* handlers count needs to be bigger than the number of handler_lookup entries */
 #define ORIGINAL_HANDLERS_TO_ALLOCATE 20
 zif_handler original_handlers[ORIGINAL_HANDLERS_TO_ALLOCATE] = {NULL};
+
+#define ADD_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH(function_name)                                             \
+    zend_try {                                                                                                \
+        add_function_to_instrumentation(function_name);                                                       \
+    } zend_catch {                                                                                            \
+        php_printf("ScoutAPM tried instrumenting '%s' - increase MAX_INSTRUMENTED_FUNCTIONS", function_name); \
+        return FAILURE;                                                                                       \
+    } zend_end_try()
+
+int setup_recording_for_functions()
+{
+    zend_function *original_function;
+    int handler_index;
+    zend_class_entry *ce;
+
+    ADD_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("file_get_contents");
+    ADD_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("file_put_contents");
+    ADD_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("pdo->exec");
+    ADD_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("pdo->query");
+    ADD_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Predis\\Client->get");
+    ADD_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Predis\\Client->set");
+    ADD_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Predis\\Client->del");
+    ADD_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Predis\\Client->append");
+    ADD_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Predis\\Client->incr");
+    ADD_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Predis\\Client->decr");
+    ADD_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Predis\\Client->incrBy");
+    ADD_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Predis\\Client->decrBy");
+
+#if HAVE_SCOUT_CURL
+    SCOUT_OVERLOAD_FUNCTION("curl_setopt", scoutapm_curl_setopt_handler)
+    SCOUT_OVERLOAD_FUNCTION("curl_exec", scoutapm_curl_exec_handler)
+#endif
+    SCOUT_OVERLOAD_FUNCTION("fopen", scoutapm_fopen_handler)
+    SCOUT_OVERLOAD_FUNCTION("fwrite", scoutapm_fwrite_handler)
+    SCOUT_OVERLOAD_FUNCTION("fread", scoutapm_fread_handler)
+    SCOUT_OVERLOAD_METHOD("pdo", "prepare", scoutapm_pdo_prepare_handler)
+    SCOUT_OVERLOAD_METHOD("pdostatement", "execute", scoutapm_pdostatement_execute_handler)
+
+    return SUCCESS;
+}
 
 /*
  * This handles most recorded calls by grabbing all arguments (we treat it as a variadic), finding the "original" handler
