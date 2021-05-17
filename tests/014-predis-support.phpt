@@ -13,15 +13,17 @@ if ($result !== 0) {
   die("skip composer failed: " . implode(", ", $out));
 }
 
-require "/tmp/scout_predis_test/vendor/autoload.php";
+if (!getenv('CI')) {
+    require "/tmp/scout_predis_test/vendor/autoload.php";
 
-// Check Redis is running & can connect to it
-// Run with: docker run --rm --name redis -p 6379:6379 -d redis
-$client = new \Predis\Client();
-try {
-  $client->connect();
-} catch (\Predis\Connection\ConnectionException $e) {
-  die("skip " . $e->getMessage());
+    // Check Redis is running & can connect to it
+    // Run with: docker run --rm --name redis -p 6379:6379 -d redis
+    $client = new \Predis\Client();
+    try {
+      $client->connect();
+    } catch (\Predis\Connection\ConnectionException $e) {
+      die("skip " . $e->getMessage());
+    }
 }
 ?>
 --FILE--

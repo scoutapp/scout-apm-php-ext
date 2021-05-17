@@ -75,7 +75,7 @@ jobs:
           make
       - name: "Run the tests"
         run: |
-          php run-tests.php -p `which php` -d zend_extension=`pwd`/modules/scoutapm.so -g "FAIL,XFAIL,BORK,WARN,LEAK,SKIP" --offline --show-diff --set-timeout 120
+          php run-tests.php -p `which php` -d zend_extension=`pwd`/modules/scoutapm.so -g "FAIL,XFAIL,BORK,WARN,LEAK,SKIP" --offline --show-diff --set-timeout 120 -q
       - name: "Run the benchmark"
         run: |
           sudo apt update && sudo apt install time
