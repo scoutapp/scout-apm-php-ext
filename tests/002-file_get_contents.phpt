@@ -4,6 +4,9 @@ Calls to file_get_contents are logged
 <?php if (!extension_loaded("scoutapm")) die("skip scoutapm extension required."); ?>
 --FILE--
 <?php
+
+var_dump(in_array('file_get_contents', scoutapm_list_instrumented_functions()));
+
 file_get_contents(__FILE__);
 $call = scoutapm_get_calls()[0];
 
@@ -15,6 +18,7 @@ var_dump($call['exited'] > $call['entered']);
 var_dump($call['argv']);
 ?>
 --EXPECTF--
+bool(true)
 string(17) "file_get_contents"
 float(%f)
 float(%f)

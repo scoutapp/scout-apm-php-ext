@@ -81,7 +81,6 @@ PHP_FUNCTION(scoutapm_list_instrumented_functions)
 {
     int i, lookup_count = handler_lookup_size / sizeof(indexed_handler_lookup);
 
-    // @todo also add zend_execute_ex list
     array_init(return_value);
 
     for(i = 0; i < lookup_count; i++) {
@@ -93,6 +92,14 @@ PHP_FUNCTION(scoutapm_list_instrumented_functions)
             return_value,
             handler_lookup[i].function_name,
             strlen(handler_lookup[i].function_name)
+        );
+    }
+
+    for(i = 0; i < SCOUTAPM_G(num_instrumented_functions); i++) {
+        add_next_index_stringl(
+            return_value,
+            SCOUTAPM_G(instrumented_function_names[i]),
+            strlen(SCOUTAPM_G(instrumented_function_names[i]))
         );
     }
 }

@@ -29,6 +29,8 @@ if (!getenv('CI')) {
 --FILE--
 <?php
 
+var_dump(in_array('Predis\Client->set', scoutapm_list_instrumented_functions()));
+
 require "/tmp/scout_predis_test/vendor/autoload.php";
 
 $client = new \Predis\Client();
@@ -54,6 +56,7 @@ var_dump(array_column($calls, 'function'));
 shell_exec("rm -Rf /tmp/scout_predis_test");
 ?>
 --EXPECTF--
+bool(true)
 string(%s) "bar"
 array(%d) {
   [%d]=>

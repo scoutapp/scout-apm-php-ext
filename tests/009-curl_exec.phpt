@@ -3,9 +3,11 @@ Calls to curl_exec are logged
 --SKIPIF--
 <?php if (!extension_loaded("scoutapm")) die("skip scoutapm extension required."); ?>
 <?php if (!extension_loaded("curl")) die("skip curl extension required."); ?>
-<?php if (!in_array("curl_exec", scoutapm_list_instrumented_functions())) die("skip scout was not compiled with curl");
 --FILE--
 <?php
+
+var_dump(in_array('curl_exec', scoutapm_list_instrumented_functions()));
+
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL, "file://" . __FILE__);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -21,6 +23,7 @@ var_dump($call['exited'] > $call['entered']);
 var_dump($call['argv']);
 ?>
 --EXPECTF--
+bool(true)
 string(9) "curl_exec"
 float(%f)
 float(%f)

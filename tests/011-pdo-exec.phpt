@@ -6,6 +6,9 @@ Calls to PDO::exec are logged
 <?php if (!extension_loaded("pdo_sqlite")) die("skip pdo_sqlite extension required."); ?>
 --FILE--
 <?php
+
+var_dump(in_array('pdo->exec', scoutapm_list_instrumented_functions()));
+
 $dbh = new PDO('sqlite::memory:');
 $dbh->exec("CREATE TABLE foo (col INT PRIMARY KEY)");
 $dbh->exec("INSERT INTO foo (col) VALUES (1), (2) ");
@@ -17,6 +20,7 @@ var_dump($calls[1]['function']);
 var_dump($calls[1]['argv'][0]);
 ?>
 --EXPECTF--
+bool(true)
 string(9) "PDO->exec"
 string(38) "CREATE TABLE foo (col INT PRIMARY KEY)"
 string(9) "PDO->exec"
