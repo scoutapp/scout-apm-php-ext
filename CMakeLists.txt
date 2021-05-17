@@ -8,6 +8,9 @@ set(SOURCE_FILES
         scout_pdo_wrapper.c
         scout_extern.h
         zend_scoutapm.h
+        scout_utils.c
+        scout_functions.c
+        scout_recording.c
 )
 
 execute_process(

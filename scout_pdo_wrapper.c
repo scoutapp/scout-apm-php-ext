@@ -12,6 +12,8 @@ ZEND_NAMED_FUNCTION(scoutapm_pdo_prepare_handler)
 {
     zval *statement;
 
+    SCOUT_PASSTHRU_IF_ALREADY_INSTRUMENTING()
+
     ZEND_PARSE_PARAMETERS_START(1, 10)
         Z_PARAM_ZVAL(statement)
     ZEND_PARSE_PARAMETERS_END();
@@ -31,6 +33,8 @@ ZEND_NAMED_FUNCTION(scoutapm_pdostatement_execute_handler)
     double entered = scoutapm_microtime();
     const char *called_function;
     zend_long recorded_arguments_index;
+
+    SCOUT_PASSTHRU_IF_ALREADY_INSTRUMENTING()
 
     called_function = determine_function_name(execute_data);
 

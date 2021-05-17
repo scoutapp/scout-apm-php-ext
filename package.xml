@@ -45,6 +45,9 @@
         <dir name="/">
             <file name="config.m4" role="src" />
             <file name="zend_scoutapm.c" role="src" />
+            <file name="scout_utils.c" role="src" />
+            <file name="scout_functions.c" role="src" />
+            <file name="scout_recording.c" role="src" />
             <file name="scout_curl_wrapper.c" role="src" />
             <file name="scout_file_wrapper.c" role="src" />
             <file name="scout_pdo_wrapper.c" role="src" />
@@ -72,6 +75,7 @@
                 <file name="011-pdostatement-execute-pdo-prepare.phpt" role="test" />
                 <file name="012-file_put_contents.phpt" role="test" />
                 <file name="013-fix-memory-leak-when-scoutapm_get_calls-not-called.phpt" role="test" />
+                <file name="014-predis-support.phpt" role="test" />
                 <file name="bug-47.phpt" role="test" />
                 <file name="bug-49.phpt" role="test" />
             </dir>

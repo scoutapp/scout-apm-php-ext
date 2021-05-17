@@ -6,6 +6,10 @@ Calls to PDOStatement::execute are logged when created from PDO->prepare()
 <?php if (!extension_loaded("pdo_sqlite")) die("skip pdo_sqlite extension required."); ?>
 --FILE--
 <?php
+
+var_dump(in_array('pdo->prepare', scoutapm_list_instrumented_functions()));
+var_dump(in_array('pdostatement->execute', scoutapm_list_instrumented_functions()));
+
 $dbh = new PDO('sqlite::memory:');
 $stmt1 = $dbh->prepare("SELECT 1 + 2");
 $stmt2 = $dbh->prepare("SELECT 3 + 4");
@@ -19,6 +23,8 @@ var_dump($calls[1]['function']);
 var_dump($calls[1]['argv']);
 ?>
 --EXPECTF--
+bool(true)
+bool(true)
 string(21) "PDOStatement->execute"
 array(1) {
   [0]=>

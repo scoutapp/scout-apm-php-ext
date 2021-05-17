@@ -9,6 +9,16 @@ on:
 jobs:
   phpt-test:
     name: "PHPT Tests"
+    services:
+      redis:
+        image: redis
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -54,7 +64,7 @@ jobs:
           wget $FINAL_DOWNLOAD_URL
           tar zxf php-${{ matrix.php-version }}.tar.gz
           cd php-${{ matrix.php-version }}
-          ./configure --enable-debug ${{ env.zts_flag}} ${{ matrix.php-options }}
+          ./configure --enable-debug --with-openssl ${{ env.zts_flag}} ${{ matrix.php-options }}
           make -j$(nproc)
           sudo make install
           cd $GITHUB_WORKSPACE
@@ -65,7 +75,7 @@ jobs:
           make
       - name: "Run the tests"
         run: |
-          php run-tests.php -p `which php` -d zend_extension=`pwd`/modules/scoutapm.so -g "FAIL,XFAIL,BORK,WARN,LEAK,SKIP" --offline --show-diff --set-timeout 120
+          php run-tests.php -p `which php` -d zend_extension=`pwd`/modules/scoutapm.so -g "FAIL,XFAIL,BORK,WARN,LEAK,SKIP" --offline --show-diff --set-timeout 120 -q
       - name: "Run the benchmark"
         run: |
           sudo apt update && sudo apt install time

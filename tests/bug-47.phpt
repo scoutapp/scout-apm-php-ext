@@ -13,7 +13,7 @@ var_dump(scoutapm_get_calls()[0]['argv']);
 --EXPECTF--
 array(2) {
   [0]=>
-  resource(%d) of type (%s)
+  string(%d) "resource(%d)"
   [1]=>
   string(%d) "fread/fwrite test"
 }

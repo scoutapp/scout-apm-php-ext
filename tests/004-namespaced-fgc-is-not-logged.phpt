@@ -4,6 +4,11 @@ Calls to file_get_contents are logged
 <?php if (!extension_loaded("scoutapm")) die("skip scoutapm extension required."); ?>
 --FILE--
 <?php
+
+namespace {
+    var_dump(in_array('file_get_contents', scoutapm_list_instrumented_functions()));
+}
+
 namespace SomeNamespace {
     function file_get_contents(string $_) {}
 
@@ -33,6 +38,7 @@ namespace {
 }
 ?>
 --EXPECTF--
+bool(true)
 should not be logged: function defined in namespace, call implicitly resolves to namespaced function
 array(0) {
 }

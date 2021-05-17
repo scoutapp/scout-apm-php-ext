@@ -22,6 +22,9 @@
 /* Extreme amounts of debugging, set to 1 to enable it and `make clean && make` (tests will fail...) */
 #define SCOUT_APM_EXT_DEBUGGING 0
 
+// @todo set this based on PHP version once we introduce observer API for PHP 8 - https://github.com/scoutapp/scout-apm-php-ext/issues/74
+#define SCOUTAPM_INSTRUMENT_USING_OBSERVER_API 0
+
 PHP_FUNCTION(scoutapm_get_calls);
 PHP_FUNCTION(scoutapm_list_instrumented_functions);
 
@@ -45,6 +48,8 @@ typedef struct _handler_lookup {
     const char *function_name;
 } indexed_handler_lookup;
 
+#define MAX_INSTRUMENTED_FUNCTIONS 100
+
 /* These are the "module globals". In non-ZTS mode, they're just regular variables, but means in ZTS mode they get handled properly */
 ZEND_BEGIN_MODULE_GLOBALS(scoutapm)
     zend_bool handlers_set;
@@ -52,6 +57,9 @@ ZEND_BEGIN_MODULE_GLOBALS(scoutapm)
     scoutapm_stack_frame *observed_stack_frames;
     zend_long disconnected_call_argument_store_count;
     scoutapm_disconnected_call_argument_store *disconnected_call_argument_store;
+    char *instrumented_function_names[MAX_INSTRUMENTED_FUNCTIONS];
+    int num_instrumented_functions;
+    int currently_instrumenting;
 ZEND_END_MODULE_GLOBALS(scoutapm)
 
 /* Accessor for "module globals" for non-ZTS and ZTS modes. */
@@ -114,6 +122,12 @@ typedef void (*zif_handler)(INTERNAL_FUNCTION_PARAMETERS);
 #define SCOUT_OVERLOAD_METHOD(lowercase_class_name, method_name, handler_to_use) SCOUT_OVERLOAD_CLASS_ENTRY_FUNCTION(lowercase_class_name, "->", method_name, handler_to_use)
 
 #define SCOUT_INTERNAL_FUNCTION_PASSTHRU() original_handlers[handler_index_for_function(determine_function_name(execute_data))](INTERNAL_FUNCTION_PARAM_PASSTHRU)
+
+#define SCOUT_PASSTHRU_IF_ALREADY_INSTRUMENTING()   \
+    if (SCOUTAPM_G(currently_instrumenting) == 1) { \
+        SCOUT_INTERNAL_FUNCTION_PASSTHRU();         \
+        return;                                     \
+    }
 
 /* these are the string keys used in scoutapm_get_calls associative array return value */
 #define SCOUT_GET_CALLS_KEY_FUNCTION "function"

@@ -4,6 +4,10 @@ Calls to fwrite and fread are logged with handle from tmpfile()
 <?php if (!extension_loaded("scoutapm")) die("skip scoutapm extension required."); ?>
 --FILE--
 <?php
+
+var_dump(in_array('fread', scoutapm_list_instrumented_functions()));
+var_dump(in_array('fwrite', scoutapm_list_instrumented_functions()));
+
 $fh = tmpfile();
 
 fwrite($fh, "fread/fwrite test\n");
@@ -20,11 +24,13 @@ var_dump($calls[1]['function']);
 var_dump($calls[1]['argv']);
 ?>
 --EXPECTF--
+bool(true)
+bool(true)
 fread/fwrite test
 string(6) "fwrite"
 array(2) {
   [0]=>
-  resource(%d) of type (Unknown)
+  string(%d) "resource(%d)"
   [1]=>
   string(18) "fread/fwrite test
 "
@@ -32,7 +38,7 @@ array(2) {
 string(5) "fread"
 array(2) {
   [0]=>
-  resource(%d) of type (Unknown)
+  string(%d) "resource(%d)"
   [1]=>
   int(18)
 }
