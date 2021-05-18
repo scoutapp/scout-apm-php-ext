@@ -18,6 +18,7 @@
 
 #include "scout_recording.h"
 #include "scout_internal_handlers.h"
+#include "scout_execute_ex.h"
 
 #define PHP_SCOUTAPM_NAME "scoutapm"
 #define PHP_SCOUTAPM_VERSION "1.2.2"
@@ -26,9 +27,7 @@
 #define SCOUT_APM_EXT_DEBUGGING 0
 
 #if PHP_VERSION_ID > 80000
-//#define SCOUTAPM_INSTRUMENT_USING_OBSERVER_API 1
-//#include "Zend/zend_observer.h"
-#define SCOUTAPM_INSTRUMENT_USING_OBSERVER_API 0
+#define SCOUTAPM_INSTRUMENT_USING_OBSERVER_API 1
 #else
 #define SCOUTAPM_INSTRUMENT_USING_OBSERVER_API 0
 #endif

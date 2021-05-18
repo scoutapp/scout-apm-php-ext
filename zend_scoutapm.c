@@ -8,11 +8,6 @@
 #include "zend_scoutapm.h"
 #include "ext/standard/info.h"
 
-void record_arguments_for_call(const char *call_reference, int argc, zval *argv);
-zend_long find_index_for_recorded_arguments(const char *call_reference);
-void record_observed_stack_frame(const char *function_name, double microtime_entered, double microtime_exited, int argc, zval *argv);
-int handler_index_for_function(const char *function_to_lookup);
-
 static PHP_GINIT_FUNCTION(scoutapm);
 static PHP_RINIT_FUNCTION(scoutapm);
 static PHP_RSHUTDOWN_FUNCTION(scoutapm);
@@ -20,18 +15,15 @@ static PHP_MINIT_FUNCTION(scoutapm);
 static PHP_MSHUTDOWN_FUNCTION(scoutapm);
 static int zend_scoutapm_startup(zend_extension*);
 
-extern const char* determine_function_name(zend_execute_data *execute_data);
-extern double scoutapm_microtime();
+extern void allocate_stack_frames_for_request();
+extern void free_observed_stack_frames();
 extern void free_recorded_call_arguments();
-extern int unchecked_handler_index_for_function(const char *function_to_lookup);
 extern int setup_recording_for_internal_handlers();
 extern int setup_functions_for_zend_execute_ex();
+extern int setup_functions_for_observer_api();
 extern void register_scout_execute_ex();
 extern void deregister_scout_execute_ex();
-
-extern indexed_handler_lookup handler_lookup[];
-extern const int handler_lookup_size;
-extern zif_handler original_handlers[];
+extern void register_scout_observer();
 
 ZEND_DECLARE_MODULE_GLOBALS(scoutapm)
 
@@ -144,15 +136,7 @@ static PHP_RINIT_FUNCTION(scoutapm)
     ZEND_TSRMLS_CACHE_UPDATE();
 #endif
 
-    SCOUTAPM_DEBUG_MESSAGE("Initialising stacks...");
-    SCOUTAPM_G(observed_stack_frames_count) = 0;
-    SCOUTAPM_G(observed_stack_frames) = calloc(0, sizeof(scoutapm_stack_frame));
-    SCOUTAPM_G(disconnected_call_argument_store_count) = 0;
-    SCOUTAPM_G(disconnected_call_argument_store) = calloc(0, sizeof(scoutapm_disconnected_call_argument_store));
-    SCOUTAPM_DEBUG_MESSAGE("Stacks made\n");
-
-    SCOUTAPM_G(currently_instrumenting) = 0;
-    SCOUTAPM_G(num_instrumented_functions) = 0;
+    allocate_stack_frames_for_request();
 
     if (SCOUTAPM_G(handlers_set) != 1) {
         SCOUTAPM_DEBUG_MESSAGE("Overriding function handlers.\n");
@@ -162,6 +146,10 @@ static PHP_RINIT_FUNCTION(scoutapm)
         }
 
         if (setup_recording_for_internal_handlers() == FAILURE) {
+            return FAILURE;
+        }
+
+        if (setup_functions_for_observer_api() == FAILURE) {
             return FAILURE;
         }
 
@@ -179,46 +167,23 @@ static PHP_RINIT_FUNCTION(scoutapm)
  */
 static PHP_RSHUTDOWN_FUNCTION(scoutapm)
 {
-    int i, j;
-
-    SCOUTAPM_DEBUG_MESSAGE("Freeing stacks... ");
-
-    for (i = 0; i < SCOUTAPM_G(observed_stack_frames_count); i++) {
-        for (j = 0; j < SCOUTAPM_G(observed_stack_frames)[i].argc; j++) {
-            zval_ptr_dtor(&(SCOUTAPM_G(observed_stack_frames)[i].argv[j]));
-        }
-        free(SCOUTAPM_G(observed_stack_frames)[i].argv);
-        free((void*)SCOUTAPM_G(observed_stack_frames)[i].function_name);
-    }
-
-    if (SCOUTAPM_G(observed_stack_frames)) {
-        free(SCOUTAPM_G(observed_stack_frames));
-    }
-    SCOUTAPM_G(observed_stack_frames_count) = 0;
-
+    free_observed_stack_frames();
     free_recorded_call_arguments();
-
-    SCOUTAPM_DEBUG_MESSAGE("Stacks freed\n");
 
     return SUCCESS;
 }
 
 static PHP_MINIT_FUNCTION(scoutapm)
 {
-#if SCOUTAPM_INSTRUMENT_USING_OBSERVER_API == 1
-    zend_observer_fcall_register(scout_observer_api_register);
-#else
+    register_scout_observer();
     register_scout_execute_ex();
-#endif
 
     return SUCCESS;
 }
 
 static PHP_MSHUTDOWN_FUNCTION(scoutapm)
 {
-#if SCOUTAPM_INSTRUMENT_USING_OBSERVER_API == 0
     deregister_scout_execute_ex();
-#endif
 
     return SUCCESS;
 }

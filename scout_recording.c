@@ -8,6 +8,63 @@
 #include "zend_scoutapm.h"
 #include "scout_extern.h"
 
+void add_function_to_instrumentation(const char *function_name)
+{
+    if (SCOUTAPM_G(num_instrumented_functions) >= MAX_INSTRUMENTED_FUNCTIONS) {
+        zend_throw_exception_ex(NULL, 0, "Unable to add instrumentation for function '%s' - MAX_INSTRUMENTED_FUNCTIONS of %d reached", function_name, MAX_INSTRUMENTED_FUNCTIONS);
+        return;
+    }
+
+    SCOUTAPM_G(instrumented_function_names)[SCOUTAPM_G(num_instrumented_functions)] = strdup(function_name);
+    SCOUTAPM_G(num_instrumented_functions)++;
+}
+
+int should_be_instrumented(const char *function_name)
+{
+    int i = 0;
+    for (; i < SCOUTAPM_G(num_instrumented_functions); i++) {
+        if (strcasecmp(function_name, SCOUTAPM_G(instrumented_function_names)[i]) == 0) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+void allocate_stack_frames_for_request()
+{
+    SCOUTAPM_DEBUG_MESSAGE("Initialising stacks...");
+    SCOUTAPM_G(observed_stack_frames_count) = 0;
+    SCOUTAPM_G(observed_stack_frames) = calloc(0, sizeof(scoutapm_stack_frame));
+    SCOUTAPM_G(disconnected_call_argument_store_count) = 0;
+    SCOUTAPM_G(disconnected_call_argument_store) = calloc(0, sizeof(scoutapm_disconnected_call_argument_store));
+    SCOUTAPM_DEBUG_MESSAGE("Stacks made\n");
+
+    SCOUTAPM_G(currently_instrumenting) = 0;
+    SCOUTAPM_G(num_instrumented_functions) = 0;
+}
+
+void free_observed_stack_frames()
+{
+    int i, j;
+
+    SCOUTAPM_DEBUG_MESSAGE("Freeing stacks... ");
+
+    for (i = 0; i < SCOUTAPM_G(observed_stack_frames_count); i++) {
+        for (j = 0; j < SCOUTAPM_G(observed_stack_frames)[i].argc; j++) {
+            zval_ptr_dtor(&(SCOUTAPM_G(observed_stack_frames)[i].argv[j]));
+        }
+        free(SCOUTAPM_G(observed_stack_frames)[i].argv);
+        free((void*)SCOUTAPM_G(observed_stack_frames)[i].function_name);
+    }
+
+    if (SCOUTAPM_G(observed_stack_frames)) {
+        free(SCOUTAPM_G(observed_stack_frames));
+    }
+    SCOUTAPM_G(observed_stack_frames_count) = 0;
+
+    SCOUTAPM_DEBUG_MESSAGE("Stacks freed\n");
+}
+
 void free_recorded_call_arguments()
 {
     zend_long i, j;

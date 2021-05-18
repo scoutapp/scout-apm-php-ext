@@ -21,13 +21,17 @@ extern ZEND_NAMED_FUNCTION(scoutapm_pdostatement_execute_handler);
 /* This is simply a map of function names to an index in original_handlers */
 indexed_handler_lookup handler_lookup[] = {
     /* define each function we want to overload, which maps to an index in the `original_handlers` array */
-    { 1, "curl_setopt"},
-    { 2, "curl_exec"},
-    { 3, "fopen"},
-    { 4, "fread"},
-    { 5, "fwrite"},
-    { 6, "pdo->prepare"},
-    { 7, "pdostatement->execute"},
+    { 0, "file_get_contents"},
+    { 1, "file_put_contents"},
+    { 2, "curl_setopt"},
+    { 3, "curl_exec"},
+    { 4, "fopen"},
+    { 5, "fread"},
+    { 6, "fwrite"},
+    { 7, "pdo->exec"},
+    { 8, "pdo->query"},
+    { 9, "pdo->prepare"},
+    {10, "pdostatement->execute"},
 };
 const int handler_lookup_size = sizeof(handler_lookup);
 
@@ -41,6 +45,8 @@ int setup_recording_for_internal_handlers()
     int handler_index;
     zend_class_entry *ce;
 
+    SCOUT_OVERLOAD_FUNCTION("file_get_contents", scoutapm_default_handler)
+    SCOUT_OVERLOAD_FUNCTION("file_put_contents", scoutapm_default_handler)
 #if HAVE_SCOUT_CURL
     SCOUT_OVERLOAD_FUNCTION("curl_setopt", scoutapm_curl_setopt_handler)
     SCOUT_OVERLOAD_FUNCTION("curl_exec", scoutapm_curl_exec_handler)
@@ -48,6 +54,8 @@ int setup_recording_for_internal_handlers()
     SCOUT_OVERLOAD_FUNCTION("fopen", scoutapm_fopen_handler)
     SCOUT_OVERLOAD_FUNCTION("fwrite", scoutapm_fwrite_handler)
     SCOUT_OVERLOAD_FUNCTION("fread", scoutapm_fread_handler)
+    SCOUT_OVERLOAD_METHOD("pdo", "exec", scoutapm_default_handler)
+    SCOUT_OVERLOAD_METHOD("pdo", "query", scoutapm_default_handler)
     SCOUT_OVERLOAD_METHOD("pdo", "prepare", scoutapm_pdo_prepare_handler)
     SCOUT_OVERLOAD_METHOD("pdostatement", "execute", scoutapm_pdostatement_execute_handler)
 

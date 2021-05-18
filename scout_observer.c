@@ -7,10 +7,18 @@
 
 #include "zend_scoutapm.h"
 #include "scout_extern.h"
+#include "Zend/zend_observer.h"
+
+int setup_functions_for_observer_api()
+{
+#if SCOUTAPM_INSTRUMENT_USING_OBSERVER_API == 1
+    ADD_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Predis\\Client->__call");
+#endif
+
+    return SUCCESS;
+}
 
 #if SCOUTAPM_INSTRUMENT_USING_OBSERVER_API == 1
-
-extern int should_be_instrumented(const char *function_name);
 
 static void observer_begin(zend_execute_data *execute_data) {
     // @todo before
@@ -43,3 +51,10 @@ zend_observer_fcall_handlers scout_observer_api_register(zend_execute_data *exec
     return handlers; // I have handlers for this function
 }
 #endif
+
+void register_scout_observer()
+{
+#if SCOUTAPM_INSTRUMENT_USING_OBSERVER_API == 1
+    zend_observer_fcall_register(scout_observer_api_register);
+#endif
+}
