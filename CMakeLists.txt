@@ -10,8 +10,13 @@ set(SOURCE_FILES
         zend_scoutapm.h
         scout_utils.c
         scout_functions.c
-        scout_recording.c
+        scout_execute_ex.c
         scout_observer.c
+        scout_internal_handlers.c
+        scout_internal_handlers.h
+        scout_recording.c
+        scout_recording.h
+        scout_execute_ex.h
 )
 
 execute_process(

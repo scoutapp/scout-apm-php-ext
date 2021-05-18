@@ -19,6 +19,7 @@ extern const char *unique_resource_id(const char *scout_wrapper_type, zval *reso
 extern const char *unique_class_instance_id(zval *class_instance);
 extern void safely_copy_argument_zval_as_scalar(zval *original_to_copy, zval *destination);
 extern int unchecked_handler_index_for_function(const char *function_to_lookup);
+extern int should_be_instrumented(const char *function_name);
 
 ZEND_EXTERN_MODULE_GLOBALS(scoutapm);
 extern indexed_handler_lookup handler_lookup[];
