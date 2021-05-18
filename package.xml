@@ -48,6 +48,7 @@
             <file name="scout_utils.c" role="src" />
             <file name="scout_functions.c" role="src" />
             <file name="scout_recording.c" role="src" />
+            <file name="scout_observer.c" role="src" />
             <file name="scout_curl_wrapper.c" role="src" />
             <file name="scout_file_wrapper.c" role="src" />
             <file name="scout_pdo_wrapper.c" role="src" />

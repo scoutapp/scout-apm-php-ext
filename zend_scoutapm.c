@@ -20,7 +20,9 @@ static PHP_MINIT_FUNCTION(scoutapm);
 static PHP_MSHUTDOWN_FUNCTION(scoutapm);
 static int zend_scoutapm_startup(zend_extension*);
 
-#if SCOUTAPM_INSTRUMENT_USING_OBSERVER_API == 0
+#if SCOUTAPM_INSTRUMENT_USING_OBSERVER_API == 1
+extern zend_observer_fcall_handlers scout_observer_api_register(zend_execute_data *execute_data);
+#else
 static void (*original_zend_execute_ex) (zend_execute_data *execute_data);
 static void (*original_zend_execute_internal) (zend_execute_data *execute_data, zval *return_value);
 void scoutapm_execute_internal(zend_execute_data *execute_data, zval *return_value);
@@ -206,7 +208,9 @@ static PHP_RSHUTDOWN_FUNCTION(scoutapm)
 
 static PHP_MINIT_FUNCTION(scoutapm)
 {
-#if SCOUTAPM_INSTRUMENT_USING_OBSERVER_API == 0
+#if SCOUTAPM_INSTRUMENT_USING_OBSERVER_API == 1
+    zend_observer_fcall_register(scout_observer_api_register);
+#else
     original_zend_execute_internal = zend_execute_internal;
     zend_execute_internal = scoutapm_execute_internal;
 

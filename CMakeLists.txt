@@ -11,6 +11,7 @@ set(SOURCE_FILES
         scout_utils.c
         scout_functions.c
         scout_recording.c
+        scout_observer.c
 )
 
 execute_process(
