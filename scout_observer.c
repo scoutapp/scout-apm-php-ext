@@ -20,12 +20,33 @@ int setup_functions_for_observer_api()
 
 #if SCOUTAPM_INSTRUMENT_USING_OBSERVER_API == 1
 
-static void observer_begin(zend_execute_data *execute_data) {
-    // @todo before
+static void scout_observer_begin(zend_execute_data *execute_data)
+{
+    if (SCOUTAPM_G(currently_instrumenting)) {
+        return;
+    }
+
+    SCOUTAPM_G(observer_api_start_time) = scoutapm_microtime();
+    SCOUTAPM_G(currently_instrumenting) = 1;
 }
 
-static void observer_end(zend_execute_data *execute_data, zval *return_value) {
-    // @todo after
+static void scout_observer_end(zend_execute_data *execute_data, zval *return_value)
+{
+    const char *function_name;
+
+    if (SCOUTAPM_G(currently_instrumenting) != 1
+        || SCOUTAPM_G(observer_api_start_time) <= 0) {
+        return; // Possibly a weird situation? Not sure how we could get into this state
+    }
+
+    function_name = determine_function_name(execute_data);
+
+    // @todo argc/argv
+
+    // @todo if __call (maybe __callStatic too?) magic method, use the $method name as function name
+    record_observed_stack_frame(function_name, SCOUTAPM_G(observer_api_start_time), scoutapm_microtime(), 0, NULL);
+    SCOUTAPM_G(currently_instrumenting) = 0;
+    SCOUTAPM_G(observer_api_start_time) = 0;
 }
 
 // Note: this is only called FIRST time each function is invoked (better that way)
@@ -41,14 +62,13 @@ zend_observer_fcall_handlers scout_observer_api_register(zend_execute_data *exec
 
     function_name = determine_function_name(execute_data);
 
-    // @todo magic methods become the function name here, unlike in zend_execute_ex
     if (should_be_instrumented(function_name) == 0) {
         return handlers;
     }
 
-    handlers.begin = observer_begin;
-    handlers.end = observer_end;
-    return handlers; // I have handlers for this function
+    handlers.begin = scout_observer_begin;
+    handlers.end = scout_observer_end;
+    return handlers;
 }
 #endif
 

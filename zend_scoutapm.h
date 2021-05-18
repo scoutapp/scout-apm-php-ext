@@ -45,6 +45,9 @@ ZEND_BEGIN_MODULE_GLOBALS(scoutapm)
     char *instrumented_function_names[MAX_INSTRUMENTED_FUNCTIONS];
     int num_instrumented_functions;
     int currently_instrumenting;
+#if SCOUTAPM_INSTRUMENT_USING_OBSERVER_API == 1
+    double observer_api_start_time;
+#endif //SCOUTAPM_INSTRUMENT_USING_OBSERVER_API
 ZEND_END_MODULE_GLOBALS(scoutapm)
 
 /* Accessor for "module globals" for non-ZTS and ZTS modes. */
