@@ -190,3 +190,27 @@ const char *unique_class_instance_id(zval *class_instance)
 
     return ret;
 }
+
+/**
+ * This function wraps PHP's implementation of str_replace so we don't have to re-implement the same mechanism :)
+ */
+const char *scout_str_replace(const char *search, const char *replace, const char *subject)
+{
+    zval args[3];
+    zval retval, func;
+
+    ZVAL_STRING(&func, "str_replace");
+
+    ZVAL_STRING(&args[0], search);
+    ZVAL_STRING(&args[1], replace);
+    ZVAL_STRING(&args[2], subject);
+
+    call_user_function(EG(function_table), NULL, &func, &retval, 3, args);
+
+    // Only return strings - if something went wrong, return the original subject
+    if (Z_TYPE(retval) != IS_STRING) {
+        return subject;
+    }
+
+    return Z_STRVAL(retval);
+}
