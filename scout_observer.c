@@ -32,19 +32,36 @@ static void scout_observer_begin(zend_execute_data *execute_data)
 
 static void scout_observer_end(zend_execute_data *execute_data, zval *return_value)
 {
-    const char *function_name;
+    char *function_name, *magic_function_name;
+    size_t magic_function_name_len;
+    int argc;
+    zval *argv = NULL;
 
     if (SCOUTAPM_G(currently_instrumenting) != 1
         || SCOUTAPM_G(observer_api_start_time) <= 0) {
         return; // Possibly a weird situation? Not sure how we could get into this state
     }
 
-    function_name = determine_function_name(execute_data);
+    if (strcasecmp("__call", ZSTR_VAL(execute_data->func->common.function_name)) == 0) {
+        // @todo would be nice to find a way to "unpack" the array here into argv
+        ZEND_PARSE_PARAMETERS_START(1, -1)
+            Z_PARAM_STRING(magic_function_name, magic_function_name_len)
+            Z_PARAM_VARIADIC(' ', argv, argc)
+        ZEND_PARSE_PARAMETERS_END();
 
-    // @todo argc/argv
+        DYNAMIC_MALLOC_SPRINTF(function_name, magic_function_name_len, "%s->%s",
+            ZSTR_VAL(execute_data->func->common.scope->name),
+            magic_function_name
+        );
+    } else {
+        function_name = (char*) determine_function_name(execute_data);
 
-    // @todo if __call (maybe __callStatic too?) magic method, use the $method name as function name
-    record_observed_stack_frame(function_name, SCOUTAPM_G(observer_api_start_time), scoutapm_microtime(), 0, NULL);
+        ZEND_PARSE_PARAMETERS_START(0, -1)
+            Z_PARAM_VARIADIC(' ', argv, argc)
+        ZEND_PARSE_PARAMETERS_END();
+    }
+
+    record_observed_stack_frame(function_name, SCOUTAPM_G(observer_api_start_time), scoutapm_microtime(), argc, argv);
     SCOUTAPM_G(currently_instrumenting) = 0;
     SCOUTAPM_G(observer_api_start_time) = 0;
 }
