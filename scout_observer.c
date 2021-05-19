@@ -7,7 +7,10 @@
 
 #include "zend_scoutapm.h"
 #include "scout_extern.h"
+
+#if SCOUTAPM_INSTRUMENT_USING_OBSERVER_API == 1
 #include "Zend/zend_observer.h"
+#endif
 
 int setup_functions_for_observer_api()
 {
