@@ -25,9 +25,27 @@ typedef struct _scoutapm_disconnected_call_argument_store {
     zval *argv;
 } scoutapm_disconnected_call_argument_store;
 
+typedef struct _scoutapm_instrumented_function {
+    const char *function_name;
+    const char *magic_method_name;
+} scoutapm_instrumented_function;
+
 #define ADD_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH(function_name)                                             \
     zend_try {                                                                                                \
-        add_function_to_instrumentation(function_name);                                                       \
+        add_function_to_instrumentation(function_name, NULL);                                                 \
+    } zend_catch {                                                                                            \
+        php_printf("ScoutAPM tried instrumenting '%s' - increase MAX_INSTRUMENTED_FUNCTIONS", function_name); \
+        return FAILURE;                                                                                       \
+    } zend_end_try()
+
+/**
+ * NOTE: magic method definitions are ONLY needed for Observer API instrumentation. The execute_data in zend_execte_ex
+ * gives us the "called" method name (e.g. "MyObj->myMethod" instead of "MyObj->__call") so you don't need to use this
+ * macro for defining methods in zend_execute_ex.
+ */
+#define ADD_MAGIC_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH(function_name, magic_method_function)                \
+    zend_try {                                                                                                \
+        add_function_to_instrumentation(function_name, magic_method_function);                                \
     } zend_catch {                                                                                            \
         php_printf("ScoutAPM tried instrumenting '%s' - increase MAX_INSTRUMENTED_FUNCTIONS", function_name); \
         return FAILURE;                                                                                       \

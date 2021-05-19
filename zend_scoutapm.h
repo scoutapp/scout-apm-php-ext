@@ -42,7 +42,7 @@ ZEND_BEGIN_MODULE_GLOBALS(scoutapm)
     scoutapm_stack_frame *observed_stack_frames;
     zend_long disconnected_call_argument_store_count;
     scoutapm_disconnected_call_argument_store *disconnected_call_argument_store;
-    char *instrumented_function_names[MAX_INSTRUMENTED_FUNCTIONS];
+    scoutapm_instrumented_function instrumented_function_names[MAX_INSTRUMENTED_FUNCTIONS];
     int num_instrumented_functions;
     int currently_instrumenting;
 #if SCOUTAPM_INSTRUMENT_USING_OBSERVER_API == 1

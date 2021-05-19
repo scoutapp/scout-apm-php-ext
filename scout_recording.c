@@ -8,23 +8,30 @@
 #include "zend_scoutapm.h"
 #include "scout_extern.h"
 
-void add_function_to_instrumentation(const char *function_name)
+void add_function_to_instrumentation(const char *function_name, const char *magic_method_name)
 {
     if (SCOUTAPM_G(num_instrumented_functions) >= MAX_INSTRUMENTED_FUNCTIONS) {
         zend_throw_exception_ex(NULL, 0, "Unable to add instrumentation for function '%s' - MAX_INSTRUMENTED_FUNCTIONS of %d reached", function_name, MAX_INSTRUMENTED_FUNCTIONS);
         return;
     }
 
-    SCOUTAPM_G(instrumented_function_names)[SCOUTAPM_G(num_instrumented_functions)] = strdup(function_name);
+    SCOUTAPM_G(instrumented_function_names)[SCOUTAPM_G(num_instrumented_functions)].function_name = strdup(function_name);
+    if (magic_method_name != NULL) {
+        SCOUTAPM_G(instrumented_function_names)[SCOUTAPM_G(num_instrumented_functions)].magic_method_name = strdup(magic_method_name);
+    }
     SCOUTAPM_G(num_instrumented_functions)++;
 }
 
-int should_be_instrumented(const char *function_name)
+int should_be_instrumented(const char *function_name, const char *magic_method_name)
 {
     int i = 0;
     for (; i < SCOUTAPM_G(num_instrumented_functions); i++) {
-        if (strcasecmp(function_name, SCOUTAPM_G(instrumented_function_names)[i]) == 0) {
-            return 1;
+        if (strcasecmp(function_name, SCOUTAPM_G(instrumented_function_names)[i].function_name) == 0) {
+            if (magic_method_name == NULL
+                || strcasecmp(magic_method_name, SCOUTAPM_G(instrumented_function_names)[i].magic_method_name) == 0
+            ) {
+                    return 1;
+            }
         }
     }
     return 0;

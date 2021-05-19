@@ -70,7 +70,7 @@ void scoutapm_execute_internal(zend_execute_data *execute_data, zval *return_val
 
     function_name = determine_function_name(execute_data);
 
-    if (should_be_instrumented(function_name) == 0 || SCOUTAPM_G(currently_instrumenting) == 1) {
+    if (should_be_instrumented(function_name, NULL) == 0 || SCOUTAPM_G(currently_instrumenting) == 1) {
         if (original_zend_execute_internal) {
             original_zend_execute_internal(execute_data, return_value);
         } else {
@@ -109,7 +109,7 @@ void scoutapm_execute_ex(zend_execute_data *execute_data)
 
     function_name = determine_function_name(execute_data);
 
-    if (should_be_instrumented(function_name) == 0 || SCOUTAPM_G(currently_instrumenting) == 1) {
+    if (should_be_instrumented(function_name, NULL) == 0 || SCOUTAPM_G(currently_instrumenting) == 1) {
         original_zend_execute_ex(execute_data);
         return;
     }

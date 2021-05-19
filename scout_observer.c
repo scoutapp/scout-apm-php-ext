@@ -12,7 +12,14 @@
 int setup_functions_for_observer_api()
 {
 #if SCOUTAPM_INSTRUMENT_USING_OBSERVER_API == 1
-    ADD_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Predis\\Client->__call");
+    ADD_MAGIC_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Predis\\Client->__call", "get");
+    ADD_MAGIC_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Predis\\Client->__call", "set");
+    ADD_MAGIC_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Predis\\Client->__call", "del");
+    ADD_MAGIC_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Predis\\Client->__call", "append");
+    ADD_MAGIC_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Predis\\Client->__call", "incr");
+    ADD_MAGIC_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Predis\\Client->__call", "decr");
+    ADD_MAGIC_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Predis\\Client->__call", "incrBy");
+    ADD_MAGIC_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Predis\\Client->__call", "decrBy");
 #endif
 
     return SUCCESS;
@@ -79,7 +86,8 @@ zend_observer_fcall_handlers scout_observer_api_register(zend_execute_data *exec
 
     function_name = determine_function_name(execute_data);
 
-    if (should_be_instrumented(function_name) == 0) {
+    // Can only resolve magic method name at call-time with Observer API, so pass NULL for the magic method name
+    if (should_be_instrumented(function_name, NULL) == 0) {
         return handlers;
     }
 
