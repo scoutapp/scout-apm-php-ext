@@ -16,6 +16,7 @@ static PHP_MSHUTDOWN_FUNCTION(scoutapm);
 static int zend_scoutapm_startup(zend_extension*);
 
 extern void allocate_stack_frames_for_request();
+extern void free_instrumented_function_names_list();
 extern void free_observed_stack_frames();
 extern void free_recorded_call_arguments();
 extern int setup_recording_for_internal_handlers();
@@ -167,6 +168,7 @@ static PHP_RINIT_FUNCTION(scoutapm)
  */
 static PHP_RSHUTDOWN_FUNCTION(scoutapm)
 {
+    free_instrumented_function_names_list();
     free_observed_stack_frames();
     free_recorded_call_arguments();
 

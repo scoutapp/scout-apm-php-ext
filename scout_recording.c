@@ -50,6 +50,19 @@ void allocate_stack_frames_for_request()
     SCOUTAPM_G(num_instrumented_functions) = 0;
 }
 
+void free_instrumented_function_names_list()
+{
+    int i;
+
+    for (i = 0; i < SCOUTAPM_G(num_instrumented_functions); i++) {
+        if (SCOUTAPM_G(instrumented_function_names)[i].magic_method_name != NULL) {
+            free((void *) SCOUTAPM_G(instrumented_function_names)[i].magic_method_name);
+        }
+        free((void*) SCOUTAPM_G(instrumented_function_names)[i].function_name);
+    }
+    SCOUTAPM_G(num_instrumented_functions) = 0;
+}
+
 void free_observed_stack_frames()
 {
     int i, j;

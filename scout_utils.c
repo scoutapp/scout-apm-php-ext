@@ -198,6 +198,7 @@ const char *scout_str_replace(const char *search, const char *replace, const cha
 {
     zval args[3];
     zval retval, func;
+    const char *replaced_string;
 
     ZVAL_STRING(&func, "str_replace");
 
@@ -212,5 +213,13 @@ const char *scout_str_replace(const char *search, const char *replace, const cha
         return subject;
     }
 
-    return Z_STRVAL(retval);
+    replaced_string = strdup(Z_STRVAL(retval));
+
+    zval_ptr_dtor(&args[0]);
+    zval_ptr_dtor(&args[1]);
+    zval_ptr_dtor(&args[2]);
+    zval_ptr_dtor(&func);
+    zval_ptr_dtor(&retval);
+
+    return replaced_string;
 }
