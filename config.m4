@@ -82,8 +82,19 @@ if test "$PHP_SCOUTAPM" != "no"; then
 
   PHP_SCOUTAPM_CFLAGS="-DZEND_ENABLE_STATIC_TSRMLS_CACHE=1 $STD_CFLAGS $MAINTAINER_CFLAGS"
 
-  PHP_NEW_EXTENSION(scoutapm, zend_scoutapm.c scout_functions.c scout_recording.c scout_utils.c scout_curl_wrapper.c scout_file_wrapper.c scout_pdo_wrapper.c,
-        $ext_shared,,$PHP_SCOUTAPM_CFLAGS,,yes)
+  PHP_NEW_EXTENSION(
+    scoutapm,
+    zend_scoutapm.c \
+    scout_observer.c \
+    scout_execute_ex.c \
+    scout_internal_handlers.c \
+    scout_recording.c \
+    scout_functions.c \
+    scout_utils.c \
+    scout_curl_wrapper.c \
+    scout_file_wrapper.c \
+    scout_pdo_wrapper.c,
+    $ext_shared,,$PHP_SCOUTAPM_CFLAGS,,yes)
 fi
 
 AC_CONFIG_COMMANDS_POST([

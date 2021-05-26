@@ -44,14 +44,20 @@
     <contents>
         <dir name="/">
             <file name="config.m4" role="src" />
-            <file name="zend_scoutapm.c" role="src" />
-            <file name="scout_utils.c" role="src" />
-            <file name="scout_functions.c" role="src" />
-            <file name="scout_recording.c" role="src" />
             <file name="scout_curl_wrapper.c" role="src" />
-            <file name="scout_file_wrapper.c" role="src" />
-            <file name="scout_pdo_wrapper.c" role="src" />
+            <file name="scout_execute_ex.c" role="src" />
+            <file name="scout_execute_ex.h" role="src" />
             <file name="scout_extern.h" role="src" />
+            <file name="scout_file_wrapper.c" role="src" />
+            <file name="scout_functions.c" role="src" />
+            <file name="scout_internal_handlers.c" role="src" />
+            <file name="scout_internal_handlers.h" role="src" />
+            <file name="scout_observer.c" role="src" />
+            <file name="scout_pdo_wrapper.c" role="src" />
+            <file name="scout_recording.c" role="src" />
+            <file name="scout_recording.h" role="src" />
+            <file name="scout_utils.c" role="src" />
+            <file name="zend_scoutapm.c" role="src" />
             <file name="zend_scoutapm.h" role="src" />
             <file name="README.md" role="doc" />
             <file name="LICENSE" role="doc" />

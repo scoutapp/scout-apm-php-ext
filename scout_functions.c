@@ -96,10 +96,22 @@ PHP_FUNCTION(scoutapm_list_instrumented_functions)
     }
 
     for(i = 0; i < SCOUTAPM_G(num_instrumented_functions); i++) {
+        if (SCOUTAPM_G(instrumented_function_names[i].magic_method_name) != NULL) {
+            add_next_index_string(
+                return_value,
+                scout_str_replace(
+                    "__call",
+                    SCOUTAPM_G(instrumented_function_names[i].magic_method_name),
+                    SCOUTAPM_G(instrumented_function_names[i].function_name)
+                )
+            );
+            continue;
+        }
+
         add_next_index_stringl(
             return_value,
-            SCOUTAPM_G(instrumented_function_names[i]),
-            strlen(SCOUTAPM_G(instrumented_function_names[i]))
+            SCOUTAPM_G(instrumented_function_names[i].function_name),
+            strlen(SCOUTAPM_G(instrumented_function_names[i].function_name))
         );
     }
 }
