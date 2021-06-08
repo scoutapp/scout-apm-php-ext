@@ -87,10 +87,18 @@ reference_retry_point:
             );
             break;
         case IS_OBJECT:
+#if PHP_MAJOR_VERSION == 7 && PHP_MINOR_VERSION == 1
+            /**
+             * Workaround for memory leak with the DYNAMIC_MALLOC_SPRINTF in PHP 7.1
+             * @link https://github.com/scoutapp/scout-apm-php-ext/issues/81
+             */
+            ret = (char*)"object";
+#else
             DYNAMIC_MALLOC_SPRINTF(ret, len,
                 "object(%s)",
                 ZSTR_VAL(Z_OBJ_HT_P(original_to_copy)->get_class_name(Z_OBJ_P(original_to_copy)))
             );
+#endif // PHP_MAJOR_VERSION == 7 && PHP_MINOR_VERSION == 1
             break;
         default:
             ret = (char*)"(unknown)";
