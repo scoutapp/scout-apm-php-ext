@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file, in reverse chronological order by release.
 
+## 1.3.0 - TBC
+
+### Added
+
+- [#77](https://github.com/scoutapp/scout-apm-php-ext/pull/77) Userland function recording for PHP 7 with zend_execute_ex
+- [#79](https://github.com/scoutapp/scout-apm-php-ext/pull/79) Userland function recording for PHP 8 with improved Zend Observer API
+- [#80](https://github.com/scoutapp/scout-apm-php-ext/pull/80) Added Predis library function instrumentation
+
+### Changed
+
+- [#78](https://github.com/scoutapp/scout-apm-php-ext/pull/78) Change CI from Circle to GitHub Actions
+
+### Deprecated
+
+- Nothing.
+
+### Removed
+
+- Nothing.
+
+### Fixed
+
+- Nothing.
+
 ## 1.2.2 - 2021-03-19
 
 ### Added
