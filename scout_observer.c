@@ -15,14 +15,26 @@
 int setup_functions_for_observer_api()
 {
 #if SCOUTAPM_INSTRUMENT_USING_OBSERVER_API == 1
-    ADD_MAGIC_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Predis\\Client->__call", "get");
-    ADD_MAGIC_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Predis\\Client->__call", "set");
-    ADD_MAGIC_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Predis\\Client->__call", "del");
     ADD_MAGIC_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Predis\\Client->__call", "append");
-    ADD_MAGIC_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Predis\\Client->__call", "incr");
     ADD_MAGIC_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Predis\\Client->__call", "decr");
-    ADD_MAGIC_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Predis\\Client->__call", "incrBy");
     ADD_MAGIC_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Predis\\Client->__call", "decrBy");
+    ADD_MAGIC_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Predis\\Client->__call", "get");
+    ADD_MAGIC_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Predis\\Client->__call", "getBit");
+    ADD_MAGIC_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Predis\\Client->__call", "getRange");
+    ADD_MAGIC_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Predis\\Client->__call", "getSet");
+    ADD_MAGIC_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Predis\\Client->__call", "incr");
+    ADD_MAGIC_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Predis\\Client->__call", "incrBy");
+    ADD_MAGIC_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Predis\\Client->__call", "mGet");
+    ADD_MAGIC_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Predis\\Client->__call", "mSet");
+    ADD_MAGIC_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Predis\\Client->__call", "mSetNx");
+    ADD_MAGIC_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Predis\\Client->__call", "set");
+    ADD_MAGIC_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Predis\\Client->__call", "setBit");
+    ADD_MAGIC_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Predis\\Client->__call", "setEx");
+    ADD_MAGIC_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Predis\\Client->__call", "pSetEx");
+    ADD_MAGIC_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Predis\\Client->__call", "setNx");
+    ADD_MAGIC_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Predis\\Client->__call", "setRange");
+    ADD_MAGIC_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Predis\\Client->__call", "strlen");
+    ADD_MAGIC_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Predis\\Client->__call", "del");
 #endif
 
     return SUCCESS;
