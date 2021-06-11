@@ -68,8 +68,12 @@ jobs:
           ./configure --enable-debug --with-openssl ${{ env.zts_flag}} ${{ matrix.php-options }}
           make -j$(nproc)
           sudo make install
-          echo '' | pecl install redis
           cd $GITHUB_WORKSPACE
+      - name: "Install redis extension"
+        run: |
+          sudo pear update-channels
+          sudo pecl update-channels
+          echo '' | sudo pecl install redis
       - name: "Base PHP configuration dump (information)"
         run: php -i
       - name: "Build scoutapm extension"
