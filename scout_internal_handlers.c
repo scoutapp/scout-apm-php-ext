@@ -32,11 +32,31 @@ indexed_handler_lookup handler_lookup[] = {
     { 8, "pdo->query"},
     { 9, "pdo->prepare"},
     {10, "pdostatement->execute"},
+    {11, "redis->append"},
+    {12, "redis->decr"},
+    {13, "redis->decrby"},
+    {14, "redis->get"},
+    {15, "redis->getbit"},
+    {16, "redis->getrange"},
+    {17, "redis->getset"},
+    {18, "redis->incr"},
+    {19, "redis->incrby"},
+    {20, "redis->mget"},
+    {21, "redis->mset"},
+    {22, "redis->msetnx"},
+    {23, "redis->set"},
+    {24, "redis->setbit"},
+    {25, "redis->setex"},
+    {26, "redis->psetex"},
+    {27, "redis->setnx"},
+    {28, "redis->setrange"},
+    {29, "redis->strlen"},
+    {30, "redis->del"},
 };
 const int handler_lookup_size = sizeof(handler_lookup);
 
 /* handlers count needs to be bigger than the number of handler_lookup entries */
-#define ORIGINAL_HANDLERS_TO_ALLOCATE 20
+#define ORIGINAL_HANDLERS_TO_ALLOCATE 40
 zif_handler original_handlers[ORIGINAL_HANDLERS_TO_ALLOCATE] = {NULL};
 
 int setup_recording_for_internal_handlers()
@@ -58,6 +78,27 @@ int setup_recording_for_internal_handlers()
     SCOUT_OVERLOAD_METHOD("pdo", "query", scoutapm_default_handler)
     SCOUT_OVERLOAD_METHOD("pdo", "prepare", scoutapm_pdo_prepare_handler)
     SCOUT_OVERLOAD_METHOD("pdostatement", "execute", scoutapm_pdostatement_execute_handler)
+
+    SCOUT_OVERLOAD_METHOD("redis", "append", scoutapm_default_handler)
+    SCOUT_OVERLOAD_METHOD("redis", "decr", scoutapm_default_handler)
+    SCOUT_OVERLOAD_METHOD("redis", "decrby", scoutapm_default_handler)
+    SCOUT_OVERLOAD_METHOD("redis", "get", scoutapm_default_handler)
+    SCOUT_OVERLOAD_METHOD("redis", "getbit", scoutapm_default_handler)
+    SCOUT_OVERLOAD_METHOD("redis", "getrange", scoutapm_default_handler)
+    SCOUT_OVERLOAD_METHOD("redis", "getset", scoutapm_default_handler)
+    SCOUT_OVERLOAD_METHOD("redis", "incr", scoutapm_default_handler)
+    SCOUT_OVERLOAD_METHOD("redis", "incrby", scoutapm_default_handler)
+    SCOUT_OVERLOAD_METHOD("redis", "mget", scoutapm_default_handler)
+    SCOUT_OVERLOAD_METHOD("redis", "mset", scoutapm_default_handler)
+    SCOUT_OVERLOAD_METHOD("redis", "msetnx", scoutapm_default_handler)
+    SCOUT_OVERLOAD_METHOD("redis", "set", scoutapm_default_handler)
+    SCOUT_OVERLOAD_METHOD("redis", "setbit", scoutapm_default_handler)
+    SCOUT_OVERLOAD_METHOD("redis", "setex", scoutapm_default_handler)
+    SCOUT_OVERLOAD_METHOD("redis", "psetex", scoutapm_default_handler)
+    SCOUT_OVERLOAD_METHOD("redis", "setnx", scoutapm_default_handler)
+    SCOUT_OVERLOAD_METHOD("redis", "setrange", scoutapm_default_handler)
+    SCOUT_OVERLOAD_METHOD("redis", "strlen", scoutapm_default_handler)
+    SCOUT_OVERLOAD_METHOD("redis", "del", scoutapm_default_handler)
 
     return SUCCESS;
 }
