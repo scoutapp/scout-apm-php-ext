@@ -3,13 +3,13 @@ PHP Redis C extension functions are instrumented
 --SKIPIF--
 <?php
 if (!extension_loaded("scoutapm")) die("skip scoutapm extension required.");
-if (!extension_loaded("redis")) die("skip redis extension required."); ?>
+if (!extension_loaded("redis")) die("skip redis extension required.");
 
 if (!getenv('CI')) {
     // Check Redis is running & can connect to it
     // Run with: docker run --rm --name redis -p 6379:6379 -d redis
     $client = new Redis();
-    if (!$client->connect('127.0.0.1', 6379);
+    if (!$client->connect('127.0.0.1', 6379)) {
       die("skip Could not connect to Redis - is it running?");
     }
 }
