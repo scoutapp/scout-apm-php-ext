@@ -3,6 +3,7 @@ Elasticsearch userland functions are supported
 --SKIPIF--
 <?php
 if (!extension_loaded("scoutapm")) die("skip scoutapm extension required.");
+if (!extension_loaded("curl")) die("skip Elasticsearch needs the curl extension.");
 if (shell_exec("which composer") === null) die("skip composer not found in path.");
 
 $out = null;
