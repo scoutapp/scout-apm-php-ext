@@ -52,13 +52,39 @@ indexed_handler_lookup handler_lookup[] = {
     {28, "redis->setrange"},
     {29, "redis->strlen"},
     {30, "redis->del"},
-    {31, "memcached->get"},
-    {32, "memcached->set"},
+    {31, "memcached->add"},
+    {32, "memcached->addbykey"},
+    {33, "memcached->append"},
+    {34, "memcached->appendbykey"},
+    {35, "memcached->cas"},
+    {36, "memcached->casbykey"},
+    {37, "memcached->decrement"},
+    {38, "memcached->decrementbykey"},
+    {39, "memcached->delete"},
+    {40, "memcached->deletebykey"},
+    {41, "memcached->deletemulti"},
+    {42, "memcached->deletemultibykey"},
+    {43, "memcached->flush"},
+    {44, "memcached->get"},
+    {45, "memcached->getallkeys"},
+    {46, "memcached->getbykey"},
+    {47, "memcached->getmulti"},
+    {48, "memcached->getmultibykey"},
+    {49, "memcached->increment"},
+    {50, "memcached->incrementbykey"},
+    {51, "memcached->prepend"},
+    {52, "memcached->prependbykey"},
+    {53, "memcached->replace"},
+    {54, "memcached->replacebykey"},
+    {55, "memcached->set"},
+    {56, "memcached->setbykey"},
+    {57, "memcached->setmulti"},
+    {58, "memcached->setmultibykey"},
 };
 const int handler_lookup_size = sizeof(handler_lookup);
 
 /* handlers count needs to be bigger than the number of handler_lookup entries */
-#define ORIGINAL_HANDLERS_TO_ALLOCATE 40
+#define ORIGINAL_HANDLERS_TO_ALLOCATE 60
 zif_handler original_handlers[ORIGINAL_HANDLERS_TO_ALLOCATE] = {NULL};
 
 int setup_recording_for_internal_handlers()
@@ -102,8 +128,34 @@ int setup_recording_for_internal_handlers()
     SCOUT_OVERLOAD_METHOD("redis", "strlen", scoutapm_default_handler)
     SCOUT_OVERLOAD_METHOD("redis", "del", scoutapm_default_handler)
 
+    SCOUT_OVERLOAD_METHOD("memcached", "add", scoutapm_default_handler)
+    SCOUT_OVERLOAD_METHOD("memcached", "addbykey", scoutapm_default_handler)
+    SCOUT_OVERLOAD_METHOD("memcached", "append", scoutapm_default_handler)
+    SCOUT_OVERLOAD_METHOD("memcached", "appendbykey", scoutapm_default_handler)
+    SCOUT_OVERLOAD_METHOD("memcached", "cas", scoutapm_default_handler)
+    SCOUT_OVERLOAD_METHOD("memcached", "casbykey", scoutapm_default_handler)
+    SCOUT_OVERLOAD_METHOD("memcached", "decrement", scoutapm_default_handler)
+    SCOUT_OVERLOAD_METHOD("memcached", "decrementbykey", scoutapm_default_handler)
+    SCOUT_OVERLOAD_METHOD("memcached", "delete", scoutapm_default_handler)
+    SCOUT_OVERLOAD_METHOD("memcached", "deletebykey", scoutapm_default_handler)
+    SCOUT_OVERLOAD_METHOD("memcached", "deletemulti", scoutapm_default_handler)
+    SCOUT_OVERLOAD_METHOD("memcached", "deletemultibykey", scoutapm_default_handler)
+    SCOUT_OVERLOAD_METHOD("memcached", "flush", scoutapm_default_handler)
     SCOUT_OVERLOAD_METHOD("memcached", "get", scoutapm_default_handler)
+    SCOUT_OVERLOAD_METHOD("memcached", "getallkeys", scoutapm_default_handler)
+    SCOUT_OVERLOAD_METHOD("memcached", "getbykey", scoutapm_default_handler)
+    SCOUT_OVERLOAD_METHOD("memcached", "getmulti", scoutapm_default_handler)
+    SCOUT_OVERLOAD_METHOD("memcached", "getmultibykey", scoutapm_default_handler)
+    SCOUT_OVERLOAD_METHOD("memcached", "increment", scoutapm_default_handler)
+    SCOUT_OVERLOAD_METHOD("memcached", "incrementbykey", scoutapm_default_handler)
+    SCOUT_OVERLOAD_METHOD("memcached", "prepend", scoutapm_default_handler)
+    SCOUT_OVERLOAD_METHOD("memcached", "prependbykey", scoutapm_default_handler)
+    SCOUT_OVERLOAD_METHOD("memcached", "replace", scoutapm_default_handler)
+    SCOUT_OVERLOAD_METHOD("memcached", "replacebykey", scoutapm_default_handler)
     SCOUT_OVERLOAD_METHOD("memcached", "set", scoutapm_default_handler)
+    SCOUT_OVERLOAD_METHOD("memcached", "setbykey", scoutapm_default_handler)
+    SCOUT_OVERLOAD_METHOD("memcached", "setmulti", scoutapm_default_handler)
+    SCOUT_OVERLOAD_METHOD("memcached", "setmultibykey", scoutapm_default_handler)
 
     return SUCCESS;
 }
