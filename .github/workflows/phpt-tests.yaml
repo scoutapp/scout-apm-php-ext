@@ -73,11 +73,16 @@ jobs:
           make -j$(nproc)
           sudo make install
           cd $GITHUB_WORKSPACE
-      - name: "Install required extensions"
+      - name: "Update PEAR/PECL channels"
         run: |
           sudo pear update-channels
           sudo pecl update-channels
+      - name: "Install Redis extension"
+        run: |
           echo '' | sudo pecl install redis
+      - name: "Install Memcached extension"
+        run: |
+          sudo apt-get install libmemcached-dev
           echo '' | sudo pecl install memcached
       - name: "Base PHP configuration dump (information)"
         run: php -i
