@@ -69,6 +69,13 @@ jobs:
           make -j$(nproc)
           sudo make install
           cd $GITHUB_WORKSPACE
+      - name: "Install redis extension"
+        run: |
+          sudo pear update-channels
+          sudo pecl update-channels
+          echo '' | sudo pecl install redis
+      - name: "Base PHP configuration dump (information)"
+        run: php -i
       - name: "Build scoutapm extension"
         run: |
           phpize
@@ -76,7 +83,7 @@ jobs:
           make
       - name: "Run the tests"
         run: |
-          php run-tests.php -p `which php` -d zend_extension=`pwd`/modules/scoutapm.so -g "FAIL,XFAIL,BORK,WARN,LEAK,SKIP" --offline --show-diff --set-timeout 120 -q
+          php run-tests.php -p `which php` -d zend_extension=`pwd`/modules/scoutapm.so -d extension=redis.so -g "FAIL,XFAIL,BORK,WARN,LEAK,SKIP" --offline --show-diff --set-timeout 120 -q
       - name: "Run the benchmark"
         run: |
           sudo apt update && sudo apt install time
