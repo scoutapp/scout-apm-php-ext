@@ -35,6 +35,10 @@ int setup_functions_for_observer_api()
     ADD_MAGIC_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Predis\\Client->__call", "setRange");
     ADD_MAGIC_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Predis\\Client->__call", "strlen");
     ADD_MAGIC_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Predis\\Client->__call", "del");
+    ADD_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Elasticsearch\\Client->index");
+    ADD_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Elasticsearch\\Client->get");
+    ADD_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Elasticsearch\\Client->search");
+    ADD_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Elasticsearch\\Client->delete");
 #endif
 
     return SUCCESS;

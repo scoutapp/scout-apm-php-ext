@@ -38,6 +38,10 @@ int setup_functions_for_zend_execute_ex()
     ADD_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Predis\\Client->setRange");
     ADD_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Predis\\Client->strlen");
     ADD_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Predis\\Client->del");
+    ADD_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Elasticsearch\\Client->index");
+    ADD_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Elasticsearch\\Client->get");
+    ADD_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Elasticsearch\\Client->search");
+    ADD_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Elasticsearch\\Client->delete");
 #endif
 
     return SUCCESS;
