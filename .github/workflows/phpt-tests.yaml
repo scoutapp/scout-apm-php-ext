@@ -10,6 +10,10 @@ jobs:
   phpt-test:
     name: "PHPT Tests"
     services:
+      memcached:
+        image: memcached
+        ports:
+          - 11211:11211
       redis:
         image: redis
         options: >-
@@ -69,11 +73,12 @@ jobs:
           make -j$(nproc)
           sudo make install
           cd $GITHUB_WORKSPACE
-      - name: "Install redis extension"
+      - name: "Install required extensions"
         run: |
           sudo pear update-channels
           sudo pecl update-channels
           echo '' | sudo pecl install redis
+          echo '' | sudo pecl install memcached
       - name: "Base PHP configuration dump (information)"
         run: php -i
       - name: "Build scoutapm extension"
@@ -83,7 +88,7 @@ jobs:
           make
       - name: "Run the tests"
         run: |
-          php run-tests.php -p `which php` -d zend_extension=`pwd`/modules/scoutapm.so -d extension=redis.so -g "FAIL,XFAIL,BORK,WARN,LEAK,SKIP" --offline --show-diff --set-timeout 120 -q
+          php run-tests.php -p `which php` -d zend_extension=`pwd`/modules/scoutapm.so -d extension=memcached.so -d extension=redis.so -g "FAIL,XFAIL,BORK,WARN,LEAK,SKIP" --offline --show-diff --set-timeout 120 -q
       - name: "Run the benchmark"
         run: |
           sudo apt update && sudo apt install time
