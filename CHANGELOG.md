@@ -9,6 +9,8 @@ All notable changes to this project will be documented in this file, in reverse 
 - [#77](https://github.com/scoutapp/scout-apm-php-ext/pull/77) Userland function recording for PHP 7 with zend_execute_ex
 - [#79](https://github.com/scoutapp/scout-apm-php-ext/pull/79) Userland function recording for PHP 8 with improved Zend Observer API
 - [#80](https://github.com/scoutapp/scout-apm-php-ext/pull/80) Added Predis library function instrumentation
+- [#82](https://github.com/scoutapp/scout-apm-php-ext/pull/82) Add support for phpredis Redis extension instrumentation
+- [#84](https://github.com/scoutapp/scout-apm-php-ext/pull/84) Add instrumentation for Memcached
 
 ### Changed
 
@@ -24,7 +26,7 @@ All notable changes to this project will be documented in this file, in reverse 
 
 ### Fixed
 
-- Nothing.
+- [#83](https://github.com/scoutapp/scout-apm-php-ext/pull/83) Fix SKIP block for phpredis test
 
 ## 1.2.2 - 2021-03-19
 
