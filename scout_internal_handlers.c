@@ -52,6 +52,8 @@ indexed_handler_lookup handler_lookup[] = {
     {28, "redis->setrange"},
     {29, "redis->strlen"},
     {30, "redis->del"},
+    {31, "memcached->get"},
+    {32, "memcached->set"},
 };
 const int handler_lookup_size = sizeof(handler_lookup);
 
@@ -99,6 +101,9 @@ int setup_recording_for_internal_handlers()
     SCOUT_OVERLOAD_METHOD("redis", "setrange", scoutapm_default_handler)
     SCOUT_OVERLOAD_METHOD("redis", "strlen", scoutapm_default_handler)
     SCOUT_OVERLOAD_METHOD("redis", "del", scoutapm_default_handler)
+
+    SCOUT_OVERLOAD_METHOD("memcached", "get", scoutapm_default_handler)
+    SCOUT_OVERLOAD_METHOD("memcached", "set", scoutapm_default_handler)
 
     return SUCCESS;
 }
