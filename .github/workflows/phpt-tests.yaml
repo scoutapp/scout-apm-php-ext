@@ -10,6 +10,12 @@ jobs:
   phpt-test:
     name: "PHPT Tests"
     services:
+      elasticsearch:
+        image: elasticsearch:7.13.1
+        env:
+          discovery.type: single-node
+        ports:
+          - 9200:9200
       memcached:
         image: memcached
         ports:
