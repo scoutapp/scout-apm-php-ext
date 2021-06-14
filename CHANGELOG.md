@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file, in reverse 
 - [#80](https://github.com/scoutapp/scout-apm-php-ext/pull/80) Added Predis library function instrumentation
 - [#82](https://github.com/scoutapp/scout-apm-php-ext/pull/82) Add support for phpredis Redis extension instrumentation
 - [#84](https://github.com/scoutapp/scout-apm-php-ext/pull/84) Add instrumentation for Memcached
+- [#85](https://github.com/scoutapp/scout-apm-php-ext/pull/85) Add instrumentation for Elasticsearch PHP library
 
 ### Changed
 
