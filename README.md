@@ -7,16 +7,15 @@ functions that can't be done in regular PHP. The `scout-apm-php`
 package detects if the `scoutapm` extension is loaded and will
 automatically send this data if available.
 
-Functions currently instrumented are:
+This extension allows instrumentation of:
 
- * `file_get_contents`
- * `file_put_contents`
- * `curl_exec`
- * `fread`
- * `fwrite`
- * `PDO->exec`
- * `PDO->query`
- * `PDOStatement->execute`
+ * Core functions: `file_get_contents`, `file_put_contents`, `fread`, `fwrite`
+ * Curl functions: `curl_exec`
+ * PDO methods: `PDO->exec`, `PDO->query`, `PDOStatement->execute`
+ * Predis PHP library methods
+ * phpredis PHP extension methods
+ * Memcached PHP extension methods
+ * Elasticsearch PHP library methods
 
 If you would like another function instrumented, please let us know on
 [our issues](https://github.com/scoutapp/scout-apm-php-ext/issues).
