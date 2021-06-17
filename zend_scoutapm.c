@@ -31,10 +31,15 @@ ZEND_DECLARE_MODULE_GLOBALS(scoutapm)
 ZEND_BEGIN_ARG_INFO_EX(no_arguments, 0, 0, 0)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(scoutapm_enable_instrumentation, 0, 0, 1)
+    ZEND_ARG_TYPE_INFO(0, enable, _IS_BOOL, 0)
+ZEND_END_ARG_INFO()
+
 /* a PHP module defines what functions it exports */
 static const zend_function_entry scoutapm_functions[] = {
     PHP_FE(scoutapm_get_calls, no_arguments)
     PHP_FE(scoutapm_list_instrumented_functions, no_arguments)
+    PHP_FE(scoutapm_enable_instrumentation, scoutapm_enable_instrumentation)
     PHP_FE_END
 };
 

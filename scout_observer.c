@@ -48,7 +48,7 @@ int setup_functions_for_observer_api()
 
 static void scout_observer_begin(zend_execute_data *execute_data)
 {
-    if (SCOUTAPM_G(currently_instrumenting)) {
+    if (SCOUTAPM_G(all_instrumentation_enabled) != 1 || SCOUTAPM_G(currently_instrumenting)) {
         return;
     }
 
@@ -63,8 +63,10 @@ static void scout_observer_end(zend_execute_data *execute_data, zval *return_val
     int argc;
     zval *argv = NULL;
 
-    if (SCOUTAPM_G(currently_instrumenting) != 1
-        || SCOUTAPM_G(observer_api_start_time) <= 0) {
+    if (SCOUTAPM_G(all_instrumentation_enabled) != 1
+        || SCOUTAPM_G(currently_instrumenting) != 1
+        || SCOUTAPM_G(observer_api_start_time) <= 0
+    ) {
         return; // Possibly a weird situation? Not sure how we could get into this state
     }
 

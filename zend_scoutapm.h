@@ -32,11 +32,13 @@
 #define SCOUTAPM_INSTRUMENT_USING_OBSERVER_API 0
 #endif
 
+PHP_FUNCTION(scoutapm_enable_instrumentation);
 PHP_FUNCTION(scoutapm_get_calls);
 PHP_FUNCTION(scoutapm_list_instrumented_functions);
 
 /* These are the "module globals". In non-ZTS mode, they're just regular variables, but means in ZTS mode they get handled properly */
 ZEND_BEGIN_MODULE_GLOBALS(scoutapm)
+    zend_bool all_instrumentation_enabled;
     zend_bool handlers_set;
     zend_long observed_stack_frames_count;
     scoutapm_stack_frame *observed_stack_frames;
