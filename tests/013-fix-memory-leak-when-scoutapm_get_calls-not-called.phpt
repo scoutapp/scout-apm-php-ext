@@ -5,6 +5,7 @@ When calls to functions are recorded, and scoutapm_get_calls is not called, don'
 <?php if (!defined("PHP_DEBUG") || PHP_DEBUG != 1) die("skip Recompile PHP with --enable-debug."); ?>
 --FILE--
 <?php
+scoutapm_enable_instrumentation(true);
 file_put_contents(__FILE__ . ".x", file_get_contents(__FILE__));
 unlink(__FILE__ . ".x");
 echo "end";

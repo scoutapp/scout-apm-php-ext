@@ -8,6 +8,7 @@ Calls to PDO::exec are logged
 <?php
 
 var_dump(in_array('pdo->exec', scoutapm_list_instrumented_functions()));
+scoutapm_enable_instrumentation(true);
 
 $dbh = new PDO('sqlite::memory:');
 $dbh->exec("CREATE TABLE foo (col INT PRIMARY KEY)");

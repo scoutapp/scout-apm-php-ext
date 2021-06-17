@@ -50,6 +50,7 @@ echo implode("\n", array_intersect(
     ],
     scoutapm_list_instrumented_functions()
 )) . "\n";
+scoutapm_enable_instrumentation(true);
 
 $m = new Memcached();
 $m->addServer('localhost', 11211);

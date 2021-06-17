@@ -4,6 +4,8 @@ Bug https://github.com/scoutapp/scout-apm-php-ext/issues/47 - fix segfault when 
 <?php if (!extension_loaded("scoutapm")) die("skip scoutapm extension required."); ?>
 --FILE--
 <?php
+scoutapm_enable_instrumentation(true);
+
 $f1 = fopen(tempnam(sys_get_temp_dir(), 'scoutapm-test'), 'w+');
 $f2 = tmpfile();
 

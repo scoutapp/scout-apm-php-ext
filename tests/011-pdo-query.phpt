@@ -8,6 +8,7 @@ Calls to PDO::query are logged
 <?php
 
 var_dump(in_array('pdo->query', scoutapm_list_instrumented_functions()));
+scoutapm_enable_instrumentation(true);
 
 $dbh = new PDO('sqlite::memory:');
 $stmt = $dbh->query("SELECT 1 + 2");

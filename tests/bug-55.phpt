@@ -6,6 +6,7 @@ Bug https://github.com/scoutapp/scout-apm-php-ext/issues/55 - don't crash when u
 <?php if (!extension_loaded("pdo_sqlite")) die("skip pdo_sqlite extension required."); ?>
 --FILE--
 <?php
+scoutapm_enable_instrumentation(true);
 
 class MyOwnPDO extends PDO {}
 

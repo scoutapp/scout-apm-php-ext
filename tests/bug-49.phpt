@@ -4,6 +4,8 @@ Bug https://github.com/scoutapp/scout-apm-php-ext/issues/49 - only record argume
 <?php if (!extension_loaded("scoutapm")) die("skip scoutapm extension required."); ?>
 --FILE--
 <?php
+scoutapm_enable_instrumentation(true);
+
 // Note, in PHP 8 the warning changed from "failed to open stream" to "Failed to open stream" hence the %c
 var_dump(fopen('/this/file/should/not/exist', 'r'));
 

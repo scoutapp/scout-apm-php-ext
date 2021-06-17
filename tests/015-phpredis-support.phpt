@@ -44,6 +44,7 @@ echo implode("\n", array_intersect(
     ],
     scoutapm_list_instrumented_functions()
 )) . "\n";
+scoutapm_enable_instrumentation(true);
 
 $client = new Redis();
 $client->connect('127.0.0.1', 6379);

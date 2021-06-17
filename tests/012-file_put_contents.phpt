@@ -6,6 +6,7 @@ Calls to file_put_contents are logged
 <?php
 
 var_dump(in_array('file_put_contents', scoutapm_list_instrumented_functions()));
+scoutapm_enable_instrumentation(true);
 
 $file = tempnam(sys_get_temp_dir(), 'scout-apm-php-ext-test');
 file_put_contents($file, 'test content');
