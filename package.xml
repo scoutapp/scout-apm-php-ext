@@ -25,11 +25,11 @@
     </lead>
 
     <!-- Current Release -->
-    <date>2021-03-19</date>
-    <time>12:15:00</time>
+    <date>2021-06-17</date>
+    <time>09:00:00</time>
     <version>
-        <release>1.2.2</release>
-        <api>1.2.2</api>
+        <release>1.3.0</release>
+        <api>1.3.0</api>
     </version>
     <stability>
         <release>stable</release>
@@ -37,7 +37,14 @@
     </stability>
     <license uri="https://opensource.org/licenses/MIT">MIT</license>
     <notes>
-        - Do not try to record arguments if PDO::prepare returns a non-object (#72)
+        - Userland function recording for PHP 7 with zend_execute_ex (#77)
+        - Userland function recording for PHP 8 with improved Zend Observer API (#79)
+        - Added Predis library function instrumentation (#80)
+        - Add support for phpredis Redis extension instrumentation (#82)
+        - Add instrumentation for Memcached (#84)
+        - Add instrumentation for Elasticsearch PHP library (#85)
+        - Change CI from Circle to GitHub Actions (#78)
+        - Fix SKIP block for phpredis test (#83)
     </notes>
     <!-- End Current Release -->
 
@@ -82,8 +89,13 @@
                 <file name="012-file_put_contents.phpt" role="test" />
                 <file name="013-fix-memory-leak-when-scoutapm_get_calls-not-called.phpt" role="test" />
                 <file name="014-predis-support.phpt" role="test" />
+                <file name="015-phpredis-support.phpt" role="test" />
+                <file name="016-memcached-support.phpt" role="test" />
+                <file name="017-elastic-support.phpt" role="test" />
                 <file name="bug-47.phpt" role="test" />
                 <file name="bug-49.phpt" role="test" />
+                <file name="bug-55.phpt" role="test" />
+                <file name="bug-71.phpt" role="test" />
             </dir>
         </dir>
     </contents>
@@ -103,6 +115,22 @@
     <zendextsrcrelease />
 
     <changelog>
+        <release>
+            <date>2021-03-19</date>
+            <time>12:15:00</time>
+            <version>
+                <release>1.2.2</release>
+                <api>1.2.2</api>
+            </version>
+            <stability>
+                <release>stable</release>
+                <api>stable</api>
+            </stability>
+            <license uri="https://opensource.org/licenses/MIT">MIT</license>
+            <notes>
+                - Do not try to record arguments if PDO::prepare returns a non-object (#72)
+            </notes>
+        </release>
         <release>
             <date>2021-02-05</date>
             <time>16:37:00</time>
