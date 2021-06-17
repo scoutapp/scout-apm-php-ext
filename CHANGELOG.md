@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file, in reverse chronological order by release.
 
+## 1.4.0 - 2021-06-17
+
+### Added
+
+- [#89](https://github.com/scoutapp/scout-apm-php-ext/pull/89) Added new function scoutapm_enable_instrumentation()
+   - NOTE: `scoutapm_enable_instrumentation(true)` must be explicitly called to enable instrumentation now
+
+### Changed
+
+- Nothing.
+
+### Deprecated
+
+- Nothing.
+
+### Removed
+
+- Nothing.
+
+### Fixed
+
+- Nothing.
+
 ## 1.3.0 - 2021-06-17
 
 ### Added
