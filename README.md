@@ -22,11 +22,14 @@ If you would like another function instrumented, please let us know on
 
 The following functions are exposed when the extension is enabled:
 
- * `scoutapm_get_calls() : array`
+ * `scoutapm_enable_instrumentation(bool $enabled): void`
+   - Enable or disable instrumentation by ScoutAPM at runtime. Instrumentation is disabled by default, so this must
+     be called with `$enabled` to `true`.
+ * `scoutapm_get_calls(): array`
    - Returns a list of any instrumented function calls since
      `scoutapm_get_calls()` was last called. The list is cleared each time the
      function is called.
- * `scoutapm_list_instrumented_functions()`
+ * `scoutapm_list_instrumented_functions(): array`
    - Returns a list of the functions the extension will instrument if called.
 
 ## Installing from PECL

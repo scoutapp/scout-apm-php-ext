@@ -75,7 +75,10 @@ void scoutapm_execute_internal(zend_execute_data *execute_data, zval *return_val
     int argc;
     zval *argv = NULL;
 
-    if (execute_data->func->common.function_name == NULL) {
+    if (SCOUTAPM_G(all_instrumentation_enabled) != 1
+        || SCOUTAPM_G(currently_instrumenting) == 1
+        || execute_data->func->common.function_name == NULL
+    ) {
         if (original_zend_execute_internal) {
             original_zend_execute_internal(execute_data, return_value);
         } else {
@@ -86,7 +89,7 @@ void scoutapm_execute_internal(zend_execute_data *execute_data, zval *return_val
 
     function_name = determine_function_name(execute_data);
 
-    if (should_be_instrumented(function_name, NULL) == 0 || SCOUTAPM_G(currently_instrumenting) == 1) {
+    if (should_be_instrumented(function_name, NULL) == 0) {
         if (original_zend_execute_internal) {
             original_zend_execute_internal(execute_data, return_value);
         } else {
@@ -118,14 +121,17 @@ void scoutapm_execute_ex(zend_execute_data *execute_data)
     int argc;
     zval *argv = NULL;
 
-    if (execute_data->func->common.function_name == NULL) {
+    if (SCOUTAPM_G(all_instrumentation_enabled) != 1
+        || SCOUTAPM_G(currently_instrumenting) == 1
+        || execute_data->func->common.function_name == NULL
+        ) {
         original_zend_execute_ex(execute_data);
         return;
     }
 
     function_name = determine_function_name(execute_data);
 
-    if (should_be_instrumented(function_name, NULL) == 0 || SCOUTAPM_G(currently_instrumenting) == 1) {
+    if (should_be_instrumented(function_name, NULL) == 0) {
         original_zend_execute_ex(execute_data);
         return;
     }

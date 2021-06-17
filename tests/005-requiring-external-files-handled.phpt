@@ -4,6 +4,7 @@ Requires to external files do not crash
 <?php if (!extension_loaded("scoutapm")) die("skip scoutapm extension required."); ?>
 --FILE--
 <?php
+scoutapm_enable_instrumentation(true);
 require 'external.inc';
 echo "End.\n";
 ?>

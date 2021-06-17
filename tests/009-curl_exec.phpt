@@ -7,6 +7,7 @@ Calls to curl_exec are logged
 <?php
 
 var_dump(in_array('curl_exec', scoutapm_list_instrumented_functions()));
+scoutapm_enable_instrumentation(true);
 
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL, "file://" . __FILE__);

@@ -26,10 +26,10 @@
 
     <!-- Current Release -->
     <date>2021-06-17</date>
-    <time>09:00:00</time>
+    <time>16:00:00</time>
     <version>
-        <release>1.3.0</release>
-        <api>1.3.0</api>
+        <release>1.4.0</release>
+        <api>1.4.0</api>
     </version>
     <stability>
         <release>stable</release>
@@ -37,14 +37,7 @@
     </stability>
     <license uri="https://opensource.org/licenses/MIT">MIT</license>
     <notes>
-        - Userland function recording for PHP 7 with zend_execute_ex (#77)
-        - Userland function recording for PHP 8 with improved Zend Observer API (#79)
-        - Added Predis library function instrumentation (#80)
-        - Add support for phpredis Redis extension instrumentation (#82)
-        - Add instrumentation for Memcached (#84)
-        - Add instrumentation for Elasticsearch PHP library (#85)
-        - Change CI from Circle to GitHub Actions (#78)
-        - Fix SKIP block for phpredis test (#83)
+        - Only instrument if specifically enabled with scoutapm_enable_instrumentation() (#89)
     </notes>
     <!-- End Current Release -->
 
@@ -92,6 +85,7 @@
                 <file name="015-phpredis-support.phpt" role="test" />
                 <file name="016-memcached-support.phpt" role="test" />
                 <file name="017-elastic-support.phpt" role="test" />
+                <file name="018-do-not-instrument-by-default.phpt" role="test" />
                 <file name="bug-47.phpt" role="test" />
                 <file name="bug-49.phpt" role="test" />
                 <file name="bug-55.phpt" role="test" />
@@ -115,6 +109,29 @@
     <zendextsrcrelease />
 
     <changelog>
+        <release>
+            <date>2021-06-17</date>
+            <time>09:00:00</time>
+            <version>
+                <release>1.3.0</release>
+                <api>1.3.0</api>
+            </version>
+            <stability>
+                <release>stable</release>
+                <api>stable</api>
+            </stability>
+            <license uri="https://opensource.org/licenses/MIT">MIT</license>
+            <notes>
+                - Userland function recording for PHP 7 with zend_execute_ex (#77)
+                - Userland function recording for PHP 8 with improved Zend Observer API (#79)
+                - Added Predis library function instrumentation (#80)
+                - Add support for phpredis Redis extension instrumentation (#82)
+                - Add instrumentation for Memcached (#84)
+                - Add instrumentation for Elasticsearch PHP library (#85)
+                - Change CI from Circle to GitHub Actions (#78)
+                - Fix SKIP block for phpredis test (#83)
+            </notes>
+        </release>
         <release>
             <date>2021-03-19</date>
             <time>12:15:00</time>

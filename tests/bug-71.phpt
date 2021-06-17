@@ -6,6 +6,8 @@ Bug https://github.com/scoutapp/scout-apm-php-ext/issues/71 - only record argume
 <?php if (!extension_loaded("pdo_sqlite")) die("skip pdo_sqlite extension required."); ?>
 --FILE--
 <?php
+scoutapm_enable_instrumentation(true);
+
 $dbh = new PDO('sqlite::memory:');
 $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
 $stmt = $dbh->prepare("SELECT nonexist FROM nonexist");

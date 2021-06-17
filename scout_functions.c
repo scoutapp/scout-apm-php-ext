@@ -81,6 +81,8 @@ PHP_FUNCTION(scoutapm_list_instrumented_functions)
 {
     int i, lookup_count = handler_lookup_size / sizeof(indexed_handler_lookup);
 
+    ZEND_PARSE_PARAMETERS_NONE();
+
     array_init(return_value);
 
     for(i = 0; i < lookup_count; i++) {
@@ -114,5 +116,19 @@ PHP_FUNCTION(scoutapm_list_instrumented_functions)
             strlen(SCOUTAPM_G(instrumented_function_names[i].function_name))
         );
     }
+}
+/* }}} */
+
+/* {{{ proto array scoutapm_list_instrumented_functions()
+   Fetch a list of functions that will be instrumented or monitored by the ScoutAPM extension. */
+PHP_FUNCTION(scoutapm_enable_instrumentation)
+{
+    zend_bool should_enable;
+
+    ZEND_PARSE_PARAMETERS_START(1, 1)
+        Z_PARAM_BOOL(should_enable)
+    ZEND_PARSE_PARAMETERS_END();
+
+    SCOUTAPM_G(all_instrumentation_enabled) = should_enable;
 }
 /* }}} */

@@ -106,6 +106,10 @@ void record_arguments_for_call(const char *call_reference, int argc, zval *argv)
 {
     zend_long i = 0;
 
+    if (SCOUTAPM_G(all_instrumentation_enabled) != 1) {
+        return;
+    }
+
     SCOUTAPM_G(disconnected_call_argument_store) = realloc(
         SCOUTAPM_G(disconnected_call_argument_store),
         (SCOUTAPM_G(disconnected_call_argument_store_count)+1) * sizeof(scoutapm_disconnected_call_argument_store)
@@ -153,6 +157,10 @@ zend_long find_index_for_recorded_arguments(const char *call_reference)
 void record_observed_stack_frame(const char *function_name, double microtime_entered, double microtime_exited, int argc, zval *argv)
 {
     int i;
+
+    if (SCOUTAPM_G(all_instrumentation_enabled) != 1) {
+        return;
+    }
 
     if (argc > 0) {
         SCOUTAPM_DEBUG_MESSAGE("Adding observed stack frame for %s (%s) ... ", function_name, Z_STRVAL(argv[0]));

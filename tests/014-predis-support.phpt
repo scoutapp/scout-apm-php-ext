@@ -54,6 +54,7 @@ echo implode("\n", array_intersect(
     ],
     scoutapm_list_instrumented_functions()
 )) . "\n";
+scoutapm_enable_instrumentation(true);
 
 require "/tmp/scout_predis_test/vendor/autoload.php";
 

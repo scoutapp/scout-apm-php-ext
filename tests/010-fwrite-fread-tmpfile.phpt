@@ -7,6 +7,7 @@ Calls to fwrite and fread are logged with handle from tmpfile()
 
 var_dump(in_array('fread', scoutapm_list_instrumented_functions()));
 var_dump(in_array('fwrite', scoutapm_list_instrumented_functions()));
+scoutapm_enable_instrumentation(true);
 
 $fh = tmpfile();
 

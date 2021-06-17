@@ -44,10 +44,11 @@ typedef struct _handler_lookup {
 
 #define SCOUT_INTERNAL_FUNCTION_PASSTHRU() original_handlers[handler_index_for_function(determine_function_name(execute_data))](INTERNAL_FUNCTION_PARAM_PASSTHRU)
 
-#define SCOUT_PASSTHRU_IF_ALREADY_INSTRUMENTING()   \
-    if (SCOUTAPM_G(currently_instrumenting) == 1) { \
-        SCOUT_INTERNAL_FUNCTION_PASSTHRU();         \
-        return;                                     \
+#define SCOUT_PASSTHRU_IF_ALREADY_INSTRUMENTING()      \
+    if (SCOUTAPM_G(all_instrumentation_enabled) != 1   \
+        || SCOUTAPM_G(currently_instrumenting) == 1) { \
+        SCOUT_INTERNAL_FUNCTION_PASSTHRU();            \
+        return;                                        \
     }
 
 #endif /* SCOUT_INTERNAL_HANDLERS_H */
