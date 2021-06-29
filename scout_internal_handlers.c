@@ -173,7 +173,7 @@ ZEND_NAMED_FUNCTION(scoutapm_default_handler)
     zval *argv = NULL;
     const char *called_function;
 
-    SCOUT_PASSTHRU_IF_ALREADY_INSTRUMENTING()
+    SCOUT_PASSTHRU_IF_ALREADY_INSTRUMENTING(called_function)
 
     /* note - no strdup needed as we copy it in record_observed_stack_frame */
     called_function = determine_function_name(execute_data);
@@ -187,6 +187,7 @@ ZEND_NAMED_FUNCTION(scoutapm_default_handler)
     original_handlers[handler_index](INTERNAL_FUNCTION_PARAM_PASSTHRU);
 
     record_observed_stack_frame(called_function, entered, scoutapm_microtime(), argc, argv);
+    free((void*) called_function);
 }
 
 int unchecked_handler_index_for_function(const char *function_to_lookup)

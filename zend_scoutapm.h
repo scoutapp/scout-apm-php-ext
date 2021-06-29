@@ -21,7 +21,7 @@
 #include "scout_execute_ex.h"
 
 #define PHP_SCOUTAPM_NAME "scoutapm"
-#define PHP_SCOUTAPM_VERSION "1.4.0"
+#define PHP_SCOUTAPM_VERSION "1.4.1"
 
 /* Extreme amounts of debugging, set to 1 to enable it and `make clean && make` (tests will fail...) */
 #define SCOUT_APM_EXT_DEBUGGING 0
@@ -76,7 +76,10 @@ typedef void (*zif_handler)(INTERNAL_FUNCTION_PARAMETERS);
 #define SCOUTAPM_DEBUG_MESSAGE(...) /**/
 #endif
 
-/* Shortcut defined to allow using a `char *` with snprintf - determine the size first, allocate, then snprintf */
+/*
+ * Shortcut defined to allow using a `char *` with snprintf - determine the size first, allocate, then snprintf
+ * NOTE: When using this macro, the destString must ALWAYS be freed!
+ */
 #define DYNAMIC_MALLOC_SPRINTF(destString, sizeNeeded, fmt, ...) \
     sizeNeeded = snprintf(NULL, 0, fmt, ##__VA_ARGS__) + 1; \
     destString = (char*)malloc(sizeNeeded); \

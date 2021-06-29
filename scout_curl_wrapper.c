@@ -19,12 +19,16 @@ ZEND_NAMED_FUNCTION(scoutapm_curl_setopt_handler)
 {
     zval *zid, *zvalue;
     zend_long options;
+    const char *passthru_function_name;
 
 #if PHP_MAJOR_VERSION >= 8
+    const char *class_instance_id;
     ASSIGN_CURL_HANDLE_CLASS_ENTRY
+#else
+    const char *resource_id;
 #endif
 
-    SCOUT_PASSTHRU_IF_ALREADY_INSTRUMENTING()
+    SCOUT_PASSTHRU_IF_ALREADY_INSTRUMENTING(passthru_function_name)
 
     ZEND_PARSE_PARAMETERS_START(3, 3)
 #if PHP_MAJOR_VERSION >= 8
@@ -38,13 +42,17 @@ ZEND_NAMED_FUNCTION(scoutapm_curl_setopt_handler)
 
     if (options == CURLOPT_URL) {
 #if PHP_MAJOR_VERSION >= 8
-        record_arguments_for_call(unique_class_instance_id(zid), 1, zvalue);
+        class_instance_id = unique_class_instance_id(zid);
+        record_arguments_for_call(class_instance_id, 1, zvalue);
+        free((void*) class_instance_id);
 #else
-        record_arguments_for_call(unique_resource_id(SCOUT_WRAPPER_TYPE_CURL, zid), 1, zvalue);
+        resource_id = unique_resource_id(SCOUT_WRAPPER_TYPE_CURL, zid);
+        record_arguments_for_call(resource_id, 1, zvalue);
+        free((void*) resource_id);
 #endif
     }
 
-    SCOUT_INTERNAL_FUNCTION_PASSTHRU();
+    SCOUT_INTERNAL_FUNCTION_PASSTHRU(passthru_function_name);
 }
 
 ZEND_NAMED_FUNCTION(scoutapm_curl_exec_handler)
@@ -56,10 +64,13 @@ ZEND_NAMED_FUNCTION(scoutapm_curl_exec_handler)
     zend_long recorded_arguments_index;
 
 #if PHP_MAJOR_VERSION >= 8
+    const char *class_instance_id;
     ASSIGN_CURL_HANDLE_CLASS_ENTRY
+#else
+    const char *resource_id;
 #endif
 
-    SCOUT_PASSTHRU_IF_ALREADY_INSTRUMENTING()
+    SCOUT_PASSTHRU_IF_ALREADY_INSTRUMENTING(called_function)
 
     called_function = determine_function_name(execute_data);
 
@@ -74,12 +85,17 @@ ZEND_NAMED_FUNCTION(scoutapm_curl_exec_handler)
     handler_index = handler_index_for_function(called_function);
 
 #if PHP_MAJOR_VERSION >= 8
-    recorded_arguments_index = find_index_for_recorded_arguments(unique_class_instance_id(zid));
+    class_instance_id = unique_class_instance_id(zid);
+    recorded_arguments_index = find_index_for_recorded_arguments(class_instance_id);
+    free((void*) class_instance_id);
 #else
-    recorded_arguments_index = find_index_for_recorded_arguments(unique_resource_id(SCOUT_WRAPPER_TYPE_CURL, zid));
+    resource_id = unique_resource_id(SCOUT_WRAPPER_TYPE_CURL, zid);
+    recorded_arguments_index = find_index_for_recorded_arguments(resource_id);
+    free((void*) resource_id);
 #endif
 
     if (recorded_arguments_index < 0) {
+        free((void*) called_function);
         scoutapm_default_handler(INTERNAL_FUNCTION_PARAM_PASSTHRU);
         return;
     }
@@ -93,5 +109,6 @@ ZEND_NAMED_FUNCTION(scoutapm_curl_exec_handler)
         SCOUTAPM_G(disconnected_call_argument_store)[recorded_arguments_index].argc,
         SCOUTAPM_G(disconnected_call_argument_store)[recorded_arguments_index].argv
     );
+    free((void*) called_function);
 }
 #endif

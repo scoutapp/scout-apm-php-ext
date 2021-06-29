@@ -25,11 +25,11 @@
     </lead>
 
     <!-- Current Release -->
-    <date>2021-06-17</date>
-    <time>16:00:00</time>
+    <date>2021-06-29</date>
+    <time>12:00:00</time>
     <version>
-        <release>1.4.0</release>
-        <api>1.4.0</api>
+        <release>1.4.1</release>
+        <api>1.4.1</api>
     </version>
     <stability>
         <release>stable</release>
@@ -37,7 +37,7 @@
     </stability>
     <license uri="https://opensource.org/licenses/MIT">MIT</license>
     <notes>
-        - Only instrument if specifically enabled with scoutapm_enable_instrumentation() (#89)
+        - Fixed memory leaks from DYNAMIC_MALLOC_SPRINTF un-freed usages (#91)
     </notes>
     <!-- End Current Release -->
 
@@ -90,6 +90,7 @@
                 <file name="bug-49.phpt" role="test" />
                 <file name="bug-55.phpt" role="test" />
                 <file name="bug-71.phpt" role="test" />
+                <file name="bug-88.phpt" role="test" />
             </dir>
         </dir>
     </contents>
@@ -109,6 +110,22 @@
     <zendextsrcrelease />
 
     <changelog>
+        <release>
+            <date>2021-06-17</date>
+            <time>16:00:00</time>
+            <version>
+                <release>1.4.0</release>
+                <api>1.4.0</api>
+            </version>
+            <stability>
+                <release>stable</release>
+                <api>stable</api>
+            </stability>
+            <license uri="https://opensource.org/licenses/MIT">MIT</license>
+            <notes>
+                - Only instrument if specifically enabled with scoutapm_enable_instrumentation() (#89)
+            </notes>
+        </release>
         <release>
             <date>2021-06-17</date>
             <time>09:00:00</time>

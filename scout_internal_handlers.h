@@ -42,13 +42,16 @@ typedef struct _handler_lookup {
 /* overload an instance class method by wrapping its handler with our own handler */
 #define SCOUT_OVERLOAD_METHOD(lowercase_class_name, method_name, handler_to_use) SCOUT_OVERLOAD_CLASS_ENTRY_FUNCTION(lowercase_class_name, "->", method_name, handler_to_use)
 
-#define SCOUT_INTERNAL_FUNCTION_PASSTHRU() original_handlers[handler_index_for_function(determine_function_name(execute_data))](INTERNAL_FUNCTION_PARAM_PASSTHRU)
+#define SCOUT_INTERNAL_FUNCTION_PASSTHRU(macro_pt_func_name) \
+    macro_pt_func_name = determine_function_name(execute_data); \
+    original_handlers[handler_index_for_function(macro_pt_func_name)](INTERNAL_FUNCTION_PARAM_PASSTHRU); \
+    free((void *) (macro_pt_func_name))
 
-#define SCOUT_PASSTHRU_IF_ALREADY_INSTRUMENTING()      \
-    if (SCOUTAPM_G(all_instrumentation_enabled) != 1   \
-        || SCOUTAPM_G(currently_instrumenting) == 1) { \
-        SCOUT_INTERNAL_FUNCTION_PASSTHRU();            \
-        return;                                        \
+#define SCOUT_PASSTHRU_IF_ALREADY_INSTRUMENTING(macro_pt_func_name)      \
+    if (SCOUTAPM_G(all_instrumentation_enabled) != 1            \
+        || SCOUTAPM_G(currently_instrumenting) == 1) {          \
+        SCOUT_INTERNAL_FUNCTION_PASSTHRU(macro_pt_func_name); \
+        return;                                                 \
     }
 
 #endif /* SCOUT_INTERNAL_HANDLERS_H */
