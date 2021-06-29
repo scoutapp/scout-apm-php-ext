@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file, in reverse chronological order by release.
 
+## 1.4.2 - 2021-06-29
+
+### Added
+
+- Nothing.
+
+### Changed
+
+- Nothing.
+
+### Deprecated
+
+- Nothing.
+
+### Removed
+
+- Nothing.
+
+### Fixed
+
+- [#92](https://github.com/scoutapp/scout-apm-php-ext/pull/92) Fixed some missed free calls after DYNAMIC_MALLOC_SPRINTF usage in PHP 8 only
+
 ## 1.4.1 - 2021-06-29
 
 ### Added
