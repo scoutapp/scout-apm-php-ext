@@ -11,7 +11,7 @@
 ZEND_NAMED_FUNCTION(scoutapm_fopen_handler)
 {
     zend_string *filename, *mode;
-    zval *argv;
+    zval argv[2];
 
     SCOUT_PASSTHRU_IF_ALREADY_INSTRUMENTING()
 
@@ -20,7 +20,6 @@ ZEND_NAMED_FUNCTION(scoutapm_fopen_handler)
             Z_PARAM_STR(mode)
     ZEND_PARSE_PARAMETERS_END();
 
-    argv = calloc(2, sizeof(zval));
     ZVAL_STR(&argv[0], filename);
     ZVAL_STR(&argv[1], mode);
 
