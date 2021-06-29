@@ -90,6 +90,7 @@
                 <file name="bug-49.phpt" role="test" />
                 <file name="bug-55.phpt" role="test" />
                 <file name="bug-71.phpt" role="test" />
+                <file name="bug-88.phpt" role="test" />
             </dir>
         </dir>
     </contents>
