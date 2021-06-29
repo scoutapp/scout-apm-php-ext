@@ -11,7 +11,7 @@
 ZEND_NAMED_FUNCTION(scoutapm_pdo_prepare_handler)
 {
     zval *statement;
-    const char *passthru_function_name;
+    const char *passthru_function_name, *class_instance_id;
 
     SCOUT_PASSTHRU_IF_ALREADY_INSTRUMENTING(passthru_function_name)
 
@@ -25,14 +25,16 @@ ZEND_NAMED_FUNCTION(scoutapm_pdo_prepare_handler)
         return;
     }
 
-    record_arguments_for_call(unique_class_instance_id(return_value), 1, statement);
+    class_instance_id = unique_class_instance_id(return_value);
+    record_arguments_for_call(class_instance_id, 1, statement);
+    free((void*) class_instance_id);
 }
 
 ZEND_NAMED_FUNCTION(scoutapm_pdostatement_execute_handler)
 {
     int handler_index;
     double entered = scoutapm_microtime();
-    const char *called_function;
+    const char *called_function, *class_instance_id;
     zend_long recorded_arguments_index;
 
     SCOUT_PASSTHRU_IF_ALREADY_INSTRUMENTING(called_function)
@@ -41,7 +43,9 @@ ZEND_NAMED_FUNCTION(scoutapm_pdostatement_execute_handler)
 
     handler_index = handler_index_for_function(called_function);
 
-    recorded_arguments_index = find_index_for_recorded_arguments(unique_class_instance_id(getThis()));
+    class_instance_id = unique_class_instance_id(getThis());
+    recorded_arguments_index = find_index_for_recorded_arguments(class_instance_id);
+    free((void*) class_instance_id);
 
     if (recorded_arguments_index < 0) {
         free((void*) called_function);

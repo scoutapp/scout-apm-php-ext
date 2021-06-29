@@ -12,7 +12,7 @@ ZEND_NAMED_FUNCTION(scoutapm_fopen_handler)
 {
     zend_string *filename, *mode;
     zval argv[2];
-    const char *passthru_function_name;
+    const char *passthru_function_name, *resource_id;
 
     SCOUT_PASSTHRU_IF_ALREADY_INSTRUMENTING(passthru_function_name)
 
@@ -27,7 +27,9 @@ ZEND_NAMED_FUNCTION(scoutapm_fopen_handler)
     SCOUT_INTERNAL_FUNCTION_PASSTHRU(passthru_function_name);
 
     if (Z_TYPE_P(return_value) == IS_RESOURCE) {
-        record_arguments_for_call(unique_resource_id(SCOUT_WRAPPER_TYPE_FILE, return_value), 2, argv);
+        resource_id = unique_resource_id(SCOUT_WRAPPER_TYPE_FILE, return_value);
+        record_arguments_for_call(resource_id, 2, argv);
+        free((void*) resource_id);
     }
 }
 
@@ -36,7 +38,7 @@ ZEND_NAMED_FUNCTION(scoutapm_fread_handler)
     int handler_index;
     double entered = scoutapm_microtime();
     zval *resource_id;
-    const char *called_function;
+    const char *called_function, *str_resource_id;
     zend_long recorded_arguments_index;
 
     SCOUT_PASSTHRU_IF_ALREADY_INSTRUMENTING(called_function)
@@ -49,7 +51,9 @@ ZEND_NAMED_FUNCTION(scoutapm_fread_handler)
 
     handler_index = handler_index_for_function(called_function);
 
-    recorded_arguments_index = find_index_for_recorded_arguments(unique_resource_id(SCOUT_WRAPPER_TYPE_FILE, resource_id));
+    str_resource_id = unique_resource_id(SCOUT_WRAPPER_TYPE_FILE, resource_id);
+    recorded_arguments_index = find_index_for_recorded_arguments(str_resource_id);
+    free((void*) str_resource_id);
 
     if (recorded_arguments_index < 0) {
         free((void*) called_function);
@@ -74,7 +78,7 @@ ZEND_NAMED_FUNCTION(scoutapm_fwrite_handler)
     int handler_index;
     double entered = scoutapm_microtime();
     zval *resource_id;
-    const char *called_function;
+    const char *called_function, *str_resource_id;
     zend_long recorded_arguments_index;
 
     SCOUT_PASSTHRU_IF_ALREADY_INSTRUMENTING(called_function)
@@ -87,7 +91,9 @@ ZEND_NAMED_FUNCTION(scoutapm_fwrite_handler)
 
     handler_index = handler_index_for_function(called_function);
 
-    recorded_arguments_index = find_index_for_recorded_arguments(unique_resource_id(SCOUT_WRAPPER_TYPE_FILE, resource_id));
+    str_resource_id = unique_resource_id(SCOUT_WRAPPER_TYPE_FILE, resource_id);
+    recorded_arguments_index = find_index_for_recorded_arguments(str_resource_id);
+    free((void*) str_resource_id);
 
     if (recorded_arguments_index < 0) {
         free((void*) called_function);

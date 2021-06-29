@@ -59,7 +59,7 @@ double scoutapm_microtime()
 
 void safely_copy_argument_zval_as_scalar(zval *original_to_copy, zval *destination)
 {
-    int len;
+    int len, should_free = 0;
     char *ret;
 
 reference_retry_point:
@@ -83,6 +83,7 @@ reference_retry_point:
             ret = (char*)"(array)";
             break;
         case IS_RESOURCE:
+            should_free = 1;
             DYNAMIC_MALLOC_SPRINTF(ret, len,
                 "resource(%d)",
                 Z_RES_HANDLE_P(original_to_copy)
@@ -96,6 +97,7 @@ reference_retry_point:
              */
             ret = (char*)"object";
 #else
+            should_free = 1;
             DYNAMIC_MALLOC_SPRINTF(ret, len,
                 "object(%s)",
                 ZSTR_VAL(Z_OBJ_HT_P(original_to_copy)->get_class_name(Z_OBJ_P(original_to_copy)))
@@ -107,8 +109,13 @@ reference_retry_point:
     }
 
     ZVAL_STRING(destination, ret);
+
+    if (should_free) {
+        free((void*) ret);
+    }
 }
 
+/** Always free the result from this */
 const char *zval_type_and_value_if_possible(zval *val)
 {
     int len;
@@ -117,11 +124,11 @@ const char *zval_type_and_value_if_possible(zval *val)
 reference_retry_point:
     switch (Z_TYPE_P(val)) {
         case IS_NULL:
-            return "null";
+            return strdup("null");
         case IS_TRUE:
-            return "bool(true)";
+            return strdup("bool(true)");
         case IS_FALSE:
-            return "bool(false)";
+            return strdup("bool(false)");
         case IS_LONG:
             DYNAMIC_MALLOC_SPRINTF(ret, len,
                 "int(%ld)",
@@ -148,7 +155,7 @@ reference_retry_point:
             );
             return ret;
         case IS_ARRAY:
-            return "array";
+            return strdup("array");
         case IS_OBJECT:
             DYNAMIC_MALLOC_SPRINTF(ret, len,
                 "object(%s)",
@@ -159,17 +166,21 @@ reference_retry_point:
             val = Z_REFVAL_P(val);
             goto reference_retry_point;
         default:
-            return "(unknown)";
+            return strdup("(unknown)");
     }
 }
 
+/** Always free the result from this */
 const char *unique_resource_id(const char *scout_wrapper_type, zval *resource_id)
 {
     int len;
     char *ret;
+    const char *zval_type_as_string;
 
     if (Z_TYPE_P(resource_id) != IS_RESOURCE) {
-        zend_throw_exception_ex(NULL, 0, "ScoutAPM ext expected a resource, received: %s", zval_type_and_value_if_possible(resource_id));
+        zval_type_as_string = zval_type_and_value_if_possible(resource_id);
+        zend_throw_exception_ex(NULL, 0, "ScoutAPM ext expected a resource, received: %s", zval_type_as_string);
+        free((void*) zval_type_as_string);
         return "";
     }
 
@@ -182,13 +193,17 @@ const char *unique_resource_id(const char *scout_wrapper_type, zval *resource_id
     return ret;
 }
 
+/** Always free the result from this */
 const char *unique_class_instance_id(zval *class_instance)
 {
     int len;
     char *ret;
+    const char *zval_type_as_string;
 
     if (Z_TYPE_P(class_instance) != IS_OBJECT) {
-        zend_throw_exception_ex(NULL, 0, "ScoutAPM ext expected an object, received: %s", zval_type_and_value_if_possible(class_instance));
+        zval_type_as_string = zval_type_and_value_if_possible(class_instance);
+        zend_throw_exception_ex(NULL, 0, "ScoutAPM ext expected an object, received: %s", zval_type_as_string);
+        free((void*) zval_type_as_string);
         return "";
     }
 

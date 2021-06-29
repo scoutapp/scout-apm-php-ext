@@ -22,7 +22,10 @@ ZEND_NAMED_FUNCTION(scoutapm_curl_setopt_handler)
     const char *passthru_function_name;
 
 #if PHP_MAJOR_VERSION >= 8
+    const char *class_instance_id;
     ASSIGN_CURL_HANDLE_CLASS_ENTRY
+#else
+    const char *resource_id;
 #endif
 
     SCOUT_PASSTHRU_IF_ALREADY_INSTRUMENTING(passthru_function_name)
@@ -39,9 +42,13 @@ ZEND_NAMED_FUNCTION(scoutapm_curl_setopt_handler)
 
     if (options == CURLOPT_URL) {
 #if PHP_MAJOR_VERSION >= 8
-        record_arguments_for_call(unique_class_instance_id(zid), 1, zvalue);
+        class_instance_id = unique_class_instance_id(zid);
+        record_arguments_for_call(class_instance_id, 1, zvalue);
+        free((void*) class_instance_id);
 #else
-        record_arguments_for_call(unique_resource_id(SCOUT_WRAPPER_TYPE_CURL, zid), 1, zvalue);
+        resource_id = unique_resource_id(SCOUT_WRAPPER_TYPE_CURL, zid);
+        record_arguments_for_call(resource_id, 1, zvalue);
+        free((void*) resource_id);
 #endif
     }
 
@@ -57,7 +64,10 @@ ZEND_NAMED_FUNCTION(scoutapm_curl_exec_handler)
     zend_long recorded_arguments_index;
 
 #if PHP_MAJOR_VERSION >= 8
+    const char *class_instance_id;
     ASSIGN_CURL_HANDLE_CLASS_ENTRY
+#else
+    const char *resource_id;
 #endif
 
     SCOUT_PASSTHRU_IF_ALREADY_INSTRUMENTING(called_function)
@@ -75,9 +85,13 @@ ZEND_NAMED_FUNCTION(scoutapm_curl_exec_handler)
     handler_index = handler_index_for_function(called_function);
 
 #if PHP_MAJOR_VERSION >= 8
-    recorded_arguments_index = find_index_for_recorded_arguments(unique_class_instance_id(zid));
+    class_instance_id = unique_class_instance_id(zid);
+    recorded_arguments_index = find_index_for_recorded_arguments(class_instance_id);
+    free((void*) class_instance_id);
 #else
-    recorded_arguments_index = find_index_for_recorded_arguments(unique_resource_id(SCOUT_WRAPPER_TYPE_CURL, zid));
+    resource_id = unique_resource_id(SCOUT_WRAPPER_TYPE_CURL, zid);
+    recorded_arguments_index = find_index_for_recorded_arguments(resource_id);
+    free((void*) resource_id);
 #endif
 
     if (recorded_arguments_index < 0) {

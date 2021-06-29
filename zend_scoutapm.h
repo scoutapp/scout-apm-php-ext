@@ -76,7 +76,10 @@ typedef void (*zif_handler)(INTERNAL_FUNCTION_PARAMETERS);
 #define SCOUTAPM_DEBUG_MESSAGE(...) /**/
 #endif
 
-/* Shortcut defined to allow using a `char *` with snprintf - determine the size first, allocate, then snprintf */
+/*
+ * Shortcut defined to allow using a `char *` with snprintf - determine the size first, allocate, then snprintf
+ * NOTE: When using this macro, the destString must ALWAYS be freed!
+ */
 #define DYNAMIC_MALLOC_SPRINTF(destString, sizeNeeded, fmt, ...) \
     sizeNeeded = snprintf(NULL, 0, fmt, ##__VA_ARGS__) + 1; \
     destString = (char*)malloc(sizeNeeded); \
