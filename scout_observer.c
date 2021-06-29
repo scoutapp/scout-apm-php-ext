@@ -92,6 +92,8 @@ static void scout_observer_end(zend_execute_data *execute_data, zval *return_val
     record_observed_stack_frame(function_name, SCOUTAPM_G(observer_api_start_time), scoutapm_microtime(), argc, argv);
     SCOUTAPM_G(currently_instrumenting) = 0;
     SCOUTAPM_G(observer_api_start_time) = 0;
+
+    free((void*) function_name);
 }
 
 // Note: this is only called FIRST time each function is invoked (better that way)
@@ -109,8 +111,11 @@ zend_observer_fcall_handlers scout_observer_api_register(zend_execute_data *exec
 
     // Can only resolve magic method name at call-time with Observer API, so pass NULL for the magic method name
     if (should_be_instrumented(function_name, NULL) == 0) {
+        free((void*) function_name);
         return handlers;
     }
+
+    free((void*) function_name);
 
     handlers.begin = scout_observer_begin;
     handlers.end = scout_observer_end;
