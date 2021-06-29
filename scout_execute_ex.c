@@ -90,6 +90,7 @@ void scoutapm_execute_internal(zend_execute_data *execute_data, zval *return_val
     function_name = determine_function_name(execute_data);
 
     if (should_be_instrumented(function_name, NULL) == 0) {
+        free((void*) function_name);
         if (original_zend_execute_internal) {
             original_zend_execute_internal(execute_data, return_value);
         } else {
@@ -112,6 +113,7 @@ void scoutapm_execute_internal(zend_execute_data *execute_data, zval *return_val
 
     record_observed_stack_frame(function_name, entered, scoutapm_microtime(), argc, argv);
     SCOUTAPM_G(currently_instrumenting) = 0;
+    free((void*) function_name);
 }
 
 void scoutapm_execute_ex(zend_execute_data *execute_data)
@@ -132,6 +134,7 @@ void scoutapm_execute_ex(zend_execute_data *execute_data)
     function_name = determine_function_name(execute_data);
 
     if (should_be_instrumented(function_name, NULL) == 0) {
+        free((void*) function_name);
         original_zend_execute_ex(execute_data);
         return;
     }
@@ -146,6 +149,7 @@ void scoutapm_execute_ex(zend_execute_data *execute_data)
 
     record_observed_stack_frame(function_name, entered, scoutapm_microtime(), argc, argv);
     SCOUTAPM_G(currently_instrumenting) = 0;
+    free((void*) function_name);
 }
 
 #endif /* SCOUTAPM_INSTRUMENT_USING_OBSERVER_API */

@@ -12,6 +12,8 @@
  * Given some zend_execute_data, figure out what the function/method/static method is being called. The convention used
  * is `ClassName::methodName` for static methods, `ClassName->methodName` for instance methods, and `functionName` for
  * regular functions.
+ *
+ * Result must ALWAYS be free'd, or you'll leak memory.
  */
 const char* determine_function_name(zend_execute_data *execute_data)
 {
@@ -19,7 +21,7 @@ const char* determine_function_name(zend_execute_data *execute_data)
     char *ret;
 
     if (!execute_data->func) {
-        return "<not a function call>";
+        return strdup("<not a function call>");
     }
 
     if (execute_data->func->common.fn_flags & ZEND_ACC_STATIC) {
@@ -38,7 +40,7 @@ const char* determine_function_name(zend_execute_data *execute_data)
         return ret;
     }
 
-    return ZSTR_VAL(execute_data->func->common.function_name);
+    return strdup(ZSTR_VAL(execute_data->func->common.function_name));
 }
 
 /*

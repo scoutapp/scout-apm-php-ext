@@ -19,12 +19,13 @@ ZEND_NAMED_FUNCTION(scoutapm_curl_setopt_handler)
 {
     zval *zid, *zvalue;
     zend_long options;
+    const char *passthru_function_name;
 
 #if PHP_MAJOR_VERSION >= 8
     ASSIGN_CURL_HANDLE_CLASS_ENTRY
 #endif
 
-    SCOUT_PASSTHRU_IF_ALREADY_INSTRUMENTING()
+    SCOUT_PASSTHRU_IF_ALREADY_INSTRUMENTING(passthru_function_name)
 
     ZEND_PARSE_PARAMETERS_START(3, 3)
 #if PHP_MAJOR_VERSION >= 8
@@ -44,7 +45,7 @@ ZEND_NAMED_FUNCTION(scoutapm_curl_setopt_handler)
 #endif
     }
 
-    SCOUT_INTERNAL_FUNCTION_PASSTHRU();
+    SCOUT_INTERNAL_FUNCTION_PASSTHRU(passthru_function_name);
 }
 
 ZEND_NAMED_FUNCTION(scoutapm_curl_exec_handler)
@@ -59,7 +60,7 @@ ZEND_NAMED_FUNCTION(scoutapm_curl_exec_handler)
     ASSIGN_CURL_HANDLE_CLASS_ENTRY
 #endif
 
-    SCOUT_PASSTHRU_IF_ALREADY_INSTRUMENTING()
+    SCOUT_PASSTHRU_IF_ALREADY_INSTRUMENTING(called_function)
 
     called_function = determine_function_name(execute_data);
 
@@ -80,6 +81,7 @@ ZEND_NAMED_FUNCTION(scoutapm_curl_exec_handler)
 #endif
 
     if (recorded_arguments_index < 0) {
+        free((void*) called_function);
         scoutapm_default_handler(INTERNAL_FUNCTION_PARAM_PASSTHRU);
         return;
     }
@@ -93,5 +95,6 @@ ZEND_NAMED_FUNCTION(scoutapm_curl_exec_handler)
         SCOUTAPM_G(disconnected_call_argument_store)[recorded_arguments_index].argc,
         SCOUTAPM_G(disconnected_call_argument_store)[recorded_arguments_index].argv
     );
+    free((void*) called_function);
 }
 #endif
