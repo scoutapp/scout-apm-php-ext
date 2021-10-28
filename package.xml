@@ -25,11 +25,11 @@
     </lead>
 
     <!-- Current Release -->
-    <date>2021-06-29</date>
-    <time>13:00:00</time>
+    <date>2021-10-29</date>
+    <time>09:00:00</time>
     <version>
-        <release>1.4.2</release>
-        <api>1.4.2</api>
+        <release>1.4.3</release>
+        <api>1.4.3</api>
     </version>
     <stability>
         <release>stable</release>
@@ -37,7 +37,7 @@
     </stability>
     <license uri="https://opensource.org/licenses/MIT">MIT</license>
     <notes>
-        - Fixed some missed free calls after DYNAMIC_MALLOC_SPRINTF usage in PHP 8 only (#92)
+        - Fixed segfault when static anonymous functions are called (#94)
     </notes>
     <!-- End Current Release -->
 
@@ -91,6 +91,7 @@
                 <file name="bug-55.phpt" role="test" />
                 <file name="bug-71.phpt" role="test" />
                 <file name="bug-88.phpt" role="test" />
+                <file name="bug-93.phpt" role="test" />
             </dir>
         </dir>
     </contents>
@@ -110,6 +111,22 @@
     <zendextsrcrelease />
 
     <changelog>
+        <release>
+            <date>2021-06-29</date>
+            <time>13:00:00</time>
+            <version>
+                <release>1.4.2</release>
+                <api>1.4.2</api>
+            </version>
+            <stability>
+                <release>stable</release>
+                <api>stable</api>
+            </stability>
+            <license uri="https://opensource.org/licenses/MIT">MIT</license>
+            <notes>
+                - Fixed some missed free calls after DYNAMIC_MALLOC_SPRINTF usage in PHP 8 only (#92)
+            </notes>
+        </release>
         <release>
             <date>2021-06-29</date>
             <time>12:00:00</time>
