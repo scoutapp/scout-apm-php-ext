@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file, in reverse chronological order by release.
 
+## 1.4.3 - 2021-10-29
+
+### Added
+
+- Nothing.
+
+### Changed
+
+- Nothing.
+
+### Deprecated
+
+- Nothing.
+
+### Removed
+
+- Nothing.
+
+### Fixed
+
+- [#94](https://github.com/scoutapp/scout-apm-php-ext/pull/94) Fixed segfault when static anonymous functions are called
+
 ## 1.4.2 - 2021-06-29
 
 ### Added
