@@ -24,7 +24,7 @@ const char* determine_function_name(zend_execute_data *execute_data)
         return strdup("<not a function call>");
     }
 
-    if (execute_data->func->common.fn_flags & ZEND_ACC_STATIC) {
+    if (execute_data->func->common.scope && execute_data->func->common.fn_flags & ZEND_ACC_STATIC) {
         DYNAMIC_MALLOC_SPRINTF(ret, len, "%s::%s",
             ZSTR_VAL(Z_CE(execute_data->This)->name),
             ZSTR_VAL(execute_data->func->common.function_name)
