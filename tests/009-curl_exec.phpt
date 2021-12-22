@@ -30,7 +30,9 @@ float(%f)
 float(%f)
 float(%f)
 bool(true)
-array(1) {
+array(%d) {
   [0]=>
   string(%d) "file://%s/tests/009-curl_exec.php"
+  [1]=>
+  NULL
 }
