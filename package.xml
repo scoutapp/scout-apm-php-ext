@@ -86,6 +86,8 @@
                 <file name="016-memcached-support.phpt" role="test" />
                 <file name="017-elastic-support.phpt" role="test" />
                 <file name="018-do-not-instrument-by-default.phpt" role="test" />
+                <file name="019-url-method-capture-fgc.phpt" role="test" />
+                <file name="020-url-method-capture-curl.phpt" role="test" />
                 <file name="bug-47.phpt" role="test" />
                 <file name="bug-49.phpt" role="test" />
                 <file name="bug-55.phpt" role="test" />

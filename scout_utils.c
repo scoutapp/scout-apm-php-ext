@@ -7,6 +7,9 @@
 
 #include "zend_scoutapm.h"
 #include "scout_extern.h"
+#include <ext/standard/file.h>
+#include <ext/json/php_json.h>
+#include <zend_smart_str.h>
 
 /*
  * Given some zend_execute_data, figure out what the function/method/static method is being called. The convention used
@@ -83,6 +86,17 @@ reference_retry_point:
             ret = (char*)"(array)";
             break;
         case IS_RESOURCE:
+            if (strcasecmp("stream-context", zend_rsrc_list_get_rsrc_type(Z_RES_P(original_to_copy))) == 0) {
+                php_stream_context *stream_context = zend_fetch_resource_ex(original_to_copy, NULL, php_le_stream_context());
+                if (stream_context != NULL) {
+                    smart_str json_encode_string_buffer = {0};
+                    php_json_encode(&json_encode_string_buffer, &stream_context->options, 0);
+                    ZVAL_STR_COPY(destination, json_encode_string_buffer.s);
+                    smart_str_free(&json_encode_string_buffer);
+                    return;
+                }
+            }
+
             should_free = 1;
             DYNAMIC_MALLOC_SPRINTF(ret, len,
                 "resource(%d)",
