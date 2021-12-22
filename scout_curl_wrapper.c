@@ -17,6 +17,7 @@
 
 #define SCOUTAPM_CURLOPT_URL "CURLOPT_URL"
 #define SCOUTAPM_CURLOPT_POST "CURLOPT_POST"
+#define SCOUTAPM_CURLOPT_CUSTOMREQUEST "CURLOPT_CUSTOMREQUEST"
 
 #define SCOUTAPM_CURL_GET_CURLOPT_ADD_TO_ARGV(opt) \
     recorded_arguments_index = scout_curl_get_curlopt(zid, opt); \
@@ -100,6 +101,9 @@ ZEND_NAMED_FUNCTION(scoutapm_curl_setopt_handler)
     if (options == CURLOPT_POST) {
         scout_curl_store_curlopt(zid, SCOUTAPM_CURLOPT_POST, zvalue);
     }
+    if (options == CURLOPT_CUSTOMREQUEST) {
+        scout_curl_store_curlopt(zid, SCOUTAPM_CURLOPT_CUSTOMREQUEST, zvalue);
+    }
 
     SCOUT_INTERNAL_FUNCTION_PASSTHRU(passthru_function_name);
 }
@@ -133,6 +137,7 @@ ZEND_NAMED_FUNCTION(scoutapm_curl_exec_handler)
 
     SCOUTAPM_CURL_GET_CURLOPT_ADD_TO_ARGV(SCOUTAPM_CURLOPT_URL);
     SCOUTAPM_CURL_GET_CURLOPT_ADD_TO_ARGV(SCOUTAPM_CURLOPT_POST);
+    SCOUTAPM_CURL_GET_CURLOPT_ADD_TO_ARGV(SCOUTAPM_CURLOPT_CUSTOMREQUEST);
 
     original_handlers[handler_index](INTERNAL_FUNCTION_PARAM_PASSTHRU);
 

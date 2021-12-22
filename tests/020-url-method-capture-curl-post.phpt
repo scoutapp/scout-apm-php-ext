@@ -1,5 +1,5 @@
 --TEST--
-Both URL and Method can be captured using curl
+Both URL and Method can be captured using curl + CURLOPT_POST
 --SKIPIF--
 <?php if (!extension_loaded("scoutapm")) die("skip scoutapm extension required."); ?>
 <?php if (!extension_loaded("curl")) die("skip curl extension required."); ?>
@@ -29,4 +29,6 @@ array(%d) {
   string(%d) "https://scoutapm.com/robots.txt"
   [%d]=>
   bool(true)
+  [%d]=>
+  NULL
 }
