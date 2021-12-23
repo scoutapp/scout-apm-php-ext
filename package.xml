@@ -25,11 +25,11 @@
     </lead>
 
     <!-- Current Release -->
-    <date>2021-10-29</date>
+    <date>2021-12-23</date>
     <time>09:00:00</time>
     <version>
-        <release>1.4.3</release>
-        <api>1.4.3</api>
+        <release>1.5.0</release>
+        <api>1.5.0</api>
     </version>
     <stability>
         <release>stable</release>
@@ -37,7 +37,7 @@
     </stability>
     <license uri="https://opensource.org/licenses/MIT">MIT</license>
     <notes>
-        - Fixed segfault when static anonymous functions are called (#94)
+        - file_get_contents and curl_exec now record HTTP methods (#96)
     </notes>
     <!-- End Current Release -->
 
@@ -86,6 +86,9 @@
                 <file name="016-memcached-support.phpt" role="test" />
                 <file name="017-elastic-support.phpt" role="test" />
                 <file name="018-do-not-instrument-by-default.phpt" role="test" />
+                <file name="019-url-method-capture-fgc.phpt" role="test" />
+                <file name="020-url-method-capture-curl-post.phpt" role="test" />
+                <file name="020-url-method-capture-curl-customreq.phpt" role="test" />
                 <file name="bug-47.phpt" role="test" />
                 <file name="bug-49.phpt" role="test" />
                 <file name="bug-55.phpt" role="test" />
@@ -111,6 +114,22 @@
     <zendextsrcrelease />
 
     <changelog>
+        <release>
+            <date>2021-10-29</date>
+            <time>09:00:00</time>
+            <version>
+                <release>1.4.3</release>
+                <api>1.4.3</api>
+            </version>
+            <stability>
+                <release>stable</release>
+                <api>stable</api>
+            </stability>
+            <license uri="https://opensource.org/licenses/MIT">MIT</license>
+            <notes>
+                - Fixed segfault when static anonymous functions are called (#94)
+            </notes>
+        </release>
         <release>
             <date>2021-06-29</date>
             <time>13:00:00</time>

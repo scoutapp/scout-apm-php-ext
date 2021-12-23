@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file, in reverse chronological order by release.
 
+## 1.5.0 - 2021-12-23
+
+### Added
+
+- [#96](https://github.com/scoutapp/scout-apm-php-ext/pull/96) file_get_contents and curl_exec now record HTTP methods
+
+### Changed
+
+- Nothing.
+
+### Deprecated
+
+- Nothing.
+
+### Removed
+
+- Nothing.
+
+### Fixed
+
+- Nothing.
+
 ## 1.4.3 - 2021-10-29
 
 ### Added
