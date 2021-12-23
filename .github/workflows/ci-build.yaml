@@ -1,4 +1,4 @@
-name: PHPT Tests
+name: CI Build
 
 on:
   push:
@@ -105,3 +105,23 @@ jobs:
           sudo apt update && sudo apt install time
           ./benchmark.sh
           ./benchmark.sh -w
+
+  check-pecl-valid:
+    name: "Check PECL Package validity"
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php-version:
+          - "8.0"
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup PHP with PECL extension
+        uses: shivammathur/setup-php@v2
+        with:
+          coverage: "none"
+          php-version: "${{ matrix.php-version }}"
+          tools: pecl
+      - name: "Validate PECL Package"
+        run: pecl package-validate
+      - name: "Verify PECL Package Build"
+        run: pecl package
