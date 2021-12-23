@@ -89,11 +89,21 @@ reference_retry_point:
             if (strcasecmp("stream-context", zend_rsrc_list_get_rsrc_type(Z_RES_P(original_to_copy))) == 0) {
                 php_stream_context *stream_context = zend_fetch_resource_ex(original_to_copy, NULL, php_le_stream_context());
                 if (stream_context != NULL) {
+#if PHP_VERSION_ID < 80000
+                    /* ext/json can be shared */
+                    zval args[1], jsonenc;
+
+                    ZVAL_STRINGL(&jsonenc, "json_encode", sizeof("json_encode")-1);
+                    args[0] = stream_context->options;
+                    call_user_function(EG(function_table), NULL, &jsonenc, destination, 1, args);
+#else
+                    /* ext/json is always there */
                     smart_str json_encode_string_buffer = {0};
                     php_json_encode(&json_encode_string_buffer, &stream_context->options, 0);
                     smart_str_0(&json_encode_string_buffer);
                     ZVAL_STR_COPY(destination, json_encode_string_buffer.s);
                     smart_str_free(&json_encode_string_buffer);
+#endif
                     return;
                 }
             }
