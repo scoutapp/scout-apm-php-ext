@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file, in reverse 
 ### Added
 
 - [#96](https://github.com/scoutapp/scout-apm-php-ext/pull/96) file_get_contents and curl_exec now record HTTP methods
+- [#97](https://github.com/scoutapp/scout-apm-php-ext/pull/97) Added CI step to verify PECL package
 
 ### Changed
 
