@@ -91,6 +91,7 @@ reference_retry_point:
                 if (stream_context != NULL) {
                     smart_str json_encode_string_buffer = {0};
                     php_json_encode(&json_encode_string_buffer, &stream_context->options, 0);
+                    smart_str_0(&json_encode_string_buffer);
                     ZVAL_STR_COPY(destination, json_encode_string_buffer.s);
                     smart_str_free(&json_encode_string_buffer);
                     return;
