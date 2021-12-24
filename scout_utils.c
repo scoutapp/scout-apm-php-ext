@@ -95,7 +95,9 @@ reference_retry_point:
 
                     ZVAL_STRINGL(&jsonenc, "json_encode", sizeof("json_encode")-1);
                     args[0] = stream_context->options;
-                    call_user_function(EG(function_table), NULL, &jsonenc, destination, 1, args);
+                    if (FAILURE == call_user_function(EG(function_table), NULL, &jsonenc, destination, 1, args)) {
+                        ZVAL_NULL(destination);
+                    }
                     zval_ptr_dtor(&jsonenc);
 #else
                     /* ext/json is always there */
