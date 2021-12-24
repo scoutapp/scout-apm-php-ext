@@ -25,11 +25,11 @@
     </lead>
 
     <!-- Current Release -->
-    <date>2021-12-23</date>
-    <time>09:00:00</time>
+    <date>2021-12-24</date>
+    <time>14:00:00</time>
     <version>
-        <release>1.5.0</release>
-        <api>1.5.0</api>
+        <release>1.5.1</release>
+        <api>1.5.1</api>
     </version>
     <stability>
         <release>stable</release>
@@ -37,7 +37,7 @@
     </stability>
     <license uri="https://opensource.org/licenses/MIT">MIT</license>
     <notes>
-        - file_get_contents and curl_exec now record HTTP methods (#96)
+        - Fix json_encode usage where ext-json is shared or does not exist - thanks @remicollet (#100)
     </notes>
     <!-- End Current Release -->
 
@@ -114,6 +114,22 @@
     <zendextsrcrelease />
 
     <changelog>
+        <release>
+            <date>2021-12-23</date>
+            <time>09:00:00</time>
+            <version>
+                <release>1.5.0</release>
+                <api>1.5.0</api>
+            </version>
+            <stability>
+                <release>stable</release>
+                <api>stable</api>
+            </stability>
+            <license uri="https://opensource.org/licenses/MIT">MIT</license>
+            <notes>
+                - file_get_contents and curl_exec now record HTTP methods (#96)
+            </notes>
+        </release>
         <release>
             <date>2021-10-29</date>
             <time>09:00:00</time>

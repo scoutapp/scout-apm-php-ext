@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file, in reverse chronological order by release.
 
+## 1.5.1 - 2021-12-24
+
+### Added
+
+- Nothing.
+
+### Changed
+
+- Nothing.
+
+### Deprecated
+
+- Nothing.
+
+### Removed
+
+- Nothing.
+
+### Fixed
+
+- [#100](https://github.com/scoutapp/scout-apm-php-ext/pull/100) Fix json_encode usage where ext-json is shared or does not exist - thanks @remicollet
+
 ## 1.5.0 - 2021-12-23
 
 ### Added
