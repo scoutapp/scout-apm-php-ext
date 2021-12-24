@@ -2,6 +2,7 @@
 Both URL and Method can be captured using file_get_contents
 --SKIPIF--
 <?php if (!extension_loaded("scoutapm")) die("skip scoutapm extension required."); ?>
+<?php if (!extension_loaded("json")) die("skip json extension required."); ?>
 --FILE--
 <?php
 
