@@ -96,4 +96,22 @@ typedef void (*zif_handler)(INTERNAL_FUNCTION_PARAMETERS);
 #define SCOUT_WRAPPER_TYPE_CURL "curl_exec"
 #define SCOUT_WRAPPER_TYPE_FILE "file"
 
+/*
+ * PHP 8.1 adds an assertion for max parameter count; we are greedy with parameters to avoid not enough args errors
+ * See: https://github.com/php/php-src/commit/5070549577bbad13941d7c2bb9a9a8456797baf1
+ */
+#if PHP_VERSION_ID >= 80100
+    #define SCOUT_ZEND_PARSE_PARAMETERS_END() \
+            } while (0); \
+            if (UNEXPECTED(_error_code != ZPP_ERROR_OK)) { \
+                if (!(_flags & ZEND_PARSE_PARAMS_QUIET)) { \
+                    zend_wrong_parameter_error(_error_code, _i, _error, _expected_type, _arg); \
+                } \
+                return; \
+            } \
+        } while (0)
+#else
+    #define SCOUT_ZEND_PARSE_PARAMETERS_END() ZEND_PARSE_PARAMETERS_END()
+#endif
+
 #endif /* ZEND_SCOUTAPM_H */

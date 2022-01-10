@@ -19,7 +19,7 @@ ZEND_NAMED_FUNCTION(scoutapm_fopen_handler)
     ZEND_PARSE_PARAMETERS_START(2, 4)
             Z_PARAM_STR(filename)
             Z_PARAM_STR(mode)
-    ZEND_PARSE_PARAMETERS_END();
+    SCOUT_ZEND_PARSE_PARAMETERS_END();
 
     ZVAL_STR(&argv[0], filename);
     ZVAL_STR(&argv[1], mode);
@@ -47,7 +47,7 @@ ZEND_NAMED_FUNCTION(scoutapm_fread_handler)
 
     ZEND_PARSE_PARAMETERS_START(1, 10)
             Z_PARAM_RESOURCE(resource_id)
-    ZEND_PARSE_PARAMETERS_END();
+    SCOUT_ZEND_PARSE_PARAMETERS_END();
 
     handler_index = handler_index_for_function(called_function);
 
@@ -87,7 +87,7 @@ ZEND_NAMED_FUNCTION(scoutapm_fwrite_handler)
 
     ZEND_PARSE_PARAMETERS_START(1, 10)
             Z_PARAM_RESOURCE(resource_id)
-    ZEND_PARSE_PARAMETERS_END();
+    SCOUT_ZEND_PARSE_PARAMETERS_END();
 
     handler_index = handler_index_for_function(called_function);
 

@@ -17,7 +17,7 @@ ZEND_NAMED_FUNCTION(scoutapm_pdo_prepare_handler)
 
     ZEND_PARSE_PARAMETERS_START(1, 10)
         Z_PARAM_ZVAL(statement)
-    ZEND_PARSE_PARAMETERS_END();
+    SCOUT_ZEND_PARSE_PARAMETERS_END();
 
     SCOUT_INTERNAL_FUNCTION_PASSTHRU(passthru_function_name);
 
