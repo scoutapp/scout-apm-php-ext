@@ -113,7 +113,11 @@ reference_retry_point:
 
             should_free = 1;
             DYNAMIC_MALLOC_SPRINTF(ret, len,
+#if PHP_VERSION_ID >= 80100
+                "resource(%ld)",
+#else
                 "resource(%d)",
+#endif
                 Z_RES_HANDLE_P(original_to_copy)
             );
             break;
@@ -178,7 +182,11 @@ reference_retry_point:
             return ret;
         case IS_RESOURCE:
             DYNAMIC_MALLOC_SPRINTF(ret, len,
+#if PHP_VERSION_ID >= 80100
+                "resource(%ld)",
+#else
                 "resource(%d)",
+#endif
                 Z_RES_HANDLE_P(val)
             );
             return ret;
@@ -213,7 +221,11 @@ const char *unique_resource_id(const char *scout_wrapper_type, zval *resource_id
     }
 
     DYNAMIC_MALLOC_SPRINTF(ret, len,
+#if PHP_VERSION_ID >= 80100
+        "%s_handle(%ld)_type(%d)",
+#else
         "%s_handle(%d)_type(%d)",
+#endif
         scout_wrapper_type,
         Z_RES_HANDLE_P(resource_id),
         Z_RES_TYPE_P(resource_id)
