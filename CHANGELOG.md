@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file, in reverse chronological order by release.
 
+## 1.6.0 - 2022-01-10
+
+### Added
+
+- [#101](https://github.com/scoutapp/scout-apm-php-ext/pull/101) Added support for PHP 8.1
+
+### Changed
+
+- Nothing.
+
+### Deprecated
+
+- Nothing.
+
+### Removed
+
+- Nothing.
+
+### Fixed
+
+- Nothing.
+
 ## 1.5.1 - 2021-12-24
 
 ### Added
