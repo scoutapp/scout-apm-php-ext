@@ -1,4 +1,5 @@
 # C Specific
+*.dep
 
 # Object files
 *.o
