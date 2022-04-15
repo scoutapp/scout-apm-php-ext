@@ -111,3 +111,34 @@ jobs:
           "SIGNING_SECRET_KEY": ${{ secrets.SIGNING_SECRET_KEY }}
           "GIT_AUTHOR_NAME": ${{ secrets.GIT_AUTHOR_NAME }}
           "GIT_AUTHOR_EMAIL": ${{ secrets.GIT_AUTHOR_EMAIL }}
+
+      ####################################################
+      ################ POST RELEASE ASSET ################
+      ####################################################
+
+      - name: Setup PHP with PECL extension
+        uses: shivammathur/setup-php@v2
+        with:
+          coverage: "none"
+          php-version: "8.0"
+          tools: pecl
+      - name: "Build PECL Package"
+        run: pecl package
+      - name: "Fetch new release from Github API"
+        uses: octokit/request-action@v2.x
+        id: get_new_release
+        with:
+          route: GET /repos/{owner}/{repo}/releases/latest
+          owner: scoutapp
+          repo: scout-apm-php-ext
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: "Upload PECL package to latest release"
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ fromJson(steps.get_new_release.outputs.data).upload_url }}
+          asset_path: ./scoutapm-${{ fromJson(steps.get_new_release.outputs.data).tag_name }}.tgz
+          asset_name: scoutapm-${{ fromJson(steps.get_new_release.outputs.data).tag_name }}.tgz
+          asset_content_type: application/gzip
