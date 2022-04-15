@@ -20,6 +20,58 @@ jobs:
       - name: "Checkout"
         uses: "actions/checkout@v2"
 
+      #####################################################
+      ################ RELEASE PREPARATION ################
+      #####################################################
+
+      - name: "Fetch latest release tag from Github API"
+        uses: octokit/request-action@v2.x
+        id: get_latest_release
+        with:
+          route: GET /repos/{owner}/{repo}/releases/latest
+          owner: scoutapp
+          repo: scout-apm-php-ext
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: "Verify that PHP_SCOUTAPM_VERSION has been changed"
+        run: |
+          PREVIOUS_RELEASE="${{ fromJson(steps.get_latest_release.outputs.data).tag_name }}"
+          HEADER_RELEASE="$(cat zend_scoutapm.h | grep "PHP_SCOUTAPM_VERSION" | awk '{print $3}' | tr -d '"')"
+          echo "Previous release: $PREVIOUS_RELEASE"
+          echo "PHP_SCOUTAPM_VERSION in header: $HEADER_RELEASE"
+          if [[ "$PREVIOUS_RELEASE" = "$HEADER_RELEASE" ]]
+          then
+            echo "PHP_SCOUTAPM_VERSION in zend_scoutapm.h has NOT been changed, cannot release"
+            exit 1
+          else
+            echo "Version in zend_scoutapm.h HAS been changed."
+            exit 0
+          fi
+      - name: "Extract latest version from package.xml"
+        uses: QwerMike/xpath-action@v1
+        id: get_package_xml_version
+        with:
+          filename: 'package.xml'
+          expression: "//*[local-name()='package']/*[local-name()='version']/*[local-name()='release']/text()"
+      - name: "Check package.xml version release has been changed"
+        run: |
+          PREVIOUS_RELEASE="${{ fromJson(steps.get_latest_release.outputs.data).tag_name }}"
+          XML_RELEASE="${{ steps.get_package_xml_version.outputs.result }}"
+          echo "Previous release: $PREVIOUS_RELEASE"
+          echo "package.xml version: $XML_RELEASE"
+          if [[ "$PREVIOUS_RELEASE" = "$XML_RELEASE" ]]
+          then
+            echo "package.xml version has NOT been changed, cannot release"
+            exit 1
+          else
+            echo "Version in package.xml HAS been changed."
+            exit 0
+          fi
+
+      ####################################################
+      ################## ACTUAL RELEASE ##################
+      ####################################################
+
       - name: "Release"
         uses: "laminas/automatic-releases@v1"
         with:
