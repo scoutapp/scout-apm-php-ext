@@ -8,7 +8,7 @@ if (shell_exec("which composer") === null) die("skip composer not found in path.
 
 $out = null;
 $result = null;
-exec("mkdir -p /tmp/scout_elastic_test && cd /tmp/scout_elastic_test && composer require -n elasticsearch/elasticsearch", $out, $result);
+exec("mkdir -p /tmp/scout_elastic_test && cd /tmp/scout_elastic_test && composer require -n elasticsearch/elasticsearch:^7.1", $out, $result);
 
 if ($result !== 0) {
   die("skip composer failed: " . implode(", ", $out));
