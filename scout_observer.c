@@ -39,6 +39,10 @@ int setup_functions_for_observer_api()
     ADD_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Elasticsearch\\Client->get");
     ADD_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Elasticsearch\\Client->search");
     ADD_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Elasticsearch\\Client->delete");
+    ADD_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Elastic\\Elasticsearch\\Client->index");
+    ADD_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Elastic\\Elasticsearch\\Client->get");
+    ADD_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Elastic\\Elasticsearch\\Client->search");
+    ADD_FUNCTION_TO_INSTRUMENTATION_SAFE_CATCH("Elastic\\Elasticsearch\\Client->delete");
 #endif
 
     return SUCCESS;
