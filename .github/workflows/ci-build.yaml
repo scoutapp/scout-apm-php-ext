@@ -9,7 +9,9 @@ jobs:
     name: "PHPT Tests"
     services:
       elasticsearch:
-        image: elasticsearch:7.13.1
+        image: elasticsearch:8.1.2
+        # https://github.community/t/services-and-volumes/16313
+        options: "-v ${{ github.workspace }}/.github/elasticsearch8.yml:/usr/share/elasticsearch/config/elasticsearch.yml"
         env:
           discovery.type: single-node
         ports:
