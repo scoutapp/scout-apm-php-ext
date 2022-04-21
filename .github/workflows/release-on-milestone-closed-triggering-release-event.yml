@@ -1,0 +1,144 @@
+# Alternate workflow example.
+# This one is identical to the one in release-on-milestone.yml, with one change:
+# the Release step uses the ORGANIZATION_ADMIN_TOKEN instead, to allow it to
+# trigger a release workflow event. This is useful if you have other actions
+# that intercept that event.
+
+name: "Automatic Releases"
+
+on:
+  milestone:
+    types:
+      - "closed"
+
+jobs:
+  release:
+    name: "GIT tag, release & create merge-up PR"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@v2"
+
+      #####################################################
+      ################ RELEASE PREPARATION ################
+      #####################################################
+
+      - name: "Fetch latest release tag from Github API"
+        uses: octokit/request-action@v2.x
+        id: get_latest_release
+        with:
+          route: GET /repos/{owner}/{repo}/releases/latest
+          owner: scoutapp
+          repo: scout-apm-php-ext
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: "Verify that PHP_SCOUTAPM_VERSION has been changed"
+        run: |
+          PREVIOUS_RELEASE="${{ fromJson(steps.get_latest_release.outputs.data).tag_name }}"
+          HEADER_RELEASE="$(cat zend_scoutapm.h | grep "PHP_SCOUTAPM_VERSION" | awk '{print $3}' | tr -d '"')"
+          echo "Previous release: $PREVIOUS_RELEASE"
+          echo "PHP_SCOUTAPM_VERSION in header: $HEADER_RELEASE"
+          if [[ "$PREVIOUS_RELEASE" = "$HEADER_RELEASE" ]]
+          then
+            echo "PHP_SCOUTAPM_VERSION in zend_scoutapm.h has NOT been changed, cannot release"
+            exit 1
+          else
+            echo "Version in zend_scoutapm.h HAS been changed."
+            exit 0
+          fi
+      - name: "Extract latest version from package.xml"
+        uses: QwerMike/xpath-action@v1
+        id: get_package_xml_version
+        with:
+          filename: 'package.xml'
+          expression: "//*[local-name()='package']/*[local-name()='version']/*[local-name()='release']/text()"
+      - name: "Check package.xml version release has been changed"
+        run: |
+          PREVIOUS_RELEASE="${{ fromJson(steps.get_latest_release.outputs.data).tag_name }}"
+          XML_RELEASE="${{ steps.get_package_xml_version.outputs.result }}"
+          echo "Previous release: $PREVIOUS_RELEASE"
+          echo "package.xml version: $XML_RELEASE"
+          if [[ "$PREVIOUS_RELEASE" = "$XML_RELEASE" ]]
+          then
+            echo "package.xml version has NOT been changed, cannot release"
+            exit 1
+          else
+            echo "Version in package.xml HAS been changed."
+            exit 0
+          fi
+
+      ####################################################
+      ################## ACTUAL RELEASE ##################
+      ####################################################
+
+      - name: "Release"
+        uses: "laminas/automatic-releases@v1"
+        with:
+          command-name: "laminas:automatic-releases:release"
+        env:
+          "GITHUB_TOKEN": ${{ secrets.ORGANIZATION_ADMIN_TOKEN }}
+          "SIGNING_SECRET_KEY": ${{ secrets.SIGNING_SECRET_KEY }}
+          "GIT_AUTHOR_NAME": ${{ secrets.GIT_AUTHOR_NAME }}
+          "GIT_AUTHOR_EMAIL": ${{ secrets.GIT_AUTHOR_EMAIL }}
+
+      - name: "Create Merge-Up Pull Request"
+        uses: "laminas/automatic-releases@v1"
+        with:
+          command-name: "laminas:automatic-releases:create-merge-up-pull-request"
+        env:
+          "GITHUB_TOKEN": ${{ secrets.GITHUB_TOKEN }}
+          "SIGNING_SECRET_KEY": ${{ secrets.SIGNING_SECRET_KEY }}
+          "GIT_AUTHOR_NAME": ${{ secrets.GIT_AUTHOR_NAME }}
+          "GIT_AUTHOR_EMAIL": ${{ secrets.GIT_AUTHOR_EMAIL }}
+
+      - name: "Create and/or Switch to new Release Branch"
+        uses: "laminas/automatic-releases@v1"
+        with:
+          command-name: "laminas:automatic-releases:switch-default-branch-to-next-minor"
+        env:
+          "GITHUB_TOKEN": ${{ secrets.ORGANIZATION_ADMIN_TOKEN }}
+          "SIGNING_SECRET_KEY": ${{ secrets.SIGNING_SECRET_KEY }}
+          "GIT_AUTHOR_NAME": ${{ secrets.GIT_AUTHOR_NAME }}
+          "GIT_AUTHOR_EMAIL": ${{ secrets.GIT_AUTHOR_EMAIL }}
+
+      - name: "Create new milestones"
+        uses: "laminas/automatic-releases@v1"
+        with:
+          command-name: "laminas:automatic-releases:create-milestones"
+        env:
+          "GITHUB_TOKEN": ${{ secrets.GITHUB_TOKEN }}
+          "SIGNING_SECRET_KEY": ${{ secrets.SIGNING_SECRET_KEY }}
+          "GIT_AUTHOR_NAME": ${{ secrets.GIT_AUTHOR_NAME }}
+          "GIT_AUTHOR_EMAIL": ${{ secrets.GIT_AUTHOR_EMAIL }}
+
+      ####################################################
+      ################ POST RELEASE ASSET ################
+      ####################################################
+
+      - name: Setup PHP with PECL extension
+        uses: shivammathur/setup-php@v2
+        with:
+          coverage: "none"
+          php-version: "8.0"
+          tools: pecl
+      - name: "Build PECL Package"
+        run: pecl package
+      - name: "Fetch new release from Github API"
+        uses: octokit/request-action@v2.x
+        id: get_new_release
+        with:
+          route: GET /repos/{owner}/{repo}/releases/latest
+          owner: scoutapp
+          repo: scout-apm-php-ext
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: "Upload PECL package to latest release"
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ fromJson(steps.get_new_release.outputs.data).upload_url }}
+          asset_path: ./scoutapm-${{ fromJson(steps.get_new_release.outputs.data).tag_name }}.tgz
+          asset_name: scoutapm-${{ fromJson(steps.get_new_release.outputs.data).tag_name }}.tgz
+          asset_content_type: application/gzip

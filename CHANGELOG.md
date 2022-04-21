@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file, in reverse chronological order by release.
 
+# THE CHANGELOG HAS MOVED
+
+Please see [the releases page](https://github.com/scoutapp/scout-apm-php-ext/releases) for release 1.7.0 onwards.
+
 ## 1.6.0 - 2022-01-10
 
 ### Added
