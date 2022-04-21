@@ -89,6 +89,7 @@
                 <file name="019-url-method-capture-fgc.phpt" role="test" />
                 <file name="020-url-method-capture-curl-post.phpt" role="test" />
                 <file name="021-url-method-capture-curl-customreq.phpt" role="test" />
+                <file name="022-elastic-8-support.phpt" role="test" />
                 <file name="bug-47.phpt" role="test" />
                 <file name="bug-49.phpt" role="test" />
                 <file name="bug-55.phpt" role="test" />
