@@ -18,7 +18,16 @@ if (!getenv('CI')) {
     require "/tmp/scout_elastic_test/vendor/autoload.php";
 
     // Check Elasticsearch is running & can connect to it
-    // Run with: docker run --rm --name elasticsearch -p 9200:9200 -v $(pwd).github/elasticsearch-8.yml:/usr/share/elasticsearch/config/elasticsearch.yml -e discovery.type=single-node elasticsearch:8.1.2
+    /* Run with:
+docker run --rm --name elasticsearch \
+  -p 9200:9200 \
+  -e discovery.type=single-node \
+  -e xpack.security.enabled=false \
+  -e xpack.security.enrollment.enabled=false \
+  -e xpack.security.http.ssl.enabled=false \
+  -e xpack.security.transport.ssl.enabled=false \
+  elasticsearch:8.1.2
+    */
     $client = \Elastic\Elasticsearch\ClientBuilder::create()
         ->setHosts(['localhost:9200'])
         ->build();
