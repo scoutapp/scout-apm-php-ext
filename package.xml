@@ -25,11 +25,11 @@
     </lead>
 
     <!-- Current Release -->
-    <date>2022-01-10</date>
+    <date>2022-04-21</date>
     <time>10:00:00</time>
     <version>
-        <release>1.6.0</release>
-        <api>1.6.0</api>
+        <release>1.7.0</release>
+        <api>1.7.0</api>
     </version>
     <stability>
         <release>stable</release>
@@ -37,7 +37,9 @@
     </stability>
     <license uri="https://opensource.org/licenses/MIT">MIT</license>
     <notes>
-        - Added support for PHP 8.1 (#101)
+        - Pinned Elasticsearch to ^7.0 as ^8.0 has major BC breaks (#105)
+        - Elasticsearch 8 support (#106)
+        - Added release automation (#103)
     </notes>
     <!-- End Current Release -->
 
@@ -115,6 +117,22 @@
     <zendextsrcrelease />
 
     <changelog>
+        <release>
+            <date>2022-01-10</date>
+            <time>10:00:00</time>
+            <version>
+                <release>1.6.0</release>
+                <api>1.6.0</api>
+            </version>
+            <stability>
+                <release>stable</release>
+                <api>stable</api>
+            </stability>
+            <license uri="https://opensource.org/licenses/MIT">MIT</license>
+            <notes>
+                - Added support for PHP 8.1 (#101)
+            </notes>
+        </release>
         <release>
             <date>2021-12-24</date>
             <time>14:00:00</time>
