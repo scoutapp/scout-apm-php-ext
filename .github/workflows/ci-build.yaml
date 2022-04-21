@@ -9,9 +9,14 @@ jobs:
     name: "PHPT Tests"
     services:
       elasticsearch:
-        image: elasticsearch:7.13.1
+        image: elasticsearch:8.1.2
         env:
           discovery.type: single-node
+          # Disable TLS which is on by default now: https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html
+          xpack.security.enabled: false
+          xpack.security.enrollment.enabled: false
+          xpack.security.http.ssl.enabled: false
+          xpack.security.transport.ssl.enabled: false
         ports:
           - 9200:9200
       memcached:
