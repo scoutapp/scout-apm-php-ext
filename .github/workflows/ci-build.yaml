@@ -34,10 +34,16 @@ jobs:
         run: phpize
       - name: configure
         run: configure --enable-scoutapm --with-prefix=${{steps.setup-php.outputs.prefix}}
+      - name: Zend extension
+        run: sed -i 's/-d extension=/-d zend_extension=/g' Makefile
       - name: make
         run: nmake
+      - name: THING
+        run: |
+          cat Makefile
+          ls -l D:\a\scout-apm-php-ext\scout-apm-php-ext\x64\Release_TS\
       - name: test
-        run: nmake test TESTS=tests
+        run: nmake test
 
   phpt-test:
     name: "PHPT Tests"

@@ -20,5 +20,5 @@ if(PHP_SCOUTAPM != 'no')
 	ADD_FLAG('CFLAGS_SCOUTAPM', '/D WIN32_ONLY_COMPILER=1');
 	PHP_INSTALL_HEADERS("ext/scoutapm", "zend_scoutapm.h scout_recording.h scout_internal_handlers.h scout_extern.h scout_execute_ex.h");
 
-	EXTENSION('scoutapm', scoutapm_sources, PHP_SCOUTAPM_SHARED, "/DZEND_ENABLE_STATIC_TSRMLS_CACHE=1");
+	ZEND_EXTENSION('scoutapm', scoutapm_sources);
 }
