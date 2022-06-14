@@ -17,8 +17,8 @@ if(PHP_SCOUTAPM != 'no')
 							'scout_pdo_wrapper.c ';
 
 	AC_DEFINE('HAVE_SCOUTAPM', 1);
-	ADD_FLAG('CFLAGS_SCOUTAPM', '/D WIN32_ONLY_COMPILER=1');
+	ADD_FLAG('CFLAGS_SCOUTAPM', '/D WIN32_ONLY_COMPILER=1 /wd4005');
 	PHP_INSTALL_HEADERS("ext/scoutapm", "zend_scoutapm.h scout_recording.h scout_internal_handlers.h scout_extern.h scout_execute_ex.h");
 
-	ZEND_EXTENSION('scoutapm', scoutapm_sources);
+	ZEND_EXTENSION('scoutapm', scoutapm_sources, true);
 }
