@@ -64,7 +64,7 @@ array(1) {
     ["argv"]=>
     array(1) {
       [0]=>
-      string(%d) "%s/tests/004-namespaced-fgc-is-not-logged.php"
+      string(%d) "%s%etests%e004-namespaced-fgc-is-not-logged.php"
     }
   }
 }

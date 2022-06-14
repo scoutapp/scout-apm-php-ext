@@ -22,7 +22,7 @@ string(12) "test content"
 string(17) "file_put_contents"
 array(2) {
   [0]=>
-  string(%d) "%sscout-apm-php-ext-test%s"
+  string(%d) "%s"
   [1]=>
   string(12) "test content"
 }
