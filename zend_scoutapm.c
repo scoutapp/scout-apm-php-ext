@@ -90,13 +90,13 @@ ZEND_TSRMLS_CACHE_DEFINE()
 #endif
 
 /* extension_version_info is used by PHP */
-zend_extension_version_info extension_version_info = {
+ZEND_DLEXPORT zend_extension_version_info extension_version_info = {
     ZEND_EXTENSION_API_NO,
     (char*) ZEND_EXTENSION_BUILD_ID
 };
 
 /* zend_extension_entry provides the metadata/information for PHP about this zend extension */
-zend_extension zend_extension_entry = {
+ZEND_DLEXPORT zend_extension zend_extension_entry = {
     (char*) PHP_SCOUTAPM_NAME,
     (char*) PHP_SCOUTAPM_VERSION,
     (char*) "Scout APM",
