@@ -11,10 +11,11 @@ jobs:
       run:
         shell: cmd
     strategy:
+      fail-fast: false
       matrix:
-        version: [ "8.1" ]
-        arch: [ x64 ]
-        ts: [ ts ]
+        version: [ "8.1", "8.0", "7.4", "7.3", "7.2", "7.1" ]
+        arch: [ x64, x86 ]
+        ts: [ ts, nts ]
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
@@ -38,10 +39,6 @@ jobs:
         run: sed -i 's/-d extension=/-d zend_extension=/g' Makefile
       - name: make
         run: nmake
-      - name: THING
-        run: |
-          cat Makefile
-          ls -l D:\a\scout-apm-php-ext\scout-apm-php-ext\x64\Release_TS\
       - name: test
         run: nmake test
 
