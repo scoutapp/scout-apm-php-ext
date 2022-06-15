@@ -20,5 +20,10 @@ if(PHP_SCOUTAPM != 'no')
 	ADD_FLAG('CFLAGS_SCOUTAPM', '/D WIN32_ONLY_COMPILER=1 /wd4005');
 	PHP_INSTALL_HEADERS("ext/scoutapm", "zend_scoutapm.h scout_recording.h scout_internal_handlers.h scout_extern.h scout_execute_ex.h");
 
-	ZEND_EXTENSION('scoutapm', scoutapm_sources, true);
+	// PHP 7.1/7.2 don't have ZEND_EXTENSION
+	if (typeof(ZEND_EXTENSION) == 'undefined') {
+		EXTENSION('scoutapm', scoutapm_sources, true);
+	} else {
+		ZEND_EXTENSION('scoutapm', scoutapm_sources, true);
+	}
 }
