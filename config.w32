@@ -1,29 +1,29 @@
 // vim:ft=javascript
+(function () {
+	ARG_ENABLE('scoutapm', 'Whether to enable scoutapm support', 'no');
+	ARG_ENABLE('scoutapm-debug', 'Whether to enable scoutapm debugging', 'no');
 
-ARG_ENABLE('scoutapm', 'Whether to enable scoutapm support', 'no');
-ARG_ENABLE('scoutapm-debug', 'Whether to enable scoutapm debugging', 'no');
+	if (PHP_SCOUTAPM != 'no') {
+		var scoutapm_sources = 'zend_scoutapm.c ' +
+			'scout_observer.c ' +
+			'scout_execute_ex.c ' +
+			'scout_internal_handlers.c ' +
+			'scout_recording.c ' +
+			'scout_functions.c ' +
+			'scout_utils.c ' +
+			'scout_curl_wrapper.c ' +
+			'scout_file_wrapper.c ' +
+			'scout_pdo_wrapper.c ';
 
-if(PHP_SCOUTAPM != 'no')
-{
-	var scoutapm_sources = 	'zend_scoutapm.c ' +
-							'scout_observer.c ' +
-							'scout_execute_ex.c ' +
-							'scout_internal_handlers.c ' +
-							'scout_recording.c ' +
-							'scout_functions.c ' +
-							'scout_utils.c ' +
-							'scout_curl_wrapper.c ' +
-							'scout_file_wrapper.c ' +
-							'scout_pdo_wrapper.c ';
+		AC_DEFINE('HAVE_SCOUTAPM', 1);
+		ADD_FLAG('CFLAGS_SCOUTAPM', '/D WIN32_ONLY_COMPILER=1 /wd4005');
+		PHP_INSTALL_HEADERS("ext/scoutapm", "zend_scoutapm.h scout_recording.h scout_internal_handlers.h scout_extern.h scout_execute_ex.h");
 
-	AC_DEFINE('HAVE_SCOUTAPM', 1);
-	ADD_FLAG('CFLAGS_SCOUTAPM', '/D WIN32_ONLY_COMPILER=1 /wd4005');
-	PHP_INSTALL_HEADERS("ext/scoutapm", "zend_scoutapm.h scout_recording.h scout_internal_handlers.h scout_extern.h scout_execute_ex.h");
-
-	// PHP 7.1/7.2 don't have ZEND_EXTENSION
-	if (typeof(ZEND_EXTENSION) == 'undefined') {
-		EXTENSION('scoutapm', scoutapm_sources, true);
-	} else {
-		ZEND_EXTENSION('scoutapm', scoutapm_sources, true);
+		// PHP 7.1/7.2 don't have ZEND_EXTENSION
+		if (typeof (ZEND_EXTENSION) == 'undefined') {
+			EXTENSION('scoutapm', scoutapm_sources, true);
+		} else {
+			ZEND_EXTENSION('scoutapm', scoutapm_sources, true);
+		}
 	}
-}
+})();
