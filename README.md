@@ -92,6 +92,34 @@ zbacktrace
 print_cvs
 ```
 
+## Windows builds
+
+ - Read this guide to put below into context: https://wiki.php.net/internals/windows/stepbystepbuild_sdk_2
+ - Read this guide to help get the environment set up: https://gist.github.com/cmb69/47b8c7fb392f5d79b245c74ac496632c
+ - PHP Binary tools - use https://github.com/php/php-sdk-binary-tools (**not** the Microsoft one as it is not maintained)
+ - Once the VS tools + php-sdk-binary-tools is installed, everything is done in this shell:
+   - Start > `Developer Command Prompt for VS 2019`
+   - Then `cd C:\php-sdk`
+   - Then `phpsdk-vs16-x64.bat` - you should now have a prompt `$ `
+ - Install PHP from https://windows.php.net/download/
+   - Download, e.g. ZTS build, https://windows.php.net/downloads/releases/php-8.1.7-Win32-vs16-x64.zip
+   - Extract into `C:\php`
+ - Prepare to compile the ext
+   - Download "Development package" from https://windows.php.net/download/ - make sure TS/NTS depending on above compilation
+     - e.g. https://windows.php.net/downloads/releases/php-devel-pack-8.1.7-nts-Win32-vs16-x64.zip
+   - Extract to `C:\php-sdk\php-8.1.7-devel-vs16-x64`
+   - Add `C:\php-sdk\php-8.1.7-devel-vs16-x64` to your PATH (Start > `env` > Environment variables > "Path" > New)
+   - restart the shell
+ - Compile the ext - go to the ext directory (mine was a VM, mounted in `Z:\`)
+   - Run `winbuild.bat`
+   - Or alternatively:
+     - `phpize`
+     - `configure --enable-scoutapm --enable-debug --with-php-build="C:\php-sdk\phpdev\vs16\x64\deps" --with-prefix="C:\php\"`
+     - `nmake`
+     - Edit `Makefile` - find `CC="$(PHP_CL)"` and replace with `CC="cl.exe"` - for some reason that variable substitution didn't work
+     - Also replace `-d extension=` with `-d zend_extension=`
+     - Run `nmake run ARGS="-m"` and check scoutapm exists in both PHP Modules and Zend modules
+
 ## Release Procedure
 
  - Open `package.xml`

@@ -31,14 +31,14 @@ fread/fwrite test
 string(6) "fwrite"
 array(2) {
   [0]=>
-  string(%d) "/tmp/scoutapm-test%s"
+  string(%d) "%s"
   [1]=>
   string(%d) "w+"
 }
 string(5) "fread"
 array(2) {
   [0]=>
-  string(%d) "/tmp/scoutapm-test%s"
+  string(%d) "%s"
   [1]=>
   string(%d) "w+"
 }

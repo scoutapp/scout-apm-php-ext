@@ -27,5 +27,5 @@ float(%f)
 bool(true)
 array(1) {
   [0]=>
-  string(%d) "%s/tests/002-file_get_contents.php"
+  string(%d) "%s%etests%e002-file_get_contents.php"
 }

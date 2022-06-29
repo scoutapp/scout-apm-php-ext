@@ -12,16 +12,16 @@
         ScoutAPM's extension for PHP provides additional capabilities to application monitoring over just using the base PHP userland library.
     </description>
     <lead>
-        <name>Chris Schneider</name>
-        <user>cschneid</user>
-        <email>chris@scoutapm.com</email>
-        <active>yes</active>
-    </lead>
-    <lead>
         <name>James Titcumb</name>
         <user>asgrim</user>
         <email>james@asgrim.com</email>
         <active>yes</active>
+    </lead>
+    <lead>
+        <name>Chris Schneider</name>
+        <user>cschneid</user>
+        <email>chris@scoutapm.com</email>
+        <active>no</active>
     </lead>
 
     <!-- Current Release -->
@@ -46,6 +46,7 @@
     <contents>
         <dir name="/">
             <file name="config.m4" role="src" />
+            <file name="config.w32" role="src" />
             <file name="scout_curl_wrapper.c" role="src" />
             <file name="scout_execute_ex.c" role="src" />
             <file name="scout_execute_ex.h" role="src" />
@@ -64,7 +65,6 @@
             <file name="README.md" role="doc" />
             <file name="LICENSE" role="doc" />
             <file name="EXPERIMENTAL" role="doc" />
-            <file name="CREDITS" role="doc" />
             <dir name="tests">
                 <file name="external.inc" role="test" />
                 <file name="001-check-ext-loaded.phpt" role="test" />

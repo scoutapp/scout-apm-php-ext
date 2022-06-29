@@ -112,14 +112,17 @@ reference_retry_point:
             }
 
             should_free = 1;
-            DYNAMIC_MALLOC_SPRINTF(ret, len,
 #if PHP_VERSION_ID >= 80100
+            DYNAMIC_MALLOC_SPRINTF(ret, len,
                 "resource(%ld)",
-#else
-                "resource(%d)",
-#endif
                 Z_RES_HANDLE_P(original_to_copy)
             );
+#else
+            DYNAMIC_MALLOC_SPRINTF(ret, len,
+                "resource(%d)",
+                Z_RES_HANDLE_P(original_to_copy)
+            );
+#endif
             break;
         case IS_OBJECT:
 #if PHP_MAJOR_VERSION == 7 && PHP_MINOR_VERSION == 1
@@ -181,14 +184,17 @@ reference_retry_point:
             );
             return ret;
         case IS_RESOURCE:
-            DYNAMIC_MALLOC_SPRINTF(ret, len,
 #if PHP_VERSION_ID >= 80100
+            DYNAMIC_MALLOC_SPRINTF(ret, len,
                 "resource(%ld)",
-#else
-                "resource(%d)",
-#endif
                 Z_RES_HANDLE_P(val)
             );
+#else
+            DYNAMIC_MALLOC_SPRINTF(ret, len,
+                "resource(%d)",
+                Z_RES_HANDLE_P(val)
+            );
+#endif
             return ret;
         case IS_ARRAY:
             return strdup("array");
@@ -220,16 +226,21 @@ const char *unique_resource_id(const char *scout_wrapper_type, zval *resource_id
         return "";
     }
 
-    DYNAMIC_MALLOC_SPRINTF(ret, len,
 #if PHP_VERSION_ID >= 80100
+    DYNAMIC_MALLOC_SPRINTF(ret, len,
         "%s_handle(%ld)_type(%d)",
-#else
-        "%s_handle(%d)_type(%d)",
-#endif
         scout_wrapper_type,
         Z_RES_HANDLE_P(resource_id),
         Z_RES_TYPE_P(resource_id)
     );
+#else
+    DYNAMIC_MALLOC_SPRINTF(ret, len,
+        "%s_handle(%d)_type(%d)",
+        scout_wrapper_type,
+        Z_RES_HANDLE_P(resource_id),
+        Z_RES_TYPE_P(resource_id)
+    );
+#endif
     return ret;
 }
 

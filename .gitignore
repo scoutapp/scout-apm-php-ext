@@ -49,12 +49,17 @@ shtool
 /config.log
 /configure.ac
 /config.status
+/config.nice.bat
+/configure.bat
+/configure.js
 
 # phpize
 /run-tests.php
+/run-tests.php:Zone.Identifier:$DATA
 .libs
 Makefile*
 build
+x64
 tests/*.diff
 tests/*.exp
 tests/*.log

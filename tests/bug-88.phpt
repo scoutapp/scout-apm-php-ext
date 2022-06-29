@@ -2,6 +2,7 @@
 Bug https://github.com/scoutapp/scout-apm-php-ext/issues/88 - memory usage should not increase when no instrumentation happens
 --SKIPIF--
 <?php if (!extension_loaded("scoutapm")) die("skip scoutapm extension required."); ?>
+<?php /* PHP_OS_FAMILY === "Windows" - needs PHP 7.2+ */ if (stripos(PHP_OS, 'Win') === 0) die("skip not for Windows."); ?>
 --FILE--
 <?php
 
