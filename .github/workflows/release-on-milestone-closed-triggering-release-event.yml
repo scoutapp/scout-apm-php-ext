@@ -12,8 +12,35 @@ on:
       - "closed"
 
 jobs:
+  windows-release-build:
+    strategy:
+      fail-fast: false
+      matrix:
+        php: [ "8.1", "8.0", "7.4", "7.3", "7.2", "7.1" ]
+        arch: [ x64, x86 ]
+        ts: [ ts, nts ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/download-artifact@v3
+        with:
+          name: DLL only ${{github.sha}}-${{matrix.php}}-${{matrix.ts}}-${{matrix.arch}}
+      - name: Get the release version
+        id: win_get_release_version
+        run: |
+          HEADER_RELEASE="$(cat zend_scoutapm.h | grep "PHP_SCOUTAPM_VERSION" | awk '{print $3}' | tr -d '"')"
+          echo "::set-output name=version::$HEADER_RELEASE"
+      - name: Prepare zip
+        run: zip php_scoutapm-${{steps.win_get_release_version.outputs.version}}-${{matrix.php}}-${{matrix.ts}}-${{matrix.arch}}.zip php_scoutapm.dll LICENSE README.md CREDITS
+      - name: Add zipped DLL as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: DLL ${{github.sha}}
+          path: php_scoutapm-${{steps.win_get_release_version.outputs.version}}-${{matrix.php}}-${{matrix.ts}}-${{matrix.arch}}.zip
+
   release:
     name: "GIT tag, release & create merge-up PR"
+    needs: [ "windows-release-build" ]
     runs-on: ubuntu-latest
 
     steps:
@@ -142,3 +169,12 @@ jobs:
           asset_path: ./scoutapm-${{ fromJson(steps.get_new_release.outputs.data).tag_name }}.tgz
           asset_name: scoutapm-${{ fromJson(steps.get_new_release.outputs.data).tag_name }}.tgz
           asset_content_type: application/gzip
+      - uses: actions/download-artifact@v3
+        with:
+          name: DLL ${{github.sha}}
+      - name: "Upload Windows DLLs to latest release"
+        uses: alexellis/upload-assets@0.3.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          asset_path:  '["php_scoutapm-*.zip"]'
