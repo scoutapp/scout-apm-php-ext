@@ -49,6 +49,17 @@ jobs:
         run: nmake
       - name: test
         run: nmake test
+      - name: copy DLL to a common place
+        run: |
+          cp .github/workflows/get-build-dir.bat .
+          for /F "usebackq tokens=*" %%i in (`get-build-dir.bat`) do set DLL_FILE=%%i\php_scoutapm.dll
+          echo %DLL_FILE%
+          cp %DLL_FILE% .
+      - name: Upload DLL as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: DLL only ${{github.sha}}-${{matrix.php}}-${{matrix.ts}}-${{matrix.arch}}
+          path: php_scoutapm.dll
 
   phpt-test:
     name: "PHPT Tests"
