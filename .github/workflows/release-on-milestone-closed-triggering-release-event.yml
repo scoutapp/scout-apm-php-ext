@@ -12,6 +12,11 @@ on:
       - "closed"
 
 jobs:
+  # @todo determine:
+  # @todo  - what version we are tagging (From milestone) (e.g. 1.8.0 or 1.8.2) OUTPUT=version_to_tag
+  # @todo  - what the previous semver version is for the new tag (e.g. 1.7.0 or 1.8.1) OUTPUT=previous_semver_version
+  # @todo  - what branch/commit/ref we are going to tag for the new tag OUTPUT=ref_to_tag_with_version
+
   windows-release-build:
     strategy:
       fail-fast: false
@@ -21,6 +26,7 @@ jobs:
         ts: [ ts, nts ]
     runs-on: ubuntu-latest
     steps:
+      # @todo need to do a git checkout at `ref_to_tag_with_version`
       - uses: actions/checkout@v2
       - uses: actions/download-artifact@v3
         with:
@@ -35,26 +41,23 @@ jobs:
       - name: Add zipped DLL as artifact
         uses: actions/upload-artifact@v3
         with:
+          # @todo replace `github.sha` with `version_to_tag`
           name: DLL ${{github.sha}}
           path: php_scoutapm-${{steps.win_get_release_version.outputs.version}}-${{matrix.php}}-${{matrix.ts}}-${{matrix.arch}}.zip
 
-  release:
-    name: "GIT tag, release & create merge-up PR"
+  pre-verify-release:
+    name: "Pre-verify release"
     needs: [ "windows-release-build" ]
     runs-on: ubuntu-latest
-
     steps:
+      # @todo need to do a git checkout at `ref_to_tag_with_version`
       - name: "Checkout"
         uses: "actions/checkout@v2"
-
-      #####################################################
-      ################ RELEASE PREPARATION ################
-      #####################################################
-
-      - name: "Fetch latest release tag from Github API"
+      - name: "Fetch previous release tag from Github API"
         uses: octokit/request-action@v2.x
         id: get_latest_release
         with:
+          # @todo replace this with `/repos/{owner}/{repo}/releases/tags/{{ previous_semver_version }}` (replace `previous_semver_version`)
           route: GET /repos/{owner}/{repo}/releases/latest
           owner: scoutapp
           repo: scout-apm-php-ext
@@ -95,9 +98,14 @@ jobs:
             exit 0
           fi
 
-      ####################################################
-      ################## ACTUAL RELEASE ##################
-      ####################################################
+  release:
+    name: "Tag, release & create merge-up PR"
+    needs: [ "pre-verify-release" ]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@v2"
 
       - name: "Release"
         uses: "laminas/automatic-releases@v1"
@@ -139,10 +147,14 @@ jobs:
           "GIT_AUTHOR_NAME": ${{ secrets.GIT_AUTHOR_NAME }}
           "GIT_AUTHOR_EMAIL": ${{ secrets.GIT_AUTHOR_EMAIL }}
 
-      ####################################################
-      ################ POST RELEASE ASSET ################
-      ####################################################
-
+  post-release-assets:
+    name: "Create assets post-release"
+    needs: [ "release" ]
+    runs-on: ubuntu-latest
+    steps:
+      # @todo need to do a git checkout at `ref_to_tag_with_version`
+      - name: "Checkout"
+        uses: "actions/checkout@v2"
       - name: Setup PHP with PECL extension
         uses: shivammathur/setup-php@v2
         with:
@@ -155,6 +167,7 @@ jobs:
         uses: octokit/request-action@v2.x
         id: get_new_release
         with:
+          # @todo replace this with `/repos/{owner}/{repo}/releases/tags/{{ version_to_tag }}` (replace `version_to_tag`)
           route: GET /repos/{owner}/{repo}/releases/latest
           owner: scoutapp
           repo: scout-apm-php-ext
@@ -171,6 +184,7 @@ jobs:
           asset_content_type: application/gzip
       - uses: actions/download-artifact@v3
         with:
+          # @todo replace `github.sha` with `version_to_tag`
           name: DLL ${{github.sha}}
       - name: "Upload Windows DLLs to latest release"
         uses: alexellis/upload-assets@0.3.0
