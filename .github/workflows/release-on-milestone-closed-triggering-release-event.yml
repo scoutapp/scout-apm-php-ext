@@ -217,8 +217,13 @@ jobs:
         with:
           name: DLL ${{ needs.release_parameters.outputs.version_to_tag }}
       - name: "Upload Windows DLLs to latest release"
-        uses: alexellis/upload-assets@0.3.0
+        # sauce: https://github.com/actions/upload-release-asset/issues/28#issuecomment-675297045
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          asset_path:  '["php_scoutapm-*.zip"]'
+        run: |
+          ls -l php_scoutapm-*.zip
+          RELEASE="${{ needs.release_parameters.outputs.version_to_tag }}"
+          ASSETS=$(find . -type f -name "php_scoutapm-*.zip" -printf "-a %p ")
+          echo "release = $RELEASE"
+          echo "assets = $ASSETS"
+          hub release edit $ASSETS -m "" "$RELEASE"
