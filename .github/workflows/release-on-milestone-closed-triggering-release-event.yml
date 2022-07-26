@@ -12,12 +12,39 @@ on:
       - "closed"
 
 jobs:
-  # @todo determine:
-  # @todo  - what version we are tagging (From milestone) (e.g. 1.8.0 or 1.8.2) OUTPUT=version_to_tag
-  # @todo  - what the previous semver version is for the new tag (e.g. 1.7.0 or 1.8.1) OUTPUT=previous_semver_version
-  # @todo  - what branch/commit/ref we are going to tag for the new tag OUTPUT=ref_to_tag_with_version
+  release_parameters:
+    runs-on: ubuntu-latest
+    outputs:
+      version_to_tag: ${{ steps.version_to_tag_step.outputs.version_to_tag }}
+      previous_semver_version: ${{ steps.previous_semver_version_step.outputs.previous_semver_version }}
+      ref_for_version_to_tag: ${{ steps.ref_for_version_to_tag_step.outputs.ref_for_version_to_tag }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Version we are making
+        id: version_to_tag_step
+        run: |
+          echo "milestone title = ${{ github.event.milestone.title }}"
+          echo "::set-output name=version_to_tag::${{ github.event.milestone.title }}"
+      - name: Previous semver version
+        id: previous_semver_version_step
+        run: |
+          PREVIOUS_SEMVER_VERSION=$(./.github/workflows/get-previous-semver-version.sh ${{ steps.version_to_tag_step.outputs.version_to_tag }})
+          echo "previous semver version = $PREVIOUS_SEMVER_VERSION"
+          echo "::set-output name=previous_semver_version::$PREVIOUS_SEMVER_VERSION"
+      - name: Get the git ref
+        id: ref_for_version_to_tag_step
+        run: |
+          BRANCH_EXTRACT_REGEX="([0-9]+\.[0-9]+)\.[0-9]+"
+          EXPECTED_BRANCH_NAME="$(echo "${{ steps.version_to_tag_step.outputs.version_to_tag }}" | sed -r -e "s/$BRANCH_EXTRACT_REGEX/\1/").x"
+          echo "expected branch name = $EXPECTED_BRANCH_NAME"
+          RELEASE_GIT_SHA=$(git rev-parse origin/$EXPECTED_BRANCH_NAME)
+          echo "ref for version to be tagged = $RELEASE_GIT_SHA"
+          echo "::set-output name=ref_for_version_to_tag::$RELEASE_GIT_SHA"
 
   windows-release-build:
+    needs: [ "release_parameters" ]
     strategy:
       fail-fast: false
       matrix:
@@ -26,11 +53,12 @@ jobs:
         ts: [ ts, nts ]
     runs-on: ubuntu-latest
     steps:
-      # @todo need to do a git checkout at `ref_to_tag_with_version`
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ needs.release_parameters.outputs.ref_for_version_to_tag }}
       - uses: actions/download-artifact@v3
         with:
-          name: DLL only ${{github.sha}}-${{matrix.php}}-${{matrix.ts}}-${{matrix.arch}}
+          name: DLL only ${{ needs.release_parameters.outputs.ref_for_version_to_tag }}-${{matrix.php}}-${{matrix.ts}}-${{matrix.arch}}
       - name: Get the release version
         id: win_get_release_version
         run: |
@@ -38,34 +66,32 @@ jobs:
           echo "::set-output name=version::$HEADER_RELEASE"
       - name: Prepare zip
         run: zip php_scoutapm-${{steps.win_get_release_version.outputs.version}}-${{matrix.php}}-${{matrix.ts}}-${{matrix.arch}}.zip php_scoutapm.dll LICENSE README.md CREDITS
-      - name: Add zipped DLL as artifact
+      - name: Add zipped DLL as artifact for ${{ needs.release_parameters.outputs.version_to_tag }}
         uses: actions/upload-artifact@v3
         with:
-          # @todo replace `github.sha` with `version_to_tag`
-          name: DLL ${{github.sha}}
+          name: DLL ${{ needs.release_parameters.outputs.version_to_tag }}
           path: php_scoutapm-${{steps.win_get_release_version.outputs.version}}-${{matrix.php}}-${{matrix.ts}}-${{matrix.arch}}.zip
 
   pre-verify-release:
     name: "Pre-verify release"
-    needs: [ "windows-release-build" ]
+    needs: [ "release_parameters", "windows-release-build" ]
     runs-on: ubuntu-latest
     steps:
-      # @todo need to do a git checkout at `ref_to_tag_with_version`
-      - name: "Checkout"
-        uses: "actions/checkout@v2"
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ needs.release_parameters.outputs.ref_for_version_to_tag }}
       - name: "Fetch previous release tag from Github API"
         uses: octokit/request-action@v2.x
-        id: get_latest_release
+        id: get_previous_release_step
         with:
-          # @todo replace this with `/repos/{owner}/{repo}/releases/tags/{{ previous_semver_version }}` (replace `previous_semver_version`)
-          route: GET /repos/{owner}/{repo}/releases/latest
+          route: GET /repos/{owner}/{repo}/releases/tags/${{ needs.release_parameters.outputs.previous_semver_version }}
           owner: scoutapp
           repo: scout-apm-php-ext
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: "Verify that PHP_SCOUTAPM_VERSION has been changed"
         run: |
-          PREVIOUS_RELEASE="${{ fromJson(steps.get_latest_release.outputs.data).tag_name }}"
+          PREVIOUS_RELEASE="${{ fromJson(steps.get_previous_release_step.outputs.data).tag_name }}"
           HEADER_RELEASE="$(cat zend_scoutapm.h | grep "PHP_SCOUTAPM_VERSION" | awk '{print $3}' | tr -d '"')"
           echo "Previous release: $PREVIOUS_RELEASE"
           echo "PHP_SCOUTAPM_VERSION in header: $HEADER_RELEASE"
@@ -85,7 +111,7 @@ jobs:
           expression: "//*[local-name()='package']/*[local-name()='version']/*[local-name()='release']/text()"
       - name: "Check package.xml version release has been changed"
         run: |
-          PREVIOUS_RELEASE="${{ fromJson(steps.get_latest_release.outputs.data).tag_name }}"
+          PREVIOUS_RELEASE="${{ fromJson(steps.get_previous_release_step.outputs.data).tag_name }}"
           XML_RELEASE="${{ steps.get_package_xml_version.outputs.result }}"
           echo "Previous release: $PREVIOUS_RELEASE"
           echo "package.xml version: $XML_RELEASE"
@@ -149,12 +175,12 @@ jobs:
 
   post-release-assets:
     name: "Create assets post-release"
-    needs: [ "release" ]
+    needs: [ "release_parameters", "release" ]
     runs-on: ubuntu-latest
     steps:
-      # @todo need to do a git checkout at `ref_to_tag_with_version`
-      - name: "Checkout"
-        uses: "actions/checkout@v2"
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ needs.release_parameters.outputs.ref_for_version_to_tag }}
       - name: Setup PHP with PECL extension
         uses: shivammathur/setup-php@v2
         with:
@@ -165,10 +191,9 @@ jobs:
         run: pecl package
       - name: "Fetch new release from Github API"
         uses: octokit/request-action@v2.x
-        id: get_new_release
+        id: get_new_release_step
         with:
-          # @todo replace this with `/repos/{owner}/{repo}/releases/tags/{{ version_to_tag }}` (replace `version_to_tag`)
-          route: GET /repos/{owner}/{repo}/releases/latest
+          route: GET /repos/{owner}/{repo}/releases/tags/${{ needs.release_parameters.outputs.version_to_tag }}
           owner: scoutapp
           repo: scout-apm-php-ext
         env:
@@ -178,14 +203,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ fromJson(steps.get_new_release.outputs.data).upload_url }}
-          asset_path: ./scoutapm-${{ fromJson(steps.get_new_release.outputs.data).tag_name }}.tgz
-          asset_name: scoutapm-${{ fromJson(steps.get_new_release.outputs.data).tag_name }}.tgz
+          upload_url: ${{ fromJson(steps.get_new_release_step.outputs.data).upload_url }}
+          asset_path: ./scoutapm-${{ fromJson(steps.get_new_release_step.outputs.data).tag_name }}.tgz
+          asset_name: scoutapm-${{ fromJson(steps.get_new_release_step.outputs.data).tag_name }}.tgz
           asset_content_type: application/gzip
       - uses: actions/download-artifact@v3
         with:
-          # @todo replace `github.sha` with `version_to_tag`
-          name: DLL ${{github.sha}}
+          name: DLL ${{ needs.release_parameters.outputs.version_to_tag }}
       - name: "Upload Windows DLLs to latest release"
         uses: alexellis/upload-assets@0.3.0
         env:
