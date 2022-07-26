@@ -56,8 +56,11 @@ jobs:
       - uses: actions/checkout@v3
         with:
           ref: ${{ needs.release_parameters.outputs.ref_for_version_to_tag }}
-      - uses: actions/download-artifact@v3
+      - uses: dawidd6/action-download-artifact@v2
         with:
+          workflow: ci-build.yaml
+          workflow_conclusion: success
+          commit: ${{ needs.release_parameters.outputs.ref_for_version_to_tag }}
           name: DLL only ${{ needs.release_parameters.outputs.ref_for_version_to_tag }}-${{matrix.php}}-${{matrix.ts}}-${{matrix.arch}}
       - name: Get the release version
         id: win_get_release_version
