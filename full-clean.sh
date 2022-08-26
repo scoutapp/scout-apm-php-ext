@@ -4,4 +4,4 @@ set -euxo pipefail
 
 make clean
 phpize --clean
-git clean -f
+git clean -xdn -e .idea
