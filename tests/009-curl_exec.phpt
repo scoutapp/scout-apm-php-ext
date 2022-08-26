@@ -32,7 +32,7 @@ float(%f)
 bool(true)
 array(%d) {
   [%d]=>
-  string(%d) "file://%s/tests/009-curl_exec.php"
+  string(%d) "file://%s%etests%e009-curl_exec.php"
   [%d]=>
   NULL
   [%d]=>
