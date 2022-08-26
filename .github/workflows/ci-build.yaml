@@ -34,11 +34,17 @@ jobs:
           version: ${{matrix.php}}
           arch: ${{matrix.arch}}
           ts: ${{matrix.ts}}
+          deps: libcurl, sqlite3
       - name: Enable Developer Command Prompt
         uses: ilammy/msvc-dev-cmd@v1
         with:
           arch: ${{matrix.arch}}
           toolset: ${{steps.setup-php.outputs.toolset}}
+      - name: Enable required extensions
+        run: |
+          cp .github/workflows/windows-php.ini ${{steps.setup-php.outputs.prefix}}/php.ini
+          echo extension_dir="${{steps.setup-php.outputs.prefix}}\ext" >> ${{steps.setup-php.outputs.prefix}}/php.ini
+          dir ${{steps.setup-php.outputs.prefix}}\ext
       - name: phpize
         run: phpize
       - name: configure
