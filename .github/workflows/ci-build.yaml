@@ -5,6 +5,31 @@ on:
   pull_request:
 
 jobs:
+  curl-compilation-test:
+    name: "Curl Compile"
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        with_curl_ext: ["yes", "no"]
+        with_libcurl: ["yes", "no"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Build the tester tool
+        run: |
+          docker build \
+            --build-arg WITH_CURL_EXT=${{ matrix.with_curl_ext }} \
+            --build-arg WITH_LIBCURL=${{ matrix.with_libcurl }} \
+            --file .github/test-curl-compilation/Dockerfile \
+            --tag scoutapm_ext_test \
+            .
+      - name: Run the tool
+        run: |
+          docker run scoutapm_ext_test > results.txt
+          cat results.txt
+      - name: Check the output
+        run: |
+          diff .github/test-curl-compilation/expected-curlext-${{ matrix.with_curl_ext }}-libcurl-${{ matrix.with_libcurl }}.txt results.txt
   windows-test:
     name: "Win PHPT"
     defaults:
