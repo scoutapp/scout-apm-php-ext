@@ -16,7 +16,8 @@ $phpinfo = array_column(array_map(
 ob_end_clean();
 
 echo sprintf("HAVE_CURL: %s\n", $phpinfo['HAVE_CURL']);
-echo sprintf("Scout CURL instrumentation enabled: %s\n", $phpinfo['functions']);
+echo sprintf("HAVE_SCOUT_CURL: %s\n", $phpinfo['HAVE_SCOUT_CURL']);
+echo sprintf("curl instrumented: %s\n", $phpinfo['enabled']);
 echo sprintf("curl_exec function exists: %s\n", function_exists('curl_exec') ? 'Yes' : 'No');
 echo sprintf("curl_exec is in instrumented list: %s\n", in_array('curl_exec', scoutapm_list_instrumented_functions()) ? 'Yes' : 'No');
 
