@@ -7,6 +7,7 @@
 
 #include "zend_scoutapm.h"
 #include "ext/standard/info.h"
+#include <stdbool.h>
 
 static PHP_GINIT_FUNCTION(scoutapm);
 static PHP_RINIT_FUNCTION(scoutapm);
@@ -45,6 +46,8 @@ static const zend_function_entry scoutapm_functions[] = {
 
 PHP_MINFO_FUNCTION(scoutapm)
 {
+    bool have_scout_curl = false, found_curl_exec = false;
+
     php_info_print_table_start();
     php_info_print_table_header(2, "scoutapm support", "enabled");
     php_info_print_table_row(2, "scoutapm Version", PHP_SCOUTAPM_VERSION);
@@ -56,14 +59,12 @@ PHP_MINFO_FUNCTION(scoutapm)
 #endif
 
 #if HAVE_SCOUT_CURL
-    bool have_scout_curl = true;
+    have_scout_curl = true;
     php_info_print_table_row(2, "scoutapm curl HAVE_SCOUT_CURL", "Yes");
 #else
-    bool have_scout_curl = false;
     php_info_print_table_row(2, "scoutapm curl HAVE_SCOUT_CURL", "No");
 #endif
 
-    bool found_curl_exec = false;
     if (zend_hash_str_find_ptr(EG(function_table), "curl_exec", sizeof("curl_exec") - 1) != NULL) {
         found_curl_exec = true;
     }
