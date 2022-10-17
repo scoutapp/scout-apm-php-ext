@@ -45,21 +45,20 @@ static const zend_function_entry scoutapm_functions[] = {
 
 PHP_MINFO_FUNCTION(scoutapm)
 {
-	php_info_print_table_start();
-	php_info_print_table_header(2, "scoutapm support", "enabled");
-	php_info_print_table_row(2, "Version", PHP_SCOUTAPM_VERSION);
+    php_info_print_table_start();
+    php_info_print_table_header(2, "scoutapm support", "enabled");
+    php_info_print_table_row(2, "scoutapm Version", PHP_SCOUTAPM_VERSION);
 #if HAVE_CURL
-  #if HAVE_SCOUT_CURL
-	php_info_print_table_row(2, "curl functions", "Yes");
-  #else
-	php_info_print_table_row(2, "curl functions", "Not instrumented");
-  #endif
+    php_info_print_table_row(2, "scoutapm curl HAVE_CURL", "Yes");
 #else
-	php_info_print_table_row(2, "curl functions", "No");
+    php_info_print_table_row(2, "scoutapm curl HAVE_CURL", "No");
 #endif
-	php_info_print_table_row(2, "file functions", "Yes");
-	php_info_print_table_row(2, "pdo functions", "Yes");
-	php_info_print_table_end();
+#if HAVE_SCOUT_CURL
+    php_info_print_table_row(2, "scoutapm curl functions", "Yes");
+#else
+    php_info_print_table_row(2, "scoutapm curl functions", "No");
+#endif
+    php_info_print_table_end();
 }
 
 /* scoutapm_module_entry provides the metadata/information for PHP about this PHP module */
