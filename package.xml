@@ -25,11 +25,11 @@
     </lead>
 
     <!-- Current Release -->
-    <date>2022-08-26</date>
-    <time>10:30:00</time>
+    <date>2022-10-18</date>
+    <time>07:30:00</time>
     <version>
-        <release>1.8.2</release>
-        <api>1.8.2</api>
+        <release>1.8.3</release>
+        <api>1.8.3</api>
     </version>
     <stability>
         <release>stable</release>
@@ -37,7 +37,7 @@
     </stability>
     <license uri="https://opensource.org/licenses/MIT">MIT</license>
     <notes>
-        - Enable HAVE_SCOUT_CURL if it is available in the Windows builds (#121)
+        - Improved MINFO output for curl availability (#126)
     </notes>
     <!-- End Current Release -->
 
@@ -115,6 +115,22 @@
     <zendextsrcrelease />
 
     <changelog>
+        <release>
+            <date>2022-08-26</date>
+            <time>10:30:00</time>
+            <version>
+                <release>1.8.2</release>
+                <api>1.8.2</api>
+            </version>
+            <stability>
+                <release>stable</release>
+                <api>stable</api>
+            </stability>
+            <license uri="https://opensource.org/licenses/MIT">MIT</license>
+            <notes>
+                - Enable HAVE_SCOUT_CURL if it is available in the Windows builds (#121)
+            </notes>
+        </release>
         <release>
             <date>2022-07-11</date>
             <time>14:30:00</time>

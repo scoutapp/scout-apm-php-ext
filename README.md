@@ -32,6 +32,40 @@ The following functions are exposed when the extension is enabled:
  * `scoutapm_list_instrumented_functions(): array`
    - Returns a list of the functions the extension will instrument if called.
 
+## Prerequisites for cURL
+
+In order to have instrumentation for cURL functions enabled, you MUST have `libcurl` available when building or
+installing from `pecl`.
+
+For example, if you are using the `ppa:ondrej/php` PPA on Ubuntu, you must install `libcurl` before building `scoutapm`
+extension, e.g.:
+
+```bash
+$ apt-get -y install libcurl4-openssl-dev
+$ pecl install scoutapm
+```
+
+To confirm if cURL instrumentation is working, check `php -i`:
+
+```
+scoutapm
+
+scoutapm support => enabled
+scoutapm Version => 1.8.3
+scoutapm curl HAVE_CURL => No
+scoutapm curl HAVE_SCOUT_CURL => Yes
+scoutapm curl enabled => Yes
+```
+
+* `scoutapm curl HAVE_CURL` was PHP itself compiled with cURL. This will not always be `Yes`, for example when using
+  pre-packaged binaries where `curl` extension is separate.
+* `scoutapm curl HAVE_SCOUT_CURL` was the `scoutapm` extension compiled and `libcurl` available? If this is `No`, then
+  cURL instrumentation will not be available at all.
+* `scoutapm curl enabled` tells you if `scoutapm` has enabled monitoring (i.e. `curl` extension was available at
+  runtime, and `libcurl` was available when `scoutapm` was compiled). _If this value is `No` and you think it
+  should be `Yes`, check that `libcurl` was available when `scoutapm` was compiled, and that you have the `curl` PHP
+  extension enabled._
+
 ## Installing from PECL
 
 The Scout APM extension is available to install using
