@@ -1,0 +1,6 @@
+HAVE_CURL: No
+HAVE_SCOUT_CURL: No
+curl instrumented: No
+curl_exec function exists: No
+curl_exec is in instrumented list: No
+curl_exec call recorded: No
