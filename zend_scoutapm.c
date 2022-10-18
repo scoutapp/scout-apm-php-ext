@@ -7,6 +7,7 @@
 
 #include "zend_scoutapm.h"
 #include "ext/standard/info.h"
+#include <stdbool.h>
 
 static PHP_GINIT_FUNCTION(scoutapm);
 static PHP_RINIT_FUNCTION(scoutapm);
@@ -45,21 +46,32 @@ static const zend_function_entry scoutapm_functions[] = {
 
 PHP_MINFO_FUNCTION(scoutapm)
 {
-	php_info_print_table_start();
-	php_info_print_table_header(2, "scoutapm support", "enabled");
-	php_info_print_table_row(2, "Version", PHP_SCOUTAPM_VERSION);
+    bool have_scout_curl = false, found_curl_exec = false;
+
+    php_info_print_table_start();
+    php_info_print_table_header(2, "scoutapm support", "enabled");
+    php_info_print_table_row(2, "scoutapm Version", PHP_SCOUTAPM_VERSION);
+
 #if HAVE_CURL
-  #if HAVE_SCOUT_CURL
-	php_info_print_table_row(2, "curl functions", "Yes");
-  #else
-	php_info_print_table_row(2, "curl functions", "Not instrumented");
-  #endif
+    php_info_print_table_row(2, "scoutapm curl HAVE_CURL", "Yes");
 #else
-	php_info_print_table_row(2, "curl functions", "No");
+    php_info_print_table_row(2, "scoutapm curl HAVE_CURL", "No");
 #endif
-	php_info_print_table_row(2, "file functions", "Yes");
-	php_info_print_table_row(2, "pdo functions", "Yes");
-	php_info_print_table_end();
+
+#if HAVE_SCOUT_CURL
+    have_scout_curl = true;
+    php_info_print_table_row(2, "scoutapm curl HAVE_SCOUT_CURL", "Yes");
+#else
+    php_info_print_table_row(2, "scoutapm curl HAVE_SCOUT_CURL", "No");
+#endif
+
+    if (zend_hash_str_find_ptr(EG(function_table), "curl_exec", sizeof("curl_exec") - 1) != NULL) {
+        found_curl_exec = true;
+    }
+
+    php_info_print_table_row(2, "scoutapm curl enabled", (have_scout_curl && found_curl_exec) ? "Yes" : "No");
+
+    php_info_print_table_end();
 }
 
 /* scoutapm_module_entry provides the metadata/information for PHP about this PHP module */
