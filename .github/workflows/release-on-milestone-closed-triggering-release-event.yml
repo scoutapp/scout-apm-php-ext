@@ -146,6 +146,16 @@ jobs:
           "GIT_AUTHOR_NAME": ${{ secrets.GIT_AUTHOR_NAME }}
           "GIT_AUTHOR_EMAIL": ${{ secrets.GIT_AUTHOR_EMAIL }}
 
+      - name: "Fetch rate limit stats"
+        uses: octokit/request-action@v2.x
+        id: get_latest_release
+        with:
+          route: GET /rate_limit
+        env:
+          GITHUB_TOKEN: ${{ secrets.ORGANIZATION_ADMIN_TOKEN }}
+      - name: "Display rate limit stats"
+        run: echo "${{ steps.get_latest_release.outputs.data }}"
+
       - name: "Create Merge-Up Pull Request"
         uses: "docker://ghcr.io/laminas/automatic-releases:1.13"
         with:
