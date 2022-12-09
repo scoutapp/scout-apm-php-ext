@@ -23,7 +23,7 @@
 #include "scout_execute_ex.h"
 
 #define PHP_SCOUTAPM_NAME "scoutapm"
-#define PHP_SCOUTAPM_VERSION "1.8.3"
+#define PHP_SCOUTAPM_VERSION "1.9.0"
 
 /* Extreme amounts of debugging, set to 1 to enable it and `make clean && make` (tests will fail...) */
 #define SCOUT_APM_EXT_DEBUGGING 0
