@@ -25,11 +25,11 @@
     </lead>
 
     <!-- Current Release -->
-    <date>2022-10-18</date>
-    <time>07:30:00</time>
+    <date>2022-12-09</date>
+    <time>11:00:00</time>
     <version>
-        <release>1.8.3</release>
-        <api>1.8.3</api>
+        <release>1.9.0</release>
+        <api>1.9.0</api>
     </version>
     <stability>
         <release>stable</release>
@@ -37,7 +37,7 @@
     </stability>
     <license uri="https://opensource.org/licenses/MIT">MIT</license>
     <notes>
-        - Improved MINFO output for curl availability (#126)
+        - Add PHP 8.2 support (#125)
     </notes>
     <!-- End Current Release -->
 
@@ -104,7 +104,7 @@
         <required>
             <php>
                 <min>7.1.0</min>
-                <max>8.1.99</max>
+                <max>8.2.99</max>
             </php>
             <pearinstaller>
                 <min>1.9.1</min>
@@ -115,6 +115,22 @@
     <zendextsrcrelease />
 
     <changelog>
+        <release>
+            <date>2022-10-18</date>
+            <time>07:30:00</time>
+            <version>
+                <release>1.8.3</release>
+                <api>1.8.3</api>
+            </version>
+            <stability>
+                <release>stable</release>
+                <api>stable</api>
+            </stability>
+            <license uri="https://opensource.org/licenses/MIT">MIT</license>
+            <notes>
+                - Improved MINFO output for curl availability (#126)
+            </notes>
+        </release>
         <release>
             <date>2022-08-26</date>
             <time>10:30:00</time>

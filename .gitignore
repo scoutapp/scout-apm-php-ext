@@ -52,6 +52,7 @@ shtool
 /config.nice.bat
 /configure.bat
 /configure.js
+/configure~
 
 # phpize
 /run-tests.php
