@@ -51,7 +51,7 @@ To confirm if cURL instrumentation is working, check `php -i`:
 scoutapm
 
 scoutapm support => enabled
-scoutapm Version => 1.8.3
+scoutapm Version => 1.9.1
 scoutapm curl HAVE_CURL => No
 scoutapm curl HAVE_SCOUT_CURL => Yes
 scoutapm curl enabled => Yes
