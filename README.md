@@ -17,6 +17,7 @@ This extension allows instrumentation of:
  * Memcached PHP extension methods
  * Elasticsearch PHP library methods
 
+
 If you would like another function instrumented, please let us know on
 [our issues](https://github.com/scoutapp/scout-apm-php-ext/issues).
 
