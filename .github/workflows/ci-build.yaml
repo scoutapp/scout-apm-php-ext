@@ -194,7 +194,12 @@ jobs:
         run: |
           sudo pear update-channels
           sudo pecl update-channels
-      - name: "Install Redis extension"
+      - name: "Install Redis extension (PHP 7.1)"
+        if: ${{ startsWith(matrix.php-version, '7.1.') }}
+        run: |
+          echo '' | sudo pecl install redis-5.3.7
+      - name: "Install Redis extension (PHP 7.2+)"
+        if: ${{ startsWith(matrix.php-version, '7.1.') != true }}
         run: |
           echo '' | sudo pecl install redis
       - name: "Install Memcached extension"
