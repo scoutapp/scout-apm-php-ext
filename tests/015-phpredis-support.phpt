@@ -116,7 +116,7 @@ array(%d) {
   [%d]=>
   string(%d) "Redis->del"
   [%d]=>
-  string(%d) "Redis->getSet"
+  string(%d) "Redis->get%cet"
   [%d]=>
   string(%d) "Redis->getRange"
   [%d]=>
