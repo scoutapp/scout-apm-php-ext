@@ -162,6 +162,11 @@ jobs:
           - { os: ubuntu-22.04, php-version: 8.0.0 }
           - { os: ubuntu-22.04, php-version: 8.0.26 }
     steps:
+      - name: "Purge built-in PHP version"
+        run: |
+          echo "libmemcached11 php* hhvm libhashkit2" | xargs -n 1 sudo apt-get purge --assume-yes || true
+          sudo apt-add-repository --remove ppa:ondrej/php -y
+          sudo apt-get update
       - uses: actions/checkout@v3
 
       - name: "Set ZTS mode, PHP 8+"
@@ -186,7 +191,7 @@ jobs:
           wget ${{ env.php_src_download_url }}
           tar zxf php-${{ matrix.php-version }}.tar.gz
           cd php-${{ matrix.php-version }}
-          ./configure --enable-debug --with-openssl ${{ env.zts_flag }} ${{ matrix.php-options }}
+          ./configure --with-pear --enable-debug --with-openssl ${{ env.zts_flag }} ${{ matrix.php-options }}
           make -j$(nproc)
           sudo make install
           cd $GITHUB_WORKSPACE
@@ -194,7 +199,12 @@ jobs:
         run: |
           sudo pear update-channels
           sudo pecl update-channels
-      - name: "Install Redis extension"
+      - name: "Install Redis extension (PHP 7.1)"
+        if: ${{ startsWith(matrix.php-version, '7.1.') }}
+        run: |
+          echo '' | sudo pecl install redis-5.3.7
+      - name: "Install Redis extension (PHP 7.2+)"
+        if: ${{ startsWith(matrix.php-version, '7.1.') != true }}
         run: |
           echo '' | sudo pecl install redis
       - name: "Install Memcached extension"
