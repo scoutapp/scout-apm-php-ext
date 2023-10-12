@@ -78,6 +78,20 @@ $ sudo pecl install scoutapm
 You may need to add `zend_extension=scoutapm.so` into your `php.ini` to
 enable the extension.
 
+## Installing with Docker
+
+If you are using Docker, with the [official PHP images](https://hub.docker.com/_/php), you can install the `scoutapm`
+extension using PECL still, for example:
+
+```dockerfile
+FROM php:8.2-cli
+
+RUN pecl install scoutapm-1.9.1 \
+    && docker-php-ext-enable scoutapm
+```
+
+For more information on this installation method, see [here](https://github.com/docker-library/docs/tree/master/php#pecl-extensions).
+
 ## Building
 
 ```bash
@@ -102,15 +116,6 @@ See <https://dev.to/jasny/developing-a-php-extension-in-clion-3oo1>.
 $ /path/to/bin/phpize
 $ ./configure --with-php-config=/path/to/bin/php-config --enable-scoutapm
 $ make test
-```
-
-## Building with Docker
-
-@todo: make docker build configurable...
-
-```bash
-docker build .
-docker run -v $PWD/modules:/v <hash_from_build>
 ```
 
 ## Debugging
