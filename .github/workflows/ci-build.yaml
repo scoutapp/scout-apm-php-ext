@@ -146,7 +146,7 @@ jobs:
           - 8.1.24
           - 8.2.0
           - 8.2.11
-          - 8.3.0RC3
+          - 8.3.0RC4
         zts-mode:
           - zts
           - nts
@@ -186,7 +186,7 @@ jobs:
         run: echo "php_src_download_url=https://www.php.net/distributions/php-${{ matrix.php-version }}.tar.gz" >> $GITHUB_ENV
       - name: "PHP 8.3 RC URL override"
         if: ${{ startsWith(matrix.php-version, '8.3.') }}
-        run: echo "php_src_download_url=https://downloads.php.net/~jakub/php-${{ matrix.php-version }}.tar.gz" >> $GITHUB_ENV
+        run: echo "php_src_download_url=https://github.com/php/php-src/archive/refs/tags/php-${{ matrix.php-version }}.tar.gz" >> $GITHUB_ENV
 
       - name: "Install PHP ${{ matrix.php-version }} (${{ env.zts_flag}} ${{ matrix.php-options }})"
         run: |
