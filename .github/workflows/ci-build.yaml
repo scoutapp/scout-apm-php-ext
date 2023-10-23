@@ -201,6 +201,7 @@ jobs:
           ls -l
           cd *
           ls -l
+          ./buildconf --force
           ./configure --with-pear --enable-debug --with-openssl ${{ env.zts_flag }} ${{ matrix.php-options }}
           make -j$(nproc)
           sudo make install
