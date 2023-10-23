@@ -191,7 +191,7 @@ jobs:
       - name: "Install PHP ${{ matrix.php-version }} (${{ env.zts_flag}} ${{ matrix.php-options }})"
         run: |
           sudo DEBIAN_FRONTEND=noninteractive apt-get update
-          sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install software-properties-common build-essential autoconf libxml2-dev libsqlite3-dev libcurl4-openssl-dev
+          sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install software-properties-common build-essential autoconf libxml2-dev libsqlite3-dev libcurl4-openssl-dev re2c
           mkdir -p /tmp/php
           cd /tmp/php
           echo "Downloading release from ${{ env.php_src_download_url }} ..."
