@@ -192,11 +192,15 @@ jobs:
         run: |
           sudo DEBIAN_FRONTEND=noninteractive apt-get update
           sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install software-properties-common build-essential autoconf libxml2-dev libsqlite3-dev libcurl4-openssl-dev
-          cd /tmp
+          mkdir -p /tmp/php
+          cd /tmp/php
           echo "Downloading release from ${{ env.php_src_download_url }} ..."
-          wget ${{ env.php_src_download_url }}
-          tar zxf php-${{ matrix.php-version }}.tar.gz
-          cd php-${{ matrix.php-version }}
+          wget -O php.tgz ${{ env.php_src_download_url }}
+          tar zxf php.tgz
+          rm php.tgz
+          ls -l
+          cd *
+          ls -l
           ./configure --with-pear --enable-debug --with-openssl ${{ env.zts_flag }} ${{ matrix.php-options }}
           make -j$(nproc)
           sudo make install
