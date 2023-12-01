@@ -48,7 +48,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: [ "8.2", "8.1", "8.0", "7.4", "7.3", "7.2", "7.1" ]
+        php: [ "8.3", "8.2", "8.1", "8.0", "7.4", "7.3", "7.2", "7.1" ]
         arch: [ x64, x86 ]
         ts: [ ts, nts ]
     runs-on: ubuntu-latest
@@ -201,6 +201,9 @@ jobs:
           coverage: "none"
           php-version: "8.0"
           tools: pecl
+      # `hub` was removed... https://github.com/actions/runner-images/issues/8362
+      - name: "Install hub"
+        run: sudo apt-get update && sudo apt-get install -y hub
       - name: "Build PECL Package"
         run: pecl package
       - name: "Fetch new release from Github API"
