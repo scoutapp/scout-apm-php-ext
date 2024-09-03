@@ -222,7 +222,7 @@ jobs:
           asset_path: ./scoutapm-${{ fromJson(steps.get_new_release_step.outputs.data).tag_name }}.tgz
           asset_name: scoutapm-${{ fromJson(steps.get_new_release_step.outputs.data).tag_name }}.tgz
           asset_content_type: application/gzip
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4.1.7
         with:
           name: DLL ${{ needs.release_parameters.outputs.version_to_tag }}
       - name: "Upload Windows DLLs to latest release"
